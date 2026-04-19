@@ -1,0 +1,41 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/**/*.{js,ts,sh}"],
+      "ignore": ["**/dist/**", "**/.nx/**", "**/node_modules/**"]
+    },
+    "apps/sample-api": {
+      "entry": ["src/main.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "apps/sample-web": {
+      "entry": [
+        "src/main.tsx",
+        "vite.config.ts",
+        "playwright.config.ts",
+        "e2e/**/*.spec.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "shared/*": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "tools/*": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts"]
+    }
+  },
+  "ignoreDependencies": [
+    "@nx/eslint",
+    "@nx/js",
+    "@nx/nest",
+    "@nx/playwright",
+    "@nx/react",
+    "@nx/vite",
+    "@playwright/test",
+    "vitest"
+  ],
+  "ignoreExportsUsedInFile": true
+}

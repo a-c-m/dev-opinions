@@ -1,0 +1,92 @@
+# Dependabot configuration — see ADR 0018.
+# Four ecosystems on a staggered weekly cadence so review load spreads across
+# the week. Minor + patch grouped; majors open individually.
+
+version: 2
+updates:
+
+  # --------------------------------------------------------------------------
+  # npm — app code. Covers root + every workspace package via `directory: /`.
+  # --------------------------------------------------------------------------
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    groups:
+      npm-minor-and-patch:
+        update-types: ["minor", "patch"]
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+
+  # --------------------------------------------------------------------------
+  # GitHub Actions — keep CI current. Covers workflow uses: and composite
+  # actions under .github/actions/.
+  # --------------------------------------------------------------------------
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "08:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 1
+    groups:
+      actions-minor-and-patch:
+        update-types: ["minor", "patch"]
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # --------------------------------------------------------------------------
+  # Docker — Dockerfiles at any depth. `directories` (plural, 2024+ syntax)
+  # is needed to scan beyond the repo root. Node major pinned by the platform
+  # ADR (see .nvmrc); ignore that axis here.
+  # --------------------------------------------------------------------------
+  - package-ecosystem: "docker"
+    directories:
+      - "/"
+      - "/apps/*"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "08:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+    commit-message:
+      prefix: "chore(docker)"
+    labels:
+      - "dependencies"
+      - "docker"
+
+  # --------------------------------------------------------------------------
+  # Terraform / OpenTofu providers — under apps/*/iac/ and shared/infra/.
+  # `directories` (plural) required to recurse into per-app IaC.
+  # --------------------------------------------------------------------------
+  - package-ecosystem: "terraform"
+    directories:
+      - "/apps/*/iac"
+      - "/shared/infra/*"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "08:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(iac)"
+    labels:
+      - "dependencies"
+      - "iac"

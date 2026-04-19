@@ -1,0 +1,39 @@
+node_modules/
+dist/
+build/
+coverage/
+.nx/
+.next/
+.turbo/
+.cache/
+
+# env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+!.vscode/settings.json.example
+
+# playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# beads — local task manager, wired via .claude/skills/beads-local-tasks.md
+# State is intentionally local-only (user convention); team tasks live on GitHub Issues.
+.beads/
+
+# Claude Code runtime cruft (session state, not template content).
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+
+# misc
+*.log
+*.tsbuildinfo

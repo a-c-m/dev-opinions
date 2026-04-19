@@ -1,0 +1,60 @@
+name: Setup monorepo
+description: Checkout, Node via .nvmrc, pnpm via Corepack, cached install.
+
+inputs:
+  fetch-depth:
+    description: git clone depth. `0` for full history (needed for nx affected base).
+    required: false
+    default: "0"
+  install:
+    description: Run `pnpm install --frozen-lockfile`. Set to `false` to skip for actions that only need the checkout and caches.
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+
+    - name: Read Node version from .nvmrc
+      id: node-version
+      shell: bash
+      run: echo "version=$(cat .nvmrc | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ steps.node-version.outputs.version }}
+
+    - name: Enable Corepack (pnpm)
+      shell: bash
+      run: corepack enable
+
+    - name: Resolve pnpm store path
+      id: pnpm-store
+      shell: bash
+      run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache pnpm store
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: pnpm-store-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-store-${{ runner.os }}-
+
+    - name: Cache NX
+      uses: actions/cache@v4
+      with:
+        path: .nx/cache
+        key: nx-${{ runner.os }}-${{ github.sha }}
+        restore-keys: |
+          nx-${{ runner.os }}-
+
+    - name: Install dependencies
+      if: inputs.install == 'true'
+      shell: bash
+      run: pnpm install --frozen-lockfile

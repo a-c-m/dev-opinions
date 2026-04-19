@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check:
+    name: Lint / Typecheck / Test / Knip
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        uses: ./.github/actions/setup-monorepo
+
+      - name: NX SHAs (for affected)
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Lint (affected)
+        run: pnpm exec nx affected --target=lint
+
+      - name: Typecheck (affected)
+        run: pnpm exec nx affected --target=typecheck
+
+      - name: Test (affected)
+        run: pnpm exec nx affected --target=test
+
+      - name: Dead code (full repo)
+        run: pnpm knip
+
+  lint-baseline:
+    name: Lint baseline (bs check)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        uses: ./.github/actions/setup-monorepo
+
+      - name: bs check with baseline enforcement
+        run: pnpm lint:ci
+
+  security:
+    name: Security (Trivy)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trivy vulnerability + secret + misconfig scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: false
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: "1"
+
+      - name: Upload SARIF to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm test:e2e:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm knip:*)",
+      "Bash(pnpm check:*)",
+      "Bash(pnpm commit:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm nx:*)",
+      "Bash(nx:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git restore:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh issue:*)",
+      "Bash(ls:*)",
+      "Bash(./.claude/commands/check.sh)",
+      "Bash(./.claude/commands/create-issue.sh:*)",
+      "Bash(./.claude/commands/create-pr.sh:*)",
+      "Bash(bd:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "./.claude/hooks/biome-check.sh" },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/prevent-wait-for-timeout.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "./.claude/hooks/echo-detection.sh" },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/check-biome-commands.sh"
+          },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/check-biome-unsafe.sh"
+          },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/check-git-commands.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.claude/hooks/post-edit-checks.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "./.claude/hooks/commit-format.sh" }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.claude/hooks/beads-session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

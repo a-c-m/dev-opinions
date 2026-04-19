@@ -1,0 +1,6 @@
+# Trivy ignore file — add CVE IDs, misconfig IDs, or secret IDs with a reason.
+# Example (never add without a reason and a review date):
+#
+#   # CVE-2024-12345 — false positive; upstream patched in 1.2.4 but detector lags.
+#   # review: 2026-07-01
+#   CVE-2024-12345

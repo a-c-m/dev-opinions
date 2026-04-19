@@ -1,0 +1,48 @@
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: "*.{ts,tsx,js,jsx,json,jsonc}"
+      run: pnpm exec biome check --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true
+    typecheck-affected:
+      # Skip on the very first commit (no HEAD~1 to diff against).
+      run: |
+        if git rev-parse HEAD~1 >/dev/null 2>&1; then
+          pnpm exec nx affected --target=typecheck --base=HEAD~1
+        else
+          echo "initial commit — skipping nx affected typecheck"
+        fi
+
+pre-push:
+  parallel: true
+  commands:
+    # On a normal push, run nx affected. On the initial push (no HEAD~1),
+    # fall back to run-many so the full repo is checked once before it
+    # reaches the remote — we never skip validation silently.
+    lint-affected:
+      run: |
+        if git rev-parse HEAD~1 >/dev/null 2>&1; then
+          pnpm exec nx affected --target=lint
+        else
+          pnpm exec nx run-many --target=lint --all
+        fi
+    test-affected:
+      run: |
+        if git rev-parse HEAD~1 >/dev/null 2>&1; then
+          pnpm exec nx affected --target=test
+        else
+          pnpm exec nx run-many --target=test --all
+        fi
+    typecheck-affected:
+      run: |
+        if git rev-parse HEAD~1 >/dev/null 2>&1; then
+          pnpm exec nx affected --target=typecheck
+        else
+          pnpm exec nx run-many --target=typecheck --all
+        fi
+
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm exec commitlint --edit {1}

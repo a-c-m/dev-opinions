@@ -1,0 +1,15 @@
+# OpenTofu / Terraform
+.terraform/
+.terraform.lock.hcl.backup
+terraform.tfstate
+terraform.tfstate.backup
+*.tfplan
+tfplan.bin
+crash.log
+crash.*.log
+
+# Never commit environment-specific tfvars that contain secrets or identifiers.
+# Commit .conf.example.tfvars and .conf.<env>.tfvars only when they are
+# non-sensitive. Err on the side of gitignore.
+.conf.*.tfvars
+!.conf.example.tfvars

@@ -1,0 +1,40 @@
+# CODEOWNERS — see ADR 0018.
+#
+# Pattern: by path, not by file type. Last match wins — put more specific
+# rules below more general ones.
+#
+# Replace the placeholder owners below with real GitHub users or teams
+# (`@org/team` or `@username`). Remove any section that does not apply.
+
+# --------------------------------------------------------------------------
+# Default catch-all — every file needs at least one owner.
+# --------------------------------------------------------------------------
+*                                   @OWNER
+
+# --------------------------------------------------------------------------
+# Architecture decisions — require architecture review, not app team review.
+# --------------------------------------------------------------------------
+/docs/adr/                          @OWNER
+
+# --------------------------------------------------------------------------
+# Cross-cutting platform concerns.
+# --------------------------------------------------------------------------
+/.github/                           @OWNER
+/.github/workflows/                 @OWNER
+/.claude/                           @OWNER
+/scripts/                           @OWNER
+**/Dockerfile                       @OWNER
+**/iac/                             @OWNER
+
+# --------------------------------------------------------------------------
+# Shared packages — per-package maintainers.
+# --------------------------------------------------------------------------
+# /shared/logger/                    @OWNER
+# /shared/env-config/                @OWNER
+# /shared/auth/                      @OWNER
+
+# --------------------------------------------------------------------------
+# Apps — per-app owners. Add a line per app as the repo grows.
+# --------------------------------------------------------------------------
+# /apps/<api-name>/                  @OWNER
+# /apps/<web-name>/                  @OWNER
