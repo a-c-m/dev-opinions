@@ -31,7 +31,7 @@
     "reset": "./scripts/reset-template.sh"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.6",
+    "@biomejs/biome": "2.4.12",
     "@commitlint/cli": "19.5.0",
     "@commitlint/config-conventional": "19.5.0",
     "@commitlint/types": "19.5.0",
@@ -41,7 +41,7 @@
     "@nx/playwright": "22.6.5",
     "@nx/react": "22.6.5",
     "@nx/vite": "22.6.5",
-    "@playwright/test": "1.56.1",
+    "@playwright/test": "1.59.1",
     "@types/node": "22.12.0",
     "@typescript/native-preview": "7.0.0-dev.20260419.1",
     "biome-suppressed": "1.3.0",
