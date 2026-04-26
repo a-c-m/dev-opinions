@@ -7,7 +7,7 @@ This repo is a monorepo starter (pnpm + NX). See [docs/adr/](docs/adr/README.md)
 - **Package manager**: pnpm 9. Never run `npm` or `yarn` against this repo.
 - **Typecheck**: `pnpm typecheck` (uses tsgo, not plain `tsc`).
 - **Lint + format**: `pnpm lint` writes; `pnpm lint:check` verifies. Biome 2 extending Ultracite.
-- **Test**: `pnpm test` runs Vitest across all projects. E2E lives under `apps/*-e2e` and runs via `pnpm test:e2e`.
+- **Test**: `pnpm test` runs Vitest across all projects. E2E lives under `apps/<product>/<service>-e2e/` and runs via `pnpm test:e2e`.
 - **Dead code**: `pnpm knip` — CI blocks on new issues.
 - **Security**: `pnpm security` — Trivy scans deps, secrets, and IaC. Fails on HIGH/CRITICAL (ADR 0015).
 - **Full gate**: `pnpm check` = lint + typecheck + test + knip + security.
@@ -15,7 +15,7 @@ This repo is a monorepo starter (pnpm + NX). See [docs/adr/](docs/adr/README.md)
 
 ## Repo layout
 
-- `apps/*` — deployable units. Each has a `project.json`, `src/main.ts`(x), and a scoped `package.json`.
+- `apps/<product>/<service>/` — deployable units, two-tier. Second tier is the product (e.g. `tool1`, `funnels`, `marketing`); third tier is the service within it (e.g. `web`, `api`, `worker`). Each leaf has a `project.json`, `src/main.ts`(x), and a scoped `package.json`.
 - `shared/*` — reusable libraries, imported as `@shared/<name>`.
 - `tools/*` — workspace-internal tooling (custom reporters, generators).
 - `docs/adr/` — architecture decision records. New significant decisions get a new ADR.
@@ -32,7 +32,7 @@ This repo is a monorepo starter (pnpm + NX). See [docs/adr/](docs/adr/README.md)
 
 ## Env variables
 
-Every app declares its env in `src/env.ts` via a zod schema (see ADR 0013). Do not read `process.env` directly in application code. Web apps additionally follow ADR 0019 for runtime env injection via placeholder tokens.
+Every app declares its env in `src/env.ts` via a zod schema (see ADR 0013). Do not read `process.env` directly in application code. Web apps additionally follow ADR 0019: deploy-time injection via `@import-meta-env/unplugin`, with the zod schema validating values once they arrive in the browser.
 
 ## Task tracking — local vs team
 

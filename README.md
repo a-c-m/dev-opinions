@@ -24,13 +24,19 @@ Decisions captured in [docs/adr/](docs/adr/README.md):
 
 ## Getting started
 
+See [docs/QUICKSTART.md](docs/QUICKSTART.md) for the full first-clone walkthrough (system tools, sample apps, container builds, troubleshooting).
+
+TL;DR:
+
 ```sh
-nvm use                   # pick up Node 22
-pnpm install              # installs deps, runs lefthook install via prepare
+nvm use                   # picks up Node 22 from .nvmrc
+pnpm install              # installs deps + lefthook git hooks via `prepare`
 pnpm dev                  # run all apps in dev
-pnpm check                # lint + typecheck + test + knip
+pnpm check                # lint + typecheck + test + knip + security (Trivy)
 pnpm commit               # interactive conventional commit
 ```
+
+`pnpm check` requires Trivy (`brew install aquasecurity/trivy/trivy` on macOS).
 
 ## Layout
 

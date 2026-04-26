@@ -39,5 +39,7 @@ Environment variables are the most common source of production misconfiguration 
 
 - **ADR 0019** — static web bundles cannot read `process.env` at runtime,
   since `import.meta.env.*` is inlined at build time. For browser apps, the
-  env layer uses build-time placeholder tokens replaced at container
-  startup. This ADR covers the server side only.
+  env layer uses `@import-meta-env/unplugin` to inject values into a single
+  HTML placeholder at deploy time, with the zod schema in `src/env.ts`
+  validating those values once they arrive in the browser. This ADR covers
+  the server side and the in-browser validator that complements 0019.

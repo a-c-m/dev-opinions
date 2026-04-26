@@ -7,8 +7,8 @@ package name (e.g. `@shared/logger`).
 Typical occupants:
 
 - `@shared/logger` — structured logger wrapper.
-- `@shared/env-config` — zod-validated env loader + placeholder-token
-  emitter for web builds (ADRs 0013 and 0019).
+- `@shared/env-config` — zod-validated env loader for server apps; web apps
+  pair the same zod pattern with `@import-meta-env/unplugin` (ADRs 0013 and 0019).
 - `@shared/auth` — cross-app authentication helpers.
 - `@shared/ui` — shared React/Svelte components.
 

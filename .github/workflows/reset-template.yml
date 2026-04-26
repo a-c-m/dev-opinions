@@ -1,0 +1,56 @@
+name: Reset-template self-test
+
+on:
+  pull_request:
+    paths:
+      - "scripts/reset-template.sh"
+      - "apps/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/reset-template.yml"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/reset-template.sh"
+      - "apps/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+  workflow_dispatch:
+
+# This job verifies that `./scripts/reset-template.sh --yes` leaves the repo
+# in a state where a fresh `pnpm install` succeeds and the empty workspace
+# stays lint-clean. It is the canary against ADR 0001 / 0005 drift — if a
+# new dependency or NX target gets baked into a sample-only path, this job
+# catches it the moment a PR opens.
+#
+# The job runs against a checked-out copy of the PR head, so removing the
+# sample apps does not affect the actual base branch.
+
+concurrency:
+  group: reset-template-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  reset-and-check:
+    name: pnpm reset → install → lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        uses: ./.github/actions/setup-monorepo
+        with:
+          install: "false"
+
+      - name: Run reset-template.sh
+        run: ./scripts/reset-template.sh --yes
+
+      - name: Install (post-reset)
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Verify lint baseline still clean
+        run: pnpm lint:ci
+
+      - name: Verify knip on empty workspace
+        run: pnpm knip

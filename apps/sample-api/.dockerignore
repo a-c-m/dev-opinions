@@ -1,0 +1,28 @@
+# What the build context never needs.
+**/node_modules
+**/dist
+**/.nx
+**/coverage
+**/.cache
+**/.turbo
+**/.next
+
+# Editor / OS noise.
+**/.DS_Store
+**/.idea
+**/.vscode
+
+# Tests / fixtures don't need to ship.
+**/*.spec.ts
+**/*.test.ts
+**/test-results
+
+# Local-only state.
+.env
+.env.local
+.env.*.local
+.beads/
+
+# Git.
+.git
+.gitignore

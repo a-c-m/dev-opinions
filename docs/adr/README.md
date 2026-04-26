@@ -34,4 +34,4 @@ Each ADR follows:
 | 0016 | [GitHub Actions with reusable workflows](0016-github-actions-ci.md) | Accepted |
 | 0017 | [OpenTofu for infrastructure-as-code](0017-opentofu-iac.md) | Accepted |
 | 0018 | [GitHub repository conventions](0018-github-repo-conventions.md) | Accepted |
-| 0019 | [Web runtime env injection via placeholder tokens](0019-web-runtime-env-tokens.md) | Accepted |
+| 0019 | [Web runtime env injection via `import-meta-env`](0019-web-runtime-env-tokens.md) | Accepted |

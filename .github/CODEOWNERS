@@ -9,32 +9,32 @@
 # --------------------------------------------------------------------------
 # Default catch-all — every file needs at least one owner.
 # --------------------------------------------------------------------------
-*                                   @OWNER
+*                                   @a-c-m
 
 # --------------------------------------------------------------------------
 # Architecture decisions — require architecture review, not app team review.
 # --------------------------------------------------------------------------
-/docs/adr/                          @OWNER
+/docs/adr/                          @a-c-m
 
 # --------------------------------------------------------------------------
 # Cross-cutting platform concerns.
 # --------------------------------------------------------------------------
-/.github/                           @OWNER
-/.github/workflows/                 @OWNER
-/.claude/                           @OWNER
-/scripts/                           @OWNER
-**/Dockerfile                       @OWNER
-**/iac/                             @OWNER
+/.github/                           @a-c-m
+/.github/workflows/                 @a-c-m
+/.claude/                           @a-c-m
+/scripts/                           @a-c-m
+**/Dockerfile                       @a-c-m
+**/iac/                             @a-c-m
 
 # --------------------------------------------------------------------------
 # Shared packages — per-package maintainers.
 # --------------------------------------------------------------------------
-# /shared/logger/                    @OWNER
-# /shared/env-config/                @OWNER
-# /shared/auth/                      @OWNER
+# /shared/logger/                    @a-c-m
+# /shared/env-config/                @a-c-m
+# /shared/auth/                      @a-c-m
 
 # --------------------------------------------------------------------------
 # Apps — per-app owners. Add a line per app as the repo grows.
 # --------------------------------------------------------------------------
-# /apps/<api-name>/                  @OWNER
-# /apps/<web-name>/                  @OWNER
+# /apps/<api-name>/                  @a-c-m
+# /apps/<web-name>/                  @a-c-m

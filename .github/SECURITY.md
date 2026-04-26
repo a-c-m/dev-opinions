@@ -8,8 +8,7 @@ Two channels, in order of preference:
 
 1. **GitHub Security Advisories** — open a draft advisory at the repo's
    Security tab → "Report a vulnerability".
-2. **Email** — `security@example.com` (replace with the project's real
-   contact on adoption).
+2. **Email** — `security@acmconsulting.eu`.
 
 Please include:
 

@@ -1,7 +1,14 @@
-# ADR 0006: NestJS 10 as default backend framework
+# ADR 0006: NestJS 11 as default backend framework
 
 - **Status**: Accepted
 - **Date**: 2026-04-19
+
+## Note on version
+
+NestJS 11 is the current major (Fastify 5 underneath). NestJS 10 is no
+longer receiving security patches — see CVE-2026-33011 in
+`@nestjs/platform-fastify 10.x` and CVE-2026-25223 in `fastify 4.x`. New apps
+pin exact NestJS 11 across the core packages.
 
 ## Context
 
@@ -9,7 +16,7 @@ Backend apps in this template need a consistent module layout, dependency inject
 
 ## Decision
 
-- **NestJS 10** for API apps under `apps/*-api`.
+- **NestJS 11** for API apps under `apps/*-api`.
 - Fastify adapter by default — lower latency and memory than Express; switch only when a dependency forces it.
 - Per-app structure:
   - `src/main.ts` boots the app and validates env via the shared env-config package.

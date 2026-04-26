@@ -32,31 +32,36 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.6",
-    "@commitlint/cli": "19.5.0",
-    "@commitlint/config-conventional": "19.5.0",
-    "@commitlint/types": "19.5.0",
-    "@nx/eslint": "22.6.5",
-    "@nx/js": "22.6.5",
-    "@nx/nest": "22.6.5",
-    "@nx/playwright": "22.6.5",
-    "@nx/react": "22.6.5",
-    "@nx/vite": "22.6.5",
-    "@playwright/test": "1.56.1",
-    "@types/node": "22.12.0",
-    "@typescript/native-preview": "7.0.0-dev.20260419.1",
+    "@commitlint/cli": "20.5.2",
+    "@commitlint/config-conventional": "20.5.0",
+    "@commitlint/types": "20.5.0",
+    "@nx/eslint": "22.7.0",
+    "@nx/js": "22.7.0",
+    "@nx/nest": "22.7.0",
+    "@nx/playwright": "22.7.0",
+    "@nx/react": "22.7.0",
+    "@nx/vite": "22.7.0",
+    "@playwright/test": "1.59.1",
+    "@types/node": "22.19.17",
+    "@typescript/native-preview": "7.0.0-dev.20260425.1",
     "biome-suppressed": "1.3.0",
     "commitizen": "4.3.1",
     "cz-conventional-changelog": "3.3.0",
-    "knip": "5.62.0",
-    "lefthook": "1.8.0",
-    "nx": "22.6.5",
-    "typescript": "5.8.3",
+    "knip": "6.7.0",
+    "lefthook": "2.1.6",
+    "nx": "22.7.0",
+    "typescript": "6.0.3",
     "ultracite": "5.4.5",
-    "vitest": "2.1.8"
+    "vitest": "4.1.5"
   },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "fastify": "5.8.5"
     }
   }
 }
