@@ -14,8 +14,8 @@
     "lint": "bs check --write ."
   },
   "dependencies": {
-    "react": "19.2.5",
-    "react-dom": "19.2.5",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
     "zod": "3.24.1"
   },
   "devDependencies": {
@@ -27,8 +27,8 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.1",
     "@vitest/coverage-v8": "4.1.5",
-    "jsdom": "29.0.2",
-    "vite": "8.0.10",
+    "jsdom": "29.1.1",
+    "vite": "8.0.12",
     "vitest": "4.1.5"
   }
 }
