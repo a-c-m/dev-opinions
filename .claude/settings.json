@@ -28,7 +28,10 @@
       "Bash(./.claude/commands/check.sh)",
       "Bash(./.claude/commands/create-issue.sh:*)",
       "Bash(./.claude/commands/create-pr.sh:*)",
-      "Bash(bd:*)"
+      "Bash(bd:*)",
+      "Bash(pnpm view *)",
+      "Bash(rg:*)",
+      "Bash(./scripts/setup-mac.sh:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
@@ -41,7 +44,10 @@
       {
         "matcher": "Edit|Write",
         "hooks": [
-          { "type": "command", "command": "./.claude/hooks/biome-check.sh" },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/biome-check.sh"
+          },
           {
             "type": "command",
             "command": "./.claude/hooks/prevent-wait-for-timeout.sh"
@@ -51,18 +57,17 @@
       {
         "matcher": "Bash",
         "hooks": [
-          { "type": "command", "command": "./.claude/hooks/echo-detection.sh" },
           {
             "type": "command",
-            "command": "./.claude/hooks/check-biome-commands.sh"
+            "command": "./.claude/hooks/check-bash-git.sh"
           },
           {
             "type": "command",
-            "command": "./.claude/hooks/check-biome-unsafe.sh"
+            "command": "./.claude/hooks/check-bash-biome.sh"
           },
           {
             "type": "command",
-            "command": "./.claude/hooks/check-git-commands.sh"
+            "command": "./.claude/hooks/check-bash-rules.sh"
           }
         ]
       }
@@ -80,7 +85,10 @@
       {
         "matcher": "Bash",
         "hooks": [
-          { "type": "command", "command": "./.claude/hooks/commit-format.sh" }
+          {
+            "type": "command",
+            "command": "./.claude/hooks/commit-format.sh"
+          }
         ]
       }
     ],

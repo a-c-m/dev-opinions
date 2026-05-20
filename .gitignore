@@ -34,6 +34,10 @@ playwright/.cache/
 .claude/scheduled_tasks.lock
 .claude/settings.local.json
 
+# Scratch logs / WIP captures from Bash tool calls. CLAUDE.md "Capture output
+# for review" — one known location, survives across sessions, never committed.
+.ai-wip/
+
 # misc
 *.log
 *.tsbuildinfo

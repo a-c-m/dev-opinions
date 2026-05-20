@@ -11,7 +11,8 @@ This repo is a monorepo starter (pnpm + NX). See [docs/adr/](docs/adr/README.md)
 - **Dead code**: `pnpm knip` — CI blocks on new issues.
 - **Security**: `pnpm security` — Trivy scans deps, secrets, and IaC. Fails on HIGH/CRITICAL (ADR 0015).
 - **Full gate**: `pnpm check` = lint + typecheck + test + knip + security.
-- **Commits**: Conventional Commits. Use `pnpm commit` for the interactive prompt, or write messages like `feat(api): add search endpoint`.
+- **Commits**: Conventional Commits + **trailing ticket reference**. Use `pnpm commit` for the interactive prompt, or write messages like `feat(api): add search endpoint #123` / `feat(api): add search endpoint PROJ-456`. See [Every commit names its ticket](#every-commit-names-its-ticket).
+- **PRs**: Use `./.claude/commands/create-pr.sh "<title>" "<summary>" <ticket>`. Title gets the ticket suffix; body opens with `Closes #N` (GitHub) or `Refs PROJ-N` (Jira/Linear). Direct `gh pr create` is blocked.
 
 ## Repo layout
 
@@ -32,7 +33,7 @@ This repo is a monorepo starter (pnpm + NX). See [docs/adr/](docs/adr/README.md)
 
 ## Env variables
 
-Every app declares its env in `src/env.ts` via a zod schema (see ADR 0013). Do not read `process.env` directly in application code. Web apps additionally follow ADR 0019: deploy-time injection via `@import-meta-env/unplugin`, with the zod schema validating values once they arrive in the browser.
+Backend services follow ADR 0021: typed schema + layered YAML files in `config/`, with secrets-only living in env vars and injected via `@shared/config`. Web apps follow ADR 0019: a zod schema in `src/env.ts` validating values injected at deploy time via `@import-meta-env/unplugin`. Do not read `process.env` directly in application code in either tier.
 
 ## Task tracking — local vs team
 
@@ -61,10 +62,16 @@ When a hook, check, or lint fails, fix the underlying cause. Never add an escape
 Don't chain unrelated Bash commands with `&&` or `;`. Each step should be runnable and reviewable on its own. Chain only when two commands are genuinely one logical operation (e.g. `mkdir -p x && cd x`).
 
 ### Capture output for review
-Prefer `cmd > /tmp/<name>.log 2>&1` over `cmd | grep …` or `cmd | jq …` inline. The user can re-read the file later. Inline pipes discard the raw output. If the file is small, `cat` it after. If large, `tail` or `grep` it — but the full output stays on disk.
+Prefer `cmd > .ai-wip/<name>.log 2>&1` over `cmd | rg …` or `cmd | jq …` inline. The user can re-read the file later. Inline pipes discard the raw output. If the file is small, `cat` it after. If large, `tail` or `rg` it — but the full output stays on disk. `.ai-wip/` is gitignored — one known location, survives across sessions, never committed. Don't use `/tmp/` (PreToolUse hook blocks it).
+
+### Search with ripgrep, never grep
+For ad-hoc searches, use the built-in `Grep` tool (ripgrep-backed). In shell scripts and Bash tool calls, use `rg`, not POSIX `grep`. Ripgrep is faster and respects `.gitignore`, which matters in this monorepo. `git grep` is fine when you specifically need git's index or history. See [docs/adr/0020-ripgrep-over-grep.md](docs/adr/0020-ripgrep-over-grep.md). The PreToolUse hook nudges (advisory, not blocking); reviewers reject new `grep` in committed shell.
 
 ### Work from the repo root
 Don't pass absolute paths into commands where a relative path from the current directory would do. If you need to work inside a subdirectory repeatedly, `cd` to it first. Keeps commands readable and diffable.
+
+### Every commit names its ticket
+Every AI-authored commit must end its subject with a tracker reference: `#NNN` (GitHub) or `PROJ-NNN` (Jira/Linear). The PreToolUse hook blocks `git commit` without one — there is no AI-side escape hatch. If a commit genuinely has no ticket (scaffolding, dep bump, hotfix-without-issue), ask the human to run the commit themselves. Same goes for PRs: use `./.claude/commands/create-pr.sh` which appends the ticket to the title and writes `Closes #N` / `Refs PROJ-N` into the body. `bd` (beads) IDs are local-only and must NOT appear in commits or PRs.
 
 ### Lock to exact versions
 All dependency versions in every `package.json` are pinned exactly (e.g. `"2.2.6"`, not `"^2.2.6"` or `"~2.2.6"`). Ranges let silent upgrades break the build between `pnpm install` runs on different machines. Upgrades happen intentionally, via a PR that bumps the pin and re-runs the full quality gate.

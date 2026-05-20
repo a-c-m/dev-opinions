@@ -9,11 +9,18 @@
 # are allowed through. Edits that *add* diagnostics are blocked with a list
 # of the new ones.
 #
-# Biome's stdin mode does not emit structured diagnostics, so the hook
-# works by briefly swapping the file's contents, scanning twice, and
-# restoring the original from a disk backup via an EXIT trap. All content
-# I/O goes through files (never bash variables) so bytes, including
-# trailing newlines, are preserved exactly.
+# Biome's stdin mode does not emit structured JSON diagnostics, so we can't
+# pipe the proposed content in. Instead, we write the proposed content to a
+# **sibling** temp file in the same directory (same extension, so biome
+# treats it identically and resolves the same biome.json) and scan that.
+# The original FILE_PATH is never modified — important because:
+#
+# 1. Claude Code's Edit/Write content-change check uses stat timestamps
+#    (mtime + ctime). Any cp/restore on the original would bump ctime even
+#    when bytes match, causing every Edit to fail with "content has changed
+#    since last read".
+# 2. File watchers (vite dev, tsc --watch) on the real path don't churn on
+#    phantom modifications.
 
 set -euo pipefail
 
@@ -39,59 +46,50 @@ if ! pnpm exec biome --version >/dev/null 2>&1; then
 fi
 
 # ---------------------------------------------------------------------------
-# Backup the file (binary-safe) and arrange for restore on any exit.
+# Build the proposed-content sibling file. Same directory + same extension so
+# biome resolves the same project config. Only this temp file is written —
+# the original FILE_PATH is never touched.
+#
+# Naming: `<stem>.biome-check.<ext>`. We deliberately avoid `mktemp`'s hex
+# randomness because biome's `useFilenamingConvention` rule rejects names
+# with non-kebab characters, which would surface as a phantom "new
+# diagnostic" on every edit. Hooks run sequentially per Claude session so
+# the static filename doesn't collide; we still `rm` it on EXIT.
 # ---------------------------------------------------------------------------
-BACKUP="$(mktemp -t biome-check-hook.XXXXXX)"
-if [ -f "$FILE_PATH" ]; then
-  cp "$FILE_PATH" "$BACKUP"
-  HAS_FILE=1
-else
-  HAS_FILE=0
-fi
+DIR="$(dirname "$FILE_PATH")"
+BASE="$(basename "$FILE_PATH")"
+EXT="${BASE##*.}"
+STEM="${BASE%.*}"
+PROPOSED="$DIR/$STEM.biome-check.$EXT"
+# A leftover from a previous crashed hook would block the new edit. Clear it.
+rm -f "$PROPOSED"
 
-restore() {
-  if [ "$HAS_FILE" -eq 1 ] && [ -f "$BACKUP" ]; then
-    cp "$BACKUP" "$FILE_PATH"
-  elif [ "$HAS_FILE" -eq 0 ] && [ -f "$FILE_PATH" ]; then
-    rm -f "$FILE_PATH"
-  fi
-  rm -f "$BACKUP"
+cleanup() {
+  rm -f "$PROPOSED"
 }
-trap restore EXIT
+trap cleanup EXIT
 
-# ---------------------------------------------------------------------------
-# Scan OLD state (file still original, before any edit is simulated).
-# ---------------------------------------------------------------------------
-if [ "$HAS_FILE" -eq 1 ]; then
-  OLD_JSON="$(pnpm exec biome check "$FILE_PATH" --reporter=json 2>/dev/null || true)"
-else
-  OLD_JSON='{"diagnostics":[]}'
-fi
-
-# ---------------------------------------------------------------------------
-# Write the proposed content to FILE_PATH directly — no bash variable
-# round-trip (which would strip trailing newlines and corrupt binary content).
-# ---------------------------------------------------------------------------
 case "$TOOL" in
   Write)
     # jq -j = raw output, no trailing newline added. Exact bytes of .content.
-    printf '%s' "$INPUT" | jq -j '.tool_input.content // ""' > "$FILE_PATH"
+    printf '%s' "$INPUT" | jq -j '.tool_input.content // ""' > "$PROPOSED"
     ;;
   Edit)
-    # node reads the (still-original) file, applies the replacement, writes
-    # back. All I/O binary-safe.
+    # Read FILE_PATH (still untouched), apply the replacement, write the
+    # result to PROPOSED. Original is never modified. All I/O binary-safe.
     printf '%s' "$INPUT" | node -e '
       let s = "";
       process.stdin.on("data", (c) => (s += c));
       process.stdin.on("end", () => {
         const fs = require("node:fs");
         const j = JSON.parse(s);
-        const p = j.tool_input?.file_path || j.tool_input?.path;
+        const src = j.tool_input?.file_path || j.tool_input?.path;
+        const dst = process.env.PROPOSED;
         const old = j.tool_input?.old_string ?? "";
         const neu = j.tool_input?.new_string ?? "";
         const all = j.tool_input?.replace_all === true;
         let current = "";
-        try { current = fs.readFileSync(p, "utf8"); } catch {}
+        try { current = fs.readFileSync(src, "utf8"); } catch {}
         let out;
         if (all) {
           out = current.split(old).join(neu);
@@ -99,9 +97,9 @@ case "$TOOL" in
           const i = current.indexOf(old);
           out = i === -1 ? current : current.slice(0, i) + neu + current.slice(i + old.length);
         }
-        fs.writeFileSync(p, out);
+        fs.writeFileSync(dst, out);
       });
-    '
+    ' PROPOSED="$PROPOSED"
     ;;
   *)
     exit 0
@@ -109,14 +107,21 @@ case "$TOOL" in
 esac
 
 # ---------------------------------------------------------------------------
-# Scan NEW state.
+# Scan OLD (real file) and NEW (sibling temp). Biome resolves the same
+# config for both because they share the same directory + extension.
 # ---------------------------------------------------------------------------
-NEW_JSON="$(pnpm exec biome check "$FILE_PATH" --reporter=json 2>/dev/null || true)"
+if [ -f "$FILE_PATH" ]; then
+  OLD_JSON="$(pnpm exec biome check "$FILE_PATH" --reporter=json 2>/dev/null || true)"
+else
+  OLD_JSON='{"diagnostics":[]}'
+fi
+NEW_JSON="$(pnpm exec biome check "$PROPOSED" --reporter=json 2>/dev/null || true)"
 
 # ---------------------------------------------------------------------------
 # Compare diagnostic sets. Signature = category + "||" + description, which
-# captures rule + message without depending on exact line numbers (edits
-# shift lines and we don't want that to masquerade as a "new" diagnostic).
+# captures rule + message without depending on exact line numbers or file
+# paths (the temp file has a different name; we want category + message
+# matching, not path matching).
 # ---------------------------------------------------------------------------
 extract_sigs() {
   printf '%s' "$1" \
@@ -130,13 +135,50 @@ NEW_SIGS="$(extract_sigs "$NEW_JSON")"
 
 DELTA="$(comm -23 <(printf '%s\n' "$NEW_SIGS") <(printf '%s\n' "$OLD_SIGS") | sed '/^$/d')"
 
-if [ -n "$DELTA" ]; then
+# ---------------------------------------------------------------------------
+# Split the delta into PERSISTENT (real new issues — block) and TRANSIENT
+# (rules that fire mid-edit and get resolved by the immediate follow-up edit
+# — allow with a warning). The lefthook pre-push gate + CI catch any
+# transients that slip through unresolved, so the cost of allowing them
+# briefly is bounded.
+#
+# Why: previously, edits that legitimately required two steps to reach a
+# clean state (add an import, then add the call site) were rejected because
+# the hook saw the unused-import after step 1. Forcing agents to invent
+# Bash workarounds is worse than trusting the downstream gates for these
+# specific rules.
+# ---------------------------------------------------------------------------
+TRANSIENT_RULES_RE='^(lint/correctness/noUnusedImports|lint/correctness/noUnusedVariables|lint/correctness/noUndeclaredVariables|lint/correctness/noUnusedFunctionParameters|lint/correctness/noUnusedPrivateClassMembers)\|\|'
+
+PERSISTENT_DELTA="$(printf '%s\n' "$DELTA" | grep -vE "$TRANSIENT_RULES_RE" || true)"
+TRANSIENT_DELTA="$(printf '%s\n' "$DELTA" | grep -E "$TRANSIENT_RULES_RE" || true)"
+
+if [ -n "$PERSISTENT_DELTA" ]; then
   echo "biome: the proposed edit introduces NEW diagnostics that were not present before:" >&2
-  printf '%s\n' "$DELTA" | sed -e 's,||, — ,' -e 's,^,  - ,' >&2
+  printf '%s\n' "$PERSISTENT_DELTA" | sed -e 's,||, — ,' -e 's,^,  - ,' >&2
+
+  # If the delta includes a "format" diagnostic, biome's JSON reporter
+  # doesn't include the formatted content — surface the actual diff so
+  # the caller can see exactly what biome wants to change. Diff is between
+  # the original on disk and the formatted version of the *proposed* content.
+  if printf '%s' "$PERSISTENT_DELTA" | grep -q '^format'; then
+    FORMATTED="$(pnpm exec biome format --stdin-file-path="$FILE_PATH" < "$PROPOSED" 2>/dev/null || true)"
+    if [ -n "$FORMATTED" ]; then
+      echo "" >&2
+      echo "format diff (proposed → biome):" >&2
+      diff -u "$FILE_PATH" <(printf '%s' "$FORMATTED") | sed 's,^,  ,' >&2
+    fi
+  fi
+
   echo "" >&2
   echo "pre-existing diagnostics in $FILE_PATH are accepted by the baseline;" >&2
   echo "only newly-introduced ones block. Fix the ones above and retry." >&2
   exit 2
+fi
+
+if [ -n "$TRANSIENT_DELTA" ]; then
+  echo "biome: edit introduced TRANSIENT diagnostics (allowed; resolve in the follow-up edit, lefthook pre-push catches if left):" >&2
+  printf '%s\n' "$TRANSIENT_DELTA" | sed -e 's,||, — ,' -e 's,^,  - ,' >&2
 fi
 
 exit 0
