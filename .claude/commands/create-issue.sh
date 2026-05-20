@@ -47,7 +47,7 @@ TEMPLATE_FILE="$REPO_ROOT/.github/ISSUE_TEMPLATE/${TEMPLATE}.md"
 if [ ! -f "$TEMPLATE_FILE" ]; then
   echo "template not found: $TEMPLATE_FILE" >&2
   echo "available:" >&2
-  ls "$REPO_ROOT/.github/ISSUE_TEMPLATE/" 2>/dev/null | grep '\.md$' | sed 's|\.md$||' | sed 's/^/  /' >&2
+  ls "$REPO_ROOT/.github/ISSUE_TEMPLATE/" 2>/dev/null | rg '\.md$' | sed 's|\.md$||' | sed 's/^/  /' >&2
   exit 1
 fi
 

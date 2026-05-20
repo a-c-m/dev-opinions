@@ -24,7 +24,7 @@ case "$TOOL" in
   *)     exit 0 ;;
 esac
 
-if printf '%s' "$NEW_TEXT" | grep -q 'waitForTimeout'; then
+if printf '%s' "$NEW_TEXT" | rg -qF 'waitForTimeout'; then
   cat >&2 <<'EOF'
 🚫 BLOCKED: page.waitForTimeout in a test file.
 

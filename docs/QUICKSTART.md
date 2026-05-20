@@ -9,14 +9,24 @@ takes ~5 minutes if everything's missing, ~30 seconds if everything's present.
 |---|---|---|
 | **Node 22** | Runtime; pinned exact in `.nvmrc` | `fnm install 22.19.0` or `nvm install` (in repo dir) |
 | **pnpm 9+** | Package manager (ADR 0001) | `corepack enable` then `corepack prepare pnpm@9.15.0 --activate` |
+| **ripgrep (`rg`)** | All search — Claude hooks, scripts, agent searches (ADR 0020) | macOS: `brew install ripgrep` &nbsp;·&nbsp; Linux: `apt install ripgrep` |
+| **jq** | JSON parser used by `.claude/hooks/*` to read tool input | macOS: `brew install jq` &nbsp;·&nbsp; Linux: `apt install jq` |
 | **Trivy** | Security gate (ADR 0015) — `pnpm check` fails without it | macOS: `brew install aquasecurity/trivy/trivy` &nbsp;·&nbsp; Linux: see <https://aquasecurity.github.io/trivy/> |
 | **OpenTofu** | Required only if you'll touch `apps/*/iac/` | macOS: `brew install opentofu` |
 | **beads (`bd`)** | Optional — local task tracking; `.claude/` SessionStart hook surfaces tasks if installed | macOS: `brew install beads` |
 | **Lefthook** | Installed automatically as a dev dep on `pnpm install` | nothing to do |
 | **Docker** (optional) | Building/running the sample app images | Docker Desktop / OrbStack / colima |
 
+On macOS, the required tools (`ripgrep`, `jq`, `trivy`) can be installed in
+one shot with the bootstrap script:
+
+```sh
+./scripts/setup-mac.sh                    # required tools only
+INCLUDE_OPTIONAL=1 ./scripts/setup-mac.sh # also install opentofu, beads
+```
+
 You don't need every tool to start. The minimum to get the gate green is
-**Node 22 + pnpm + Trivy**. Beads and OpenTofu are opt-in.
+**Node 22 + pnpm + ripgrep + jq + Trivy**. Beads and OpenTofu are opt-in.
 
 ## 2. First clone
 
