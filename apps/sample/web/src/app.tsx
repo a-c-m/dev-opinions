@@ -8,7 +8,7 @@ export function App({ greeting = "hello" }: Props) {
   return (
     <main>
       <h1>{greeting}, base-app</h1>
-      <p>api: {env.VITE_API_URL}</p>
+      <p>api: {env.API_URL}</p>
       <button onClick={() => setCount((c) => c + 1)} type="button">
         clicked {count} times
       </button>

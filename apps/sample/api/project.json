@@ -1,7 +1,7 @@
 {
-  "name": "sample-web",
+  "name": "sample-api",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/sample-web/src",
+  "sourceRoot": "apps/sample/api/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -15,10 +15,6 @@
     "test": {
       "executor": "nx:run-script",
       "options": { "script": "test" }
-    },
-    "e2e": {
-      "executor": "nx:run-script",
-      "options": { "script": "e2e" }
     },
     "typecheck": {
       "executor": "nx:run-script",

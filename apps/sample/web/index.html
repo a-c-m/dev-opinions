@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sample-web</title>
+    <script>
+      // ADR 0019: this sentinel string is the placeholder that
+      // @import-meta-env/cli swaps for a JSON object of env values at
+      // deploy time. Must run before the module bundle so that
+      // globalThis.import_meta_env is populated before any module-level
+      // code reads it.
+      globalThis.import_meta_env = JSON.parse('"import_meta_env_placeholder"');
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
