@@ -27,31 +27,38 @@ We need a mechanism that:
 
 ## Decision
 
-We use **[`@import-meta-env/unplugin`](https://github.com/iendeavor/import-meta-env)** as the standard runtime configuration mechanism for frontend applications. It is paired with our existing zod-validated `src/env.ts` pattern from [ADR 0013](0013-env-config.md): the plugin handles the build-time/deploy-time mechanics, and zod handles in-browser shape and value validation after the swap.
+We use **[`@import-meta-env/unplugin`](https://github.com/iendeavor/import-meta-env)** as the standard runtime configuration mechanism for frontend applications. It is paired with a zod-validated `src/env.ts` module owned by this ADR: the plugin handles the build-time/deploy-time mechanics, and zod handles in-browser shape and value validation after the swap.
 
 ### How it works
 
 1. **Allowlist** — A `.env.example` file at the app root declares every variable the client is allowed to read. Variables not listed cannot be referenced at runtime.
 
-2. **Build-time transform** — The plugin replaces every `import.meta.env.FOO` reference in source with a property access on a global:
+2. **Build-time transform** — The plugin replaces every `import.meta.env.FOO` **property-access** expression in source with a property access on a runtime global:
 
    ```js
    // source
    const apiUrl = import.meta.env.API_URL;
 
-   // built
-   const apiUrl = globalThis.import_meta_env.API_URL;
+   // built (approximately)
+   const apiUrl = Object.create(globalThis.import_meta_env || null).API_URL;
    ```
 
    The JS bundle contains **no values and no per-variable placeholders**.
 
-3. **Single placeholder in HTML** — The plugin injects one inline script tag into `index.html`, before the bundle's module script:
+   Two important caveats specific to Vite:
+
+   - The plugin only fires on **member expressions** (`import.meta.env.X`), not bare `import.meta.env` references. Code that does `safeParse(import.meta.env)` will be statically inlined by Vite to an object literal with only the Vite built-ins (`MODE`, `BASE_URL`, `DEV`, `PROD`, `SSR`) and the runtime swap will never reach it. Read each variable individually instead: `safeParse({ API_URL: import.meta.env.API_URL, MODE: import.meta.env.MODE })`.
+   - Vite's native `envPrefix` (default `VITE_`) statically inlines `import.meta.env.VITE_*` references **before** the unplugin can transform them. Drop the `VITE_` prefix from variable names — call them what they are (`API_URL`, not `VITE_API_URL`). The whole point of the prefix is Vite's native handling, which is exactly what we are replacing.
+
+3. **Single placeholder in HTML** — The app's entry HTML manually includes one inline script tag in `<head>`, before the bundle's module script. The string `"import_meta_env_placeholder"` is the sentinel the CLI looks for.
 
    ```html
    <script>
      globalThis.import_meta_env = JSON.parse('"import_meta_env_placeholder"');
    </script>
    ```
+
+   The plugin does **not** inject this for you (verified against `@import-meta-env/unplugin@0.6.3`). It must be present in source HTML so it is part of the built artifact.
 
 4. **Deploy-time replacement** — `@import-meta-env/cli` replaces that single placeholder in `index.html` with a JSON payload built from the deploy environment:
 
@@ -68,18 +75,19 @@ We use **[`@import-meta-env/unplugin`](https://github.com/iendeavor/import-meta-
 ### Operational model
 
 - **CI**: Build the bundle once. Publish as an immutable artifact (Docker image / S3 object).
-- **Deploy**: Container entrypoint runs `import-meta-env -x .env.example -p index.html` against the on-disk `index.html` using values from the container's environment. Bundle JS is never touched.
-- **Local dev**: A `.env` (or process env) provides values; the dev plugin reads them directly without the placeholder dance.
+- **Deploy**: Container entrypoint runs `import-meta-env --disposable -x .env.example -p index.html` against the on-disk `index.html` using values from the container's environment. `--disposable` skips the `.bak` file the CLI otherwise leaves alongside (which a static server would happily serve). Bundle JS is never touched.
+- **Local dev**: `.env.example` doubles as a committed defaults file (e.g. `API_URL=http://localhost:3000`). Devs can copy to `.env` to override per-machine. The plugin reads both at config-resolve time and inlines values in compile-time mode.
+- **Tests**: The plugin must be conditionally excluded under Vitest (e.g. `if (process.env.VITEST === "true")`). Otherwise the plugin's `configResolved` hook demands env values for every `.env.example` key at test-run time, which is brittle in CI. Tests don't exercise the runtime injection mechanism — they import the modules and the schema's defaults take over.
 
-### Reconciliation with [ADR 0013](0013-env-config.md)
+### In-browser validation
 
-[ADR 0013](0013-env-config.md) requires every app to declare env in `src/env.ts` via a zod schema. That contract stays. In a web app, `src/env.ts` reads `import.meta.env` exactly as today — but the values now arrive via `globalThis.import_meta_env` after the entrypoint swap.
+Every web app declares its env surface in a single `src/env.ts` module: a zod schema validated once at module init, producing a typed `env` object the rest of the app imports. `src/env.ts` reads each variable individually from `import.meta.env` — values arrive via `globalThis.import_meta_env` after the entrypoint swap, so by the time the schema runs in the browser, real values are present.
 
 - The plugin gives us **shape/type** safety against the `.env.example` allowlist.
-- The zod schema gives us **value** validation (e.g. `z.string().url()`, enums, defaults). Keep it.
-- The schema runs in the browser after the swap script executes, so by the time `src/env.ts` is evaluated, real values are present.
+- The zod schema gives us **value** validation (e.g. `z.string().url()`, enums, defaults).
+- Validators can use their natural strict forms (URLs, enums) — no need to loosen them to admit placeholder strings, since by execution time the placeholders have been replaced.
 
-`src/env.ts` therefore becomes simpler than the prior 2026-04-19 revision required: validators can use their natural strict forms (URLs, enums) instead of being loosened to admit placeholder strings.
+(Backend services follow a different approach — see [ADR 0021](0021-backend-config.md). The retired [ADR 0013](0013-env-config.md) previously covered both surfaces in a single shared pattern.)
 
 ### Required vs optional variables
 
@@ -110,7 +118,12 @@ Anything that mutates `index.html` between plugin output and the entrypoint CLI 
 
 ### Pinned versions
 
-Per CLAUDE.md ("Lock to exact versions"), `@import-meta-env/unplugin` and `@import-meta-env/cli` are pinned exactly in `package.json`. Bumps go through a PR that re-runs the full quality gate. The current pinned version is recorded in the implementing app's `package.json`; this ADR does not enshrine a number to avoid drift.
+Per CLAUDE.md ("Lock to exact versions"):
+
+- `@import-meta-env/unplugin` is a dev dependency in the app's `package.json`, pinned exactly.
+- `@import-meta-env/cli` is **not** a JS dependency — it's a runtime tool installed into the container image only. It's pinned via an `IMV_CLI_VERSION` build ARG in the Dockerfile and consumed by `npm install -g "@import-meta-env/cli@${IMV_CLI_VERSION}"`. Keeping it out of `package.json` matches knip's view (no source file imports it) and keeps the dev-time install slim.
+
+Bumps to either version go through a PR that re-runs the full quality gate. Exact numbers live in the implementing app's `package.json` and Dockerfile rather than in this ADR.
 
 ## Consequences
 
@@ -129,7 +142,7 @@ Per CLAUDE.md ("Lock to exact versions"), `@import-meta-env/unplugin` and `@impo
 
 ### Negative
 
-- **Frontend-only** — Does not address backend/Node service config (covered by [ADR 0013](0013-env-config.md)).
+- **Frontend-only** — Does not address backend/Node service config (covered by [ADR 0021](0021-backend-config.md)).
 - **Runtime indirection** — Every env access is a property lookup on a global instead of an inlined literal. Negligible perf cost; slightly less amenable to dead-code elimination based on env values (e.g. `if (import.meta.env.DEV)` may not tree-shake at build time the way Vite's native handling does).
 - **HTML mutation step required** — Deploys must run the CLI (or equivalent) before serving. One step in the entrypoint.
 - **Placeholder must reach the browser unchanged** — Constraints listed in "HTML processing constraints" above.
@@ -180,18 +193,20 @@ If the dependency disappears, an in-house replacement is small and isolated. We 
 
 ## Implementation Plan
 
-1. Migrate `apps/sample-web` to demonstrate the new pattern (smallest blast radius; throwaway scaffold).
-2. Add `@import-meta-env/unplugin` to its `vite.config.ts` and create `apps/sample-web/.env.example`.
-3. Restore strict zod validators in `src/env.ts` (e.g. `z.string().url()` for `VITE_API_URL`) now that placeholders are no longer flowing through the schema.
-4. Replace `apps/sample-web/container/entrypoint.sh` with a thin script that invokes `import-meta-env -x .env.example -p /usr/share/nginx/html/index.html`. Drop the BSD/GNU `sed` handling.
-5. Drop `BUILD_MODE` from the Dockerfile build step.
-6. Verify: same image, two stages, two configs, identical bundle hash; confirm SRI integrity hashes are stable across deploys.
-7. Roll out to subsequent frontend apps as they are scaffolded.
+The throwaway `apps/sample-web` scaffold has been migrated to this pattern as the reference implementation; subsequent frontend apps adopt the same shape as they are scaffolded. The reference layout is:
+
+- `apps/sample-web/.env.example` — allowlist + committed defaults.
+- `apps/sample-web/vite.config.ts` — `ImportMetaEnvPlugin.vite({ example: ".env.example" })`, conditionally excluded when `process.env.VITEST === "true"`.
+- `apps/sample-web/index.html` — the placeholder `<script>` in `<head>`, before the bundle's module script.
+- `apps/sample-web/src/env.ts` — zod schema with strict validators; reads each variable individually (not bare `import.meta.env`).
+- `apps/sample-web/Dockerfile` — pins the CLI via `IMV_CLI_VERSION` ARG and installs it into the runtime image.
+- `apps/sample-web/container/entrypoint.sh` — invokes `import-meta-env --disposable -x /etc/import-meta-env/.env.example -p /usr/share/nginx/html/index.html`.
 
 ## References
 
 - [import-meta-env documentation](https://import-meta-env.org/)
-- [GitHub: iendeavor/import-meta-env](https://github.com/iendeavor/import-meta-env)
+- [GitHub: runtime-env/import-meta-env](https://github.com/runtime-env/import-meta-env)
 - [12-factor: Config](https://12factor.net/config)
 - [12-factor: Build, release, run](https://12factor.net/build-release-run)
-- [ADR 0013: Env config via validated schema](0013-env-config.md) — server-side counterpart and the in-browser zod validator that complements this plugin.
+- [ADR 0021: Typed file-based config with secrets-only env vars (backend)](0021-backend-config.md) — server-side counterpart.
+- [ADR 0013: Env config via validated schema](0013-env-config.md) — superseded; previously covered both surfaces under a single per-app `src/env.ts` pattern.
