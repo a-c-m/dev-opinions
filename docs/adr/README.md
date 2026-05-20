@@ -28,10 +28,14 @@ Each ADR follows:
 | 0010 | [Lefthook for git hooks](0010-lefthook.md) | Accepted |
 | 0011 | [Conventional Commits + commitlint + commitizen](0011-conventional-commits.md) | Accepted |
 | 0012 | [Claude Code configuration layout](0012-claude-code-setup.md) | Accepted |
-| 0013 | [Env config via validated schema](0013-env-config.md) | Accepted |
+| 0013 | [Env config via validated schema](0013-env-config.md) | Superseded |
 | 0014 | [Node 22 LTS pinned via .nvmrc](0014-node-22-lts.md) | Accepted |
 | 0015 | [Trivy for vulnerability scanning](0015-trivy-security-scan.md) | Accepted |
 | 0016 | [GitHub Actions with reusable workflows](0016-github-actions-ci.md) | Accepted |
 | 0017 | [OpenTofu for infrastructure-as-code](0017-opentofu-iac.md) | Accepted |
 | 0018 | [GitHub repository conventions](0018-github-repo-conventions.md) | Accepted |
 | 0019 | [Web runtime env injection via `import-meta-env`](0019-web-runtime-env-tokens.md) | Accepted |
+| 0020 | [Ripgrep over grep for all search](0020-ripgrep-over-grep.md) | Accepted |
+| 0021 | [Typed file-based config with secrets-only env vars (backend)](0021-backend-config.md) | Proposed |
+| 0022 | [Package by feature for application code](0022-package-by-feature.md) | Proposed |
+| 0023 | [Package script conventions](0023-package-script-conventions.md) | Proposed |
