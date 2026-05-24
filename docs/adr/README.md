@@ -82,3 +82,5 @@ Each ADR follows:
   — Curated `.claude/` layout (agents, hooks, commands, skills, settings.json) plus root + per-app `CLAUDE.md` and `.mcp.json` (context7, playwright, chrome-devtools). Hooks split into content validators and command guards, no escape hatches.
 - **[0024 — AGENTS.md as cross-agent standard](0024-multi-agent-rule-distribution.md)** — *Proposed*
   — `AGENTS.md` is the canonical cross-agent brief; `CLAUDE.md` is a committed symlink to it. Skills move to `.agents/skills/<name>/SKILL.md` with per-agent symlinks. OpenCode hook parity via `opencode-claude-hooks` plugin (best-effort). Supersedes the single-agent parts of 0012.
+- **[0025 — Child code layout: `apps/` and `repos/`](0025-child-apps-and-repos.md)** — *Proposed*
+  — Two parallel root directories, each optional: `apps/` for pnpm workspace members (existing monorepo), `repos/` for independent child git repos (new). Children in `repos/` are excluded from pnpm workspace and NX graph, own their own everything, work standalone. Capability is opt-in by population; no flag. Cross-repo agent context via running the agent at the parent root. No git-hook cascading. Extends 0024.
