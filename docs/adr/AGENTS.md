@@ -21,6 +21,7 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 - **[0007 — Knip](0007-knip-dead-code.md)** — Knip 5 at repo root; CI-blocks new issues.
 - **[0008 — Trivy](0008-trivy-security-scan.md)** — single scanner via `pnpm security`; fs/image/config; HIGH+CRITICAL fail.
 - **[0009 — Ripgrep over grep](0009-ripgrep-over-grep.md)** — `rg` everywhere; PreToolUse hook blocks bare `grep`.
+- **[0030 — Child code layout: `apps/` and `repos/`](0030-child-apps-and-repos.md)** — two parallel optional roots; `apps/` for workspace members, `repos/` for independent child git repos; cross-repo agent context via running at parent root.
 
 ### Application stack
 
@@ -72,7 +73,6 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 
 - **[0028 — AGENTS.md as cross-agent standard](0028-multi-agent-rule-distribution.md)** — `AGENTS.md` canonical; `CLAUDE.md` symlinked; skills in `.agents/skills/<name>/SKILL.md` with per-agent symlinks; OpenCode hook parity via plugin (best-effort).
 - **[0029 — Claude Code config layout](0029-claude-code-setup.md)** — `.claude/` layout (agents, hooks, commands, skills, settings); `.mcp.json` (context7, playwright, chrome-devtools); hooks split into content validators and command guards. Claude-specific impl; cross-agent parts superseded by 0028.
-- **[0030 — Child code layout: `apps/` and `repos/`](0030-child-apps-and-repos.md)** — two parallel optional roots; `apps/` for workspace members, `repos/` for independent child git repos; cross-repo agent context via running at parent root.
 
 ### Superseded
 
