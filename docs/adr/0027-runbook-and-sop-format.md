@@ -29,6 +29,11 @@ template.
 Filenames: **kebab-case**, descriptive, no `RUN-NNN` prefix. The
 path is the identity.
 
+A `runbooks/` or `sops/` folder may carry an `AGENTS.md` once it
+holds enough procedures to warrant a brief — per [ADR 0024](0024-multi-agent-rule-distribution.md)'s
+per-folder pattern, with `README.md` symlinked to it for human
+browsing.
+
 ### Frontmatter (both optional)
 
 ```yaml
