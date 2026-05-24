@@ -4,15 +4,15 @@ date: 2026-05-22
 decision-makers: [Repo platform]
 ---
 
-# ADR 0030: Container build and local dev conventions
+# ADR 0023: Container build and local dev conventions
 
 ## Context and Problem Statement
 
-[ADR 0015](0015-trivy-security-scan.md) (Trivy scans),
-[ADR 0016](0016-github-actions-ci.md) (CI builds),
-[ADR 0017](0017-opentofu-iac.md) (IaC deploys),
-[ADR 0023](0023-package-script-conventions.md) (`lint:container`),
-and [ADR 0029](0029-production-data-flow.md) (in-VPC sanitisation
+[ADR 0008](0008-trivy-security-scan.md) (Trivy scans),
+[ADR 0021](0021-github-actions-ci.md) (CI builds),
+[ADR 0022](0022-opentofu-iac.md) (IaC deploys),
+[ADR 0005](0005-package-script-conventions.md) (`lint:container`),
+and [ADR 0025](0025-production-data-flow.md) (in-VPC sanitisation
 container) all assume a `Dockerfile` shape that no ADR defines.
 Each service inventing its own = different base images,
 different attack surfaces, different healthcheck contracts.
@@ -60,7 +60,7 @@ CMD ["dist/main.js"]
 ```
 
 - **Slim Debian** for every stage (glibc — `better-sqlite3` and
-  other native modules from [ADR 0009](0009-drizzle-orm.md) work
+  other native modules from [ADR 0012](0012-drizzle-orm.md) work
   without rebuild flags). Distroless deferred pending devops review.
 - **`USER node`** (uid 1000, shipped by the official image —
   no `useradd` ceremony).
@@ -78,7 +78,7 @@ CMD ["dist/main.js"]
 `dev` → local compose only. `runtime` → stage / temp / prod.
 `deps` and `builder` are intermediate. Single artifact promotes
 through environments unchanged
-([ADR 0028](0028-branching-releases-environments.md)).
+([ADR 0024](0024-branching-releases-environments.md)).
 
 ### CI image tagging
 
@@ -130,13 +130,13 @@ services:
 - **postgres pinned `postgres:16-bookworm`** — Debian-based,
   matches the slim alignment. Major pinned; patch via PR.
 
-[ADR 0023](0023-package-script-conventions.md)'s `db:up`/`db:down`/`db:reset`
+[ADR 0005](0005-package-script-conventions.md)'s `db:up`/`db:down`/`db:reset`
 verbs wrap this compose file per service.
 
 ### Out of scope
 
 k8s / helm / kustomize manifests; image registry choice (already
-parameterised in [ADR 0016](0016-github-actions-ci.md)); image
+parameterised in [ADR 0021](0021-github-actions-ci.md)); image
 signing / SBOM (security follow-up).
 
 Build tool: `podman build` (or `buildah bud`) locally; CI uses
@@ -148,9 +148,9 @@ Build tool: `podman build` (or `buildah bud`) locally; CI uses
 
 - **One image, every environment** — `runtime` promotes through
   stage/temp/prod unchanged.
-- **Trivy scan surface is bounded** ([ADR 0015](0015-trivy-security-scan.md))
+- **Trivy scan surface is bounded** ([ADR 0008](0008-trivy-security-scan.md))
   — same base across services means findings dedupe.
-- **Hadolint contract from [ADR 0023](0023-package-script-conventions.md)
+- **Hadolint contract from [ADR 0005](0005-package-script-conventions.md)
   is concrete** — there's a shape to lint against.
 - **`podman compose up` is the whole local dev story.**
 
@@ -165,7 +165,7 @@ Build tool: `podman build` (or `buildah bud`) locally; CI uses
 
 ### Neutral
 
-- **Frontend services** ([ADR 0007](0007-frontend-frameworks.md))
+- **Frontend services** ([ADR 0011](0011-frontend-frameworks.md))
   ship a similarly-shaped image where `dist/main.js` is an SSR
   entry or static-serve. Shape unchanged.
 - **`node` uid 1000** — bind mounts work if host UID matches;
@@ -190,14 +190,14 @@ Build tool: `podman build` (or `buildah bud`) locally; CI uses
 
 ## Relationship to prior ADRs
 
-- **Consumed by [0015](0015-trivy-security-scan.md), [0016](0016-github-actions-ci.md),
-  [0028](0028-branching-releases-environments.md)** — Trivy scans
+- **Consumed by [0008](0008-trivy-security-scan.md), [0021](0021-github-actions-ci.md),
+  [0024](0024-branching-releases-environments.md)** — Trivy scans
   this; CI builds it; release flow deploys it.
-- **References [0009](0009-drizzle-orm.md)** — native modules
+- **References [0012](0012-drizzle-orm.md)** — native modules
   motivate slim/glibc over Alpine.
-- **References [0014](0014-node-22-lts.md)** — base image follows
+- **References [0002](0002-node-22-lts.md)** — base image follows
   the Node LTS pin.
-- **References [0023](0023-package-script-conventions.md)** —
+- **References [0005](0005-package-script-conventions.md)** —
   `lint:container` lints this shape; `db:*` family wraps the
   per-service compose.
 

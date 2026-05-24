@@ -12,7 +12,7 @@ Adapted from [mattpocock/skills](https://github.com/mattpocock/skills/blob/main/
 - **Good tests** are integration-style: they exercise real code paths through public APIs. They describe _what_ the system does, not _how_. "User can checkout with valid cart" tells you exactly what capability exists. They survive refactors.
 - **Bad tests** are coupled to implementation: they mock internal collaborators, test private methods, or verify through external means. The warning sign: your test breaks when you refactor, but behaviour hasn't changed.
 
-For our stack ([ADR 0008](../../docs/adr/0008-vitest-playwright.md)):
+For our stack ([ADR 0013](../../docs/adr/0013-vitest-playwright.md)):
 - Vitest for unit + integration. Mock only at external boundaries (network, filesystem, time, random) — see also [.claude/agents/testing-specialist.md](../agents/testing-specialist.md).
 - Playwright for E2E (`apps/<product>/<service>-e2e/`).
 

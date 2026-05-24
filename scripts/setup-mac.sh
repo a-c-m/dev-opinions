@@ -5,12 +5,12 @@
 # (https://brew.sh).
 #
 # Required (the gate and Claude hooks depend on these):
-#   ripgrep   — search tool used by .claude/hooks/* and ADR 0020.
+#   ripgrep   — search tool used by .claude/hooks/* and ADR 0009.
 #   jq        — JSON parser used by .claude/hooks/* to read tool input.
-#   trivy     — vulnerability scanner used by `pnpm security` (ADR 0015).
+#   trivy     — vulnerability scanner used by `pnpm security` (ADR 0008).
 #
 # Optional (re-run with INCLUDE_OPTIONAL=1):
-#   opentofu  — only if you'll touch apps/*/iac/ (ADR 0017).
+#   opentofu  — only if you'll touch apps/*/iac/ (ADR 0022).
 #   beads     — local task tracking surfaced by SessionStart hook.
 #
 # Does NOT install Node / pnpm. Use nvm/fnm + corepack — see docs/QUICKSTART.md.

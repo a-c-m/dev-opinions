@@ -1,12 +1,13 @@
-# ADR 0029: Production data flow to lower environments
+---
+date: 2026-05-22
+tags: [data, security, environments, sanitisation]
+---
 
-- **Status**: Proposed
-- **Date**: 2026-05-22
-- **Tags**: data, security, environments, sanitisation
+# ADR 0025: Production data flow to lower environments
 
-## Context
+## Context and Problem Statement
 
-[ADR 0028](0028-branching-releases-environments.md) covers code
+[ADR 0024](0024-branching-releases-environments.md) covers code
 direction (feature → main → tag → prod). This ADR covers the
 opposite: production data flowing into lower environments for
 realistic development and integration testing.
@@ -17,7 +18,7 @@ credentials stored as data (payment provider keys, OAuth
 tokens), and pending outbox events that replay against live
 external endpoints on restore.
 
-## Decision
+## Decision Outcome
 
 Production data flows to lower environments only via a
 **sanitised snapshot**. Three hard rules, decoupled pipeline.
@@ -65,10 +66,10 @@ are cheap; prod DB load is bounded.
 ### Where the sanitised data lands
 
 - **stage**: full sanitised snapshot. Refresh cadence per-service.
-- **hosted dev** (when present, per [ADR 0028](0028-branching-releases-environments.md)):
+- **hosted dev** (when present, per [ADR 0024](0024-branching-releases-environments.md)):
   a **1% cutdown of stage** — same shape, smaller volume.
 - **developer laptops**: pull the artifact directly, IAM-gated.
-- **temp env** ([ADR 0028](0028-branching-releases-environments.md)):
+- **temp env** ([ADR 0024](0024-branching-releases-environments.md)):
   stage-equivalent backing services → same sanitised data.
 
 ### Out of scope for this ADR
@@ -126,15 +127,15 @@ services), and per-service sanitisation tables / columns.
 
 ## Relationship to prior ADRs
 
-- **Companion to [ADR 0028](0028-branching-releases-environments.md)**
+- **Companion to [ADR 0024](0024-branching-releases-environments.md)**
   — code direction; data direction.
-- **Builds on [ADR 0015](0015-trivy-security-scan.md)** at the
+- **Builds on [ADR 0008](0008-trivy-security-scan.md)** at the
   principle level: prod-data containment is security-adjacent.
-- **Consumed by [ADR 0027](0027-runbook-and-sop-format.md)** —
+- **Consumed by [ADR 0026](0026-runbook-and-sop-format.md)** —
   per-service sanitisation and restore may carry their own
   runbooks.
 
 ## References
 
-- [ADR 0028](0028-branching-releases-environments.md) — code direction.
-- [ADR 0015](0015-trivy-security-scan.md) — security gate.
+- [ADR 0024](0024-branching-releases-environments.md) — code direction.
+- [ADR 0008](0008-trivy-security-scan.md) — security gate.

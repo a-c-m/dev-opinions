@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Full quality gate: lint + typecheck + test + knip + security.
-# Matches `pnpm check` — keep the two in sync (see ADR 0015).
+# Matches `pnpm check` — keep the two in sync (see ADR 0008).
 # Run this before raising a PR.
 
 set -euo pipefail

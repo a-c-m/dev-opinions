@@ -1,12 +1,13 @@
-# ADR 0025: Child code layout — `apps/` and `repos/`
+---
+date: 2026-05-22
+tags: [ai-agents, multi-repo, layout]
+---
 
-- **Status**: Proposed
-- **Date**: 2026-05-22
-- **Tags**: ai-agents, multi-repo, layout
+# ADR 0030: Child code layout — `apps/` and `repos/`
 
-## Context
+## Context and Problem Statement
 
-[ADRs 0012](0012-claude-code-setup.md) and [0024](0024-multi-agent-rule-distribution.md)
+[ADRs 0012](0029-claude-code-setup.md) and [0028](0028-multi-agent-rule-distribution.md)
 set up agent context for *one* repo. A new use case has surfaced:
 **cross-repo context**. Working on a web client, the agent should
 also be able to read its server; organizational ADRs that live in
@@ -22,12 +23,12 @@ drafts explored cascading hooks across a wrapper and its children;
 that path was abandoned — the wrapper widens what the agent can see
 and the rules it knows to follow, not what `git commit` enforces.
 
-## Decision
+## Decision Outcome
 
 Two parallel directories under the repo root, each optional:
 
 - **`apps/`** — pnpm workspace members. The existing monorepo
-  capability per [ADR 0005](0005-nx-monorepo.md). One git history,
+  capability per [ADR 0004](0004-nx-monorepo.md). One git history,
   shared lockfile, NX-aware.
 - **`repos/`** — independent child git repos. Each owns its
   `.git`, `package.json`, `pnpm-lock.yaml`, `node_modules`,
@@ -68,7 +69,7 @@ walks `repos/*/` and checks for a nested `.git/`.
 The parent's `AGENTS.md` carries a curated one-line entry per
 child plus a pointer to that child's own `AGENTS.md` for full
 detail — progressive disclosure per
-[ADR 0024](0024-multi-agent-rule-distribution.md). Hand-maintained
+[ADR 0028](0028-multi-agent-rule-distribution.md). Hand-maintained
 as children are added.
 
 ### Rule inheritance
@@ -79,7 +80,7 @@ as children are added.
 - **ADR enforcement when editing a child**: agentic. The parent's
   `AGENTS.md` instructs the agent to surface and seek clarification
   when proposed work counters a parent ADR. Specific ADRs that
-  ship hooks ([0020](0020-ripgrep-over-grep.md) →
+  ship hooks ([0009](0009-ripgrep-over-grep.md) →
   `check-bash-rules.sh`) keep firing — they're project-level.
 
 ### Use case coverage
@@ -149,15 +150,15 @@ No upstream sync from base-app. Forks diverge from day one.
 
 ## Relationship to prior ADRs
 
-- **Extends [ADR 0024](0024-multi-agent-rule-distribution.md)**:
+- **Extends [ADR 0028](0028-multi-agent-rule-distribution.md)**:
   cross-agent context now spans multiple repos. No supersedence.
-- **Depends on [ADR 0012](0012-claude-code-setup.md)**: Claude
+- **Depends on [ADR 0029](0029-claude-code-setup.md)**: Claude
   Code's project-root model is the load-bearing primitive.
-- **Parallel to [ADR 0005](0005-nx-monorepo.md)**: `apps/`
+- **Parallel to [ADR 0004](0004-nx-monorepo.md)**: `apps/`
   (workspace monorepo) and `repos/` (independent siblings) are
   sibling capabilities.
 
 ## References
 
 - [agents.md spec](https://agents.md/) — `AGENTS.md` format.
-- [ADR 0024](0024-multi-agent-rule-distribution.md) — extended here.
+- [ADR 0028](0028-multi-agent-rule-distribution.md) — extended here.

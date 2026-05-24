@@ -1,13 +1,14 @@
-# ADR 0014: Node 22 LTS pinned via .nvmrc
+---
+date: 2026-04-19
+---
 
-- **Status**: Accepted
-- **Date**: 2026-04-19
+# ADR 0002: Node 22 LTS pinned via .nvmrc
 
-## Context
+## Context and Problem Statement
 
 Node 22 entered LTS in October 2024 and is the current active LTS through 2027. Audited projects do not pin Node versions consistently; this causes drift across machines and CI. NX, pnpm, Vitest, NestJS 10, and Drizzle all support Node 22.
 
-## Decision
+## Decision Outcome
 
 - Pin Node **22 LTS** to an **exact** patch version via `.nvmrc` at repo root
   (e.g. `22.19.0`, not `22` or `22.x`). Drift between dev machines and CI is
@@ -23,16 +24,16 @@ Node 22 entered LTS in October 2024 and is the current active LTS through 2027. 
 
 ## Consequences
 
-**Positive**
+### Positive
 - One pinned version for all contributors and CI → deterministic builds.
 - Access to Node 22 features: stable `node:test`, built-in `--watch`, ESM-first ergonomics, `require(esm)` support.
 - LTS window until 2027 gives runway.
 
-**Negative**
+### Negative
 - Tooling that lags on Node 22 (rare now) would need patching or a downshift.
 - nvm/fnm/volta is required locally; lightweight but not zero-install.
 
-## Alternatives
+## Alternatives considered
 
 - **Node 20 LTS** — still supported, slightly safer, misses newer perf wins.
 - **Node 24** — current, but not LTS until Oct 2025 → too fresh for a template default.

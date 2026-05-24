@@ -9,9 +9,9 @@ takes ~5 minutes if everything's missing, ~30 seconds if everything's present.
 |---|---|---|
 | **Node 22** | Runtime; pinned exact in `.nvmrc` | `fnm install 22.19.0` or `nvm install` (in repo dir) |
 | **pnpm 9+** | Package manager (ADR 0001) | `corepack enable` then `corepack prepare pnpm@9.15.0 --activate` |
-| **ripgrep (`rg`)** | All search — Claude hooks, scripts, agent searches (ADR 0020) | macOS: `brew install ripgrep` &nbsp;·&nbsp; Linux: `apt install ripgrep` |
+| **ripgrep (`rg`)** | All search — Claude hooks, scripts, agent searches (ADR 0009) | macOS: `brew install ripgrep` &nbsp;·&nbsp; Linux: `apt install ripgrep` |
 | **jq** | JSON parser used by `.claude/hooks/*` to read tool input | macOS: `brew install jq` &nbsp;·&nbsp; Linux: `apt install jq` |
-| **Trivy** | Security gate (ADR 0015) — `pnpm check` fails without it | macOS: `brew install aquasecurity/trivy/trivy` &nbsp;·&nbsp; Linux: see <https://aquasecurity.github.io/trivy/> |
+| **Trivy** | Security gate (ADR 0008) — `pnpm check` fails without it | macOS: `brew install aquasecurity/trivy/trivy` &nbsp;·&nbsp; Linux: see <https://aquasecurity.github.io/trivy/> |
 | **OpenTofu** | Required only if you'll touch `apps/*/iac/` | macOS: `brew install opentofu` |
 | **beads (`bd`)** | Optional — local task tracking; `.claude/` SessionStart hook surfaces tasks if installed | macOS: `brew install beads` |
 | **Lefthook** | Installed automatically as a dev dep on `pnpm install` | nothing to do |
@@ -47,11 +47,11 @@ That sequences:
 
 | Step | Command | Source of truth |
 |---|---|---|
-| Lint | `pnpm lint:check` (`bs check`) | ADR 0003 — biome 2 + ultracite + baseline |
-| Typecheck | `pnpm typecheck` (`tsgo`) | ADR 0002 |
-| Tests | `pnpm test` (vitest 4) | ADR 0008 |
-| Dead code | `pnpm knip` | ADR 0004 |
-| Security | `pnpm security` (Trivy fs scan) | ADR 0015 |
+| Lint | `pnpm lint:check` (`bs check`) | ADR 0006 — biome 2 + ultracite + baseline |
+| Typecheck | `pnpm typecheck` (`tsgo`) | ADR 0003 |
+| Tests | `pnpm test` (vitest 4) | ADR 0013 |
+| Dead code | `pnpm knip` | ADR 0007 |
+| Security | `pnpm security` (Trivy fs scan) | ADR 0008 |
 
 All five exit 0 on a fresh clone. If `security` fails because Trivy isn't on
 PATH, install it (above) — don't skip the step.
@@ -78,7 +78,7 @@ docker build -f apps/sample-api/Dockerfile -t sample-api:dev .
 docker build -f apps/sample-web/Dockerfile -t sample-web:dev .
 ```
 
-`sample-web`'s Dockerfile demonstrates ADR 0019: build with `BUILD_MODE=true`
+`sample-web`'s Dockerfile demonstrates ADR 0016: build with `BUILD_MODE=true`
 so VITE_* env values are baked as `___KEY___` placeholder tokens; the
 container entrypoint sed-replaces them at runtime. Run it with:
 

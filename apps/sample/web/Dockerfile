@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 #
-# sample-web — React 19 + Vite 8, with ADR 0019 runtime env injection.
+# sample-web — React 19 + Vite 8, with ADR 0016 runtime env injection.
 #
 # Multi-stage:
 #   1. builder — install workspace deps and `vite build`. The

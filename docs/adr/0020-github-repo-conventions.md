@@ -1,15 +1,16 @@
-# ADR 0018: GitHub repository conventions
+---
+date: 2026-04-19
+---
 
-- **Status**: Accepted
-- **Date**: 2026-04-19
+# ADR 0020: GitHub repository conventions
 
-## Context
+## Context and Problem Statement
 
 A repository communicates through more than its code. GitHub surfaces — issue templates, PR templates, CODEOWNERS, Dependabot, SECURITY.md — are all default-on slots for conventions that otherwise live in tribal knowledge. A template that ships with these slots filled puts every downstream project on the same footing from day one, instead of re-inventing them at different rates.
 
-This ADR covers the repository-meta layer. CI workflows themselves are in ADR 0016.
+This ADR covers the repository-meta layer. CI workflows themselves are in ADR 0021.
 
-## Decision
+## Decision Outcome
 
 ### Pull request template (`.github/pull_request_template.md`)
 
@@ -64,21 +65,21 @@ Four ecosystems, **staggered weekly** so the review load spreads across the week
 
 ### Copilot / other AI instruction files
 
-Deliberately **not** added. `CLAUDE.md` (ADR 0012) is the single canonical AI context file. Mirroring it into `copilot-instructions.md` guarantees drift. If Copilot users join the project, point them at `CLAUDE.md`.
+Deliberately **not** added. Per [ADR 0028](0028-multi-agent-rule-distribution.md), `AGENTS.md` is now the canonical cross-agent context file; `CLAUDE.md` is a committed symlink to it. Mirroring into `copilot-instructions.md` guarantees drift. If Copilot users join the project, point them at `AGENTS.md`.
 
 ## Consequences
 
-**Positive**
+### Positive
 - Every repo spawned from the template has the same issue/PR shape, making cross-repo review and triage lower-friction.
 - Dependabot is on by default with a sensible cadence, not a rushed afterthought that teams disable because it became noisy.
 - CODEOWNERS is a concrete stub, not a blank file — consumers have a pattern to follow.
 - SECURITY.md gives external reporters a channel from day one, not after the first disclosure panic.
 
-**Negative**
+### Negative
 - The templates are opinionated. Teams wanting a different PR shape must edit them on adoption.
 - Staggered Dependabot days are a convention; a team in a different timezone or cadence may want to shift the schedule.
 
-## Alternatives
+## Alternatives considered
 
 - **Ship the repo without these files** — fastest to write, forces every downstream project to invent the shape. Rejected.
 - **Link to external docs instead of inlining templates** — external docs drift and are not surfaced by GitHub. Inlined is cheaper.

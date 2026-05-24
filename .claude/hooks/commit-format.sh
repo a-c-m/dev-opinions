@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PostToolUse hook for Bash.
 # After any `git commit` call, validate HEAD's subject against:
-#   1. Conventional Commits (ADR 0011).
+#   1. Conventional Commits (ADR 0019).
 #   2. Trailing GitHub issue reference (`#NNN`).
 #
 # Advisory-only: emits a warning on stderr, exits 0, so the session
@@ -28,7 +28,7 @@ WARN=0
 # 1. Conventional Commits — type(scope)!?: description  or  type!?: description
 if ! printf '%s' "$SUBJECT" | rg -q '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._-]+\))?!?: .+'; then
   echo "commit subject does not match Conventional Commits: \"$SUBJECT\"" >&2
-  echo "expected: type(scope): description — see docs/adr/0011-conventional-commits.md" >&2
+  echo "expected: type(scope): description — see docs/adr/0019-conventional-commits.md" >&2
   WARN=1
 fi
 

@@ -8,7 +8,7 @@ Typical occupants:
 
 - `knip-issue-count-reporter` — reporter for the `knip` dead-code tool.
 - `monorepo-cz-adapter` — custom Commitizen adapter enforcing the repo's
-  scope conventions (ADR 0011).
+  scope conventions (ADR 0019).
 - `eslint-plugin-package-json-dependencies` — project-local lint rules.
 
 ## Conventions

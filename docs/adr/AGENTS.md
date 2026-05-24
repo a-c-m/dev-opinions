@@ -8,15 +8,18 @@ enough of the decision that an agent (or a human) gets the gist
 without opening the file. Open the linked ADR when you need the
 context, the alternatives that were rejected, or the consequences.
 
+ADRs are Accepted by default. A `status` field on an ADR declares Proposed, Superseded, or Deprecated.
+
 ## Format
 
-Each ADR follows:
+Each ADR follows the MADR-lite shape:
 
-- **Status**: Proposed | Accepted | Superseded | Deprecated
-- **Context**: What is the situation that prompts this decision?
-- **Decision**: What did we decide?
-- **Consequences**: What follows — positive, negative, and neutral?
-- **Alternatives**: What else was considered and why rejected?
+- **Frontmatter** — `date`, optional `decision-makers`, optional `tags`. A `status:` field appears only when the ADR is `proposed`, `superseded by ADR-NNNN`, or `deprecated`; absence = Accepted.
+- **Context and Problem Statement** — the situation that prompts the decision.
+- **Decision Outcome** — what we decided.
+- **Consequences** — Positive / Negative / Neutral.
+- **Alternatives considered** — what else was on the table and why rejected.
+- **Relationship to prior ADRs** and **References** as needed.
 
 ## Index
 
@@ -24,73 +27,73 @@ Each ADR follows:
 
 - **[0001 — Package manager: pnpm](0001-package-manager.md)** — *Accepted*
   — Adopt pnpm 9 as the sole package manager; enforce via `packageManager` field and `engines.pnpm`; workspaces declared in `pnpm-workspace.yaml`.
-- **[0002 — TypeScript strict + tsgo](0002-typescript-strict-tsgo.md)** — *Accepted*
-  — Use TypeScript 5.8.x with `strict: true` plus extra `noUnused*` flags; typecheck via tsgo (`@typescript/native-preview --noEmit`); keep `tsc` only for `.d.ts` emission.
-- **[0003 — Biome + Ultracite for lint/format](0003-biome-ultracite.md)** — *Accepted*
-  — Single tool: Biome 2.2.6 + Ultracite 5.4.5, wrapped by `biome-suppressed` (`bs` CLI) for baseline-aware checks. `lint` writes, `lint:check` reads, `lint:ci` blocks improvements without baseline update.
-- **[0004 — Knip for dead-code detection](0004-knip-dead-code.md)** — *Accepted*
-  — Knip ^5.62 at repo root for unused files/exports/types/deps; CI-blocking, driven by NX entry points.
-- **[0005 — NX for monorepo orchestration](0005-nx-monorepo.md)** — *Accepted*
-  — NX 22.6.5 with `apps/*`, `shared/*`, `tools/*` layout; CI runs `nx affected`; independent per-project releases via `nx release`.
-- **[0010 — Lefthook for git hooks](0010-lefthook.md)** — *Accepted*
-  — Lefthook (YAML) as runner with parallel pre-commit (biome, knip, commitlint), pre-push (`nx affected`), and commit-msg gates.
-- **[0011 — Conventional Commits](0011-conventional-commits.md)** — *Accepted*
-  — Conventional Commits 1.0 enforced by commitlint via `commit-msg`; `pnpm commit` for interactive prompts; scope = NX project name; optional `#<n>` issue suffix; drives `nx release`.
-- **[0014 — Node 22 LTS](0014-node-22-lts.md)** — *Accepted*
+- **[0002 — Node 22 LTS](0002-node-22-lts.md)** — *Accepted*
   — Pin Node 22 LTS to exact patch in `.nvmrc`; declare `engines.node >=22.0.0`; CI uses `actions/setup-node@v4` with `node-version-file: .nvmrc`.
-- **[0020 — Ripgrep over grep](0020-ripgrep-over-grep.md)** — *Accepted*
-  — Use `rg` for all search; never POSIX `grep`. Prefer Claude's `Grep` tool, then `rg` in Bash. `git grep` exempt. Installed via `scripts/setup-mac.sh`. *(Hook now blocks bare grep — see CLAUDE.md.)*
-- **[0023 — Package script conventions](0023-package-script-conventions.md)** — *Proposed*
+- **[0003 — TypeScript strict + tsgo](0003-typescript-strict-tsgo.md)** — *Accepted*
+  — Use TypeScript 5.8.x with `strict: true` plus extra `noUnused*` flags; typecheck via tsgo (`@typescript/native-preview --noEmit`); keep `tsc` only for `.d.ts` emission.
+- **[0004 — NX for monorepo orchestration](0004-nx-monorepo.md)** — *Accepted*
+  — NX 22.6.5 with `apps/*`, `shared/*`, `tools/*` layout (apps in practice are two-tier `apps/<product>/<service>/`); CI runs `nx affected`; independent per-project releases via `nx release`.
+- **[0005 — Package script conventions](0005-package-script-conventions.md)** — *Accepted*
   — Fixed alphabet of script verbs (`dev`, `serve`, `start`, `build`, `clean`, `lint`, `typecheck`, `test{,:cov,:watch,:int*}`, `e2e`, `codegen`, `db:*`) so `nx run-many` works without flag-juggling. `lint` writes; CI uses `lint:ci`.
+- **[0006 — Biome + Ultracite for lint/format](0006-biome-ultracite.md)** — *Accepted*
+  — Single tool: Biome 2.2.6 + Ultracite 5.4.5, wrapped by `biome-suppressed` (`bs` CLI) for baseline-aware checks. `lint` writes, `lint:check` reads, `lint:ci` blocks improvements without baseline update.
+- **[0007 — Knip for dead-code detection](0007-knip-dead-code.md)** — *Accepted*
+  — Knip ^5.62 at repo root for unused files/exports/types/deps; CI-blocking, driven by NX entry points.
+- **[0008 — Trivy vulnerability scanning](0008-trivy-security-scan.md)** — *Accepted*
+  — Trivy (Aqua) as the single scanner via `pnpm security` → `./scripts/security-scan.sh`; covers fs/image/config; HIGH+CRITICAL fail; part of `pnpm check`.
+- **[0009 — Ripgrep over grep](0009-ripgrep-over-grep.md)** — *Accepted*
+  — Use `rg` for all search; never POSIX `grep`. Prefer Claude's `Grep` tool, then `rg` in Bash. `git grep` exempt. Installed via `scripts/setup-mac.sh`. *(Hook now blocks bare grep — see CLAUDE.md.)*
 
 ### Application code
 
-- **[0006 — NestJS for backend APIs](0006-nestjs-backend.md)** — *Accepted*
+- **[0010 — NestJS for backend APIs](0010-nestjs-backend.md)** — *Accepted*
   — NestJS 11 (Fastify adapter) as default backend framework; cross-cutting concerns live in `shared/*` packages. NestJS 10 dropped due to CVE-2026-33011 / CVE-2026-25223.
-- **[0007 — React primary, SvelteKit alternative](0007-frontend-frameworks.md)** — *Accepted*
+- **[0011 — React primary, SvelteKit alternative](0011-frontend-frameworks.md)** — *Accepted*
   — Default frontend is React 19 + Vite 7 SPA; SvelteKit 2 is the explicit alternative for bundle-sensitive or form-heavy apps. Next.js is not the default.
-- **[0008 — Vitest + Playwright](0008-vitest-playwright.md)** — *Accepted*
-  — Vitest ≥2 for unit/integration; Playwright ≥1.56 for E2E; Stagehand opt-in per app; no Jest.
-- **[0009 — Drizzle ORM](0009-drizzle-orm.md)** — *Accepted*
+- **[0012 — Drizzle ORM](0012-drizzle-orm.md)** — *Accepted*
   — Drizzle as data layer with `node-postgres` (Postgres) and `better-sqlite3` (SQLite); schemas in `shared/db-<domain>/`; migrations via drizzle-kit; DTO validation via `drizzle-zod`.
-- **[0022 — Package by feature](0022-package-by-feature.md)** — *Proposed*
+- **[0013 — Vitest + Playwright](0013-vitest-playwright.md)** — *Accepted*
+  — Vitest ≥2 for unit/integration; Playwright ≥1.56 for E2E; Stagehand opt-in per app; no Jest.
+- **[0014 — Package by feature](0014-package-by-feature.md)** — *Accepted*
   — Vertical-slice layout: domain folders own resolver/service/component/tests/types. Cross-domain primitives go in type-folders (`ui/`, `gql/`). Files extract to shared only on second consumer.
 
 ### Configuration
 
-- **[0013 — Env config via validated schema](0013-env-config.md)** — *Superseded by 0021 (backend) and 0019 (frontend)*
-  — Original per-app `src/env.ts` zod schema pattern is retired. Zod-for-env idea survives in both successors.
-- **[0019 — Web runtime env injection](0019-web-runtime-env-tokens.md)** — *Accepted*
+- **[0015 — Backend file-based config](0015-backend-config.md)** — *Accepted*
+  — Backend config = typed zod schema + layered YAML (`default.yaml` → `{APP_ENV}.yaml` → `local.yaml`) + secrets-only env vars, via `@shared/config` with `file()`/`secret()` helpers and branded NestJS DI tokens. `APP_ENV` separate from `NODE_ENV`. Supersedes 0017 for backend.
+- **[0016 — Web runtime env injection](0016-web-runtime-env-tokens.md)** — *Accepted*
   — Inject web env vars at deploy time via `@import-meta-env/unplugin` + CLI: byte-identical bundles, single `index.html` placeholder swap, `.env.example` allowlist, in-browser zod validation in `src/env.ts`. Supersedes the prior `sed`-replacement revision.
-- **[0021 — Backend file-based config](0021-backend-config.md)** — *Proposed*
-  — Backend config = typed zod schema + layered YAML (`default.yaml` → `{APP_ENV}.yaml` → `local.yaml`) + secrets-only env vars, via `@shared/config` with `file()`/`secret()` helpers and branded NestJS DI tokens. `APP_ENV` separate from `NODE_ENV`. Supersedes 0013 for backend.
+- **[0017 — Env config via validated schema](0017-env-config.md)** — *Superseded by 0015 (backend) and 0016 (frontend)*
+  — Original per-app `src/env.ts` zod schema pattern is retired. Zod-for-env idea survives in both successors.
 
 ### CI / CD / infra / security
 
-- **[0015 — Trivy vulnerability scanning](0015-trivy-security-scan.md)** — *Accepted*
-  — Trivy (Aqua) as the single scanner via `pnpm security` → `./scripts/security-scan.sh`; covers fs/image/config; HIGH+CRITICAL fail; part of `pnpm check`.
-- **[0016 — GitHub Actions](0016-github-actions-ci.md)** — *Accepted*
+- **[0018 — Lefthook for git hooks](0018-lefthook.md)** — *Accepted*
+  — Lefthook (YAML) as runner with parallel pre-commit (biome, knip, commitlint), pre-push (`nx affected`), and commit-msg gates.
+- **[0019 — Conventional Commits](0019-conventional-commits.md)** — *Accepted*
+  — Conventional Commits 1.0 enforced by commitlint via `commit-msg`; `pnpm commit` for interactive prompts; scope = NX project name; mandatory `#<n>` or `PROJ-<n>` ticket suffix for AI-authored commits (PreToolUse hook blocks omission); drives `nx release`.
+- **[0020 — GitHub repo conventions](0020-github-repo-conventions.md)** — *Accepted*
+  — PR template (risk level + structured sections), 5 issue templates, path-based CODEOWNERS, staggered weekly Dependabot (4 ecosystems), SECURITY.md with severity SLAs. No Copilot-instructions file; canonical AI context is `AGENTS.md` (with `CLAUDE.md` as a symlink) per ADR 0028.
+- **[0021 — GitHub Actions](0021-github-actions-ci.md)** — *Accepted*
   — Reusable workflows (prefix `_`) + `setup-monorepo` composite action; PR CI runs `nx affected` + Trivy; container registry parameterised; cloud creds via OIDC.
-- **[0017 — OpenTofu for IaC](0017-opentofu-iac.md)** — *Accepted*
+- **[0022 — OpenTofu for IaC](0022-opentofu-iac.md)** — *Accepted*
   — OpenTofu (MPL-2.0) with per-app `apps/<name>/iac/` directories; remote encrypted state (`TF_ENCRYPTION`); environments via `-var-file` not workspaces; deploys via `_infra-deploy.yml` only.
-- **[0018 — GitHub repo conventions](0018-github-repo-conventions.md)** — *Accepted*
-  — PR template (risk level + structured sections), 5 issue templates, path-based CODEOWNERS, staggered weekly Dependabot (4 ecosystems), SECURITY.md with severity SLAs. No Copilot-instructions file.
+- **[0023 — Container build and local dev conventions](0023-container-conventions.md)** — *Proposed*
+  — Single `Dockerfile` per service, four targets (`deps`/`dev`/`builder`/`runtime`), `node:22-bookworm-slim` throughout (distroless deferred pending devops review). Same `runtime` image promotes through stage/temp/prod; `dev` target only used by local compose. `USER node`, `ENTRYPOINT ["node"]`, `HEALTHCHECK` on `GET /health`. CI tags `<service>:vX.Y.Z` + `<service>:<sha>`; no `latest`. Per-service `compose.yml` with `postgres:16-bookworm`, source bind + anonymous `node_modules`, healthcheck-gated `depends_on`. Connective tissue for 0008/0021/0022/0024/0025. First ADR in MADR-lite format.
+- **[0024 — Branching, releases, and environments](0024-branching-releases-environments.md)** — *Accepted*
+  — Two branches: `main` (trunk) + `release-candidate` (deliberate release branch, renamed from `stage` to disambiguate from the env). Mandatory envs: stage + prod; hosted dev optional with direction-of-travel toward "1% cutdown of stage". Tag-driven prod with merge-back on success. Hotfix from prod tag → PR into `release-candidate`. Per-service temp env as escape hatch (one at a time, off by default, social governance). Release-in-flight enforced by precondition + concurrency group. GitLab Flow + SemVer. Companion to 0025 (data flow).
+- **[0025 — Production data flow to lower environments](0025-production-data-flow.md)** — *Accepted*
+  — Data direction companion to 0024. Three hard rules: raw prod data never leaves its environment; sanitisation happens inside the prod boundary; prod credentials never reach CI runners or developer machines. Decoupled snapshot/restore pipeline (one job dumps + sanitises to artifact store; another reads to lower envs). SQL-level sanitisation, not stream parsing. Lower envs (stage, hosted dev, developer laptops, temp) see only sanitised data; hosted dev as 1% cutdown. Implementation (cloud, scheduler, store) per-fork.
+- **[0026 — Runbook and SOP format](0026-runbook-and-sop-format.md)** — *Accepted*
+  — Procedure docs (runbooks for ops, SOPs for process) in version control, shared template. Co-located: `apps/<p>/<s>/runbooks|sops/`; cross-cutting at `docs/runbooks|sops/`. Kebab-case filenames, no `RUN-NNN`. Frontmatter only `triggers:` and `status:` (both optional). Required sections: Overview, Prerequisites, Steps, Related. Staleness via git mtime + agent point-of-use check + advisory CI script; no `last-reviewed` field.
+- **[0027 — Team metadata in CODEOWNERS comments](0027-codeowners-team-metadata.md)** — *Accepted*
+  — Carry team-and-ops metadata in `# key: value` comments above CODEOWNERS rule lines. Required when block present: `PM` and `TechLead` (one person each). Free-form additional role lines (`# Frontend: @a @b`, `# DBA: @c`). Optional operational keys: `slack`, `alerting`, `monitoring`, `status`. No separate `TEAM.md` file. AGENTS.md gains a 3-sentence pointer telling the agent to consult CODEOWNERS on big edits. Extends 0020.
 
 ### AI agents
 
-- **[0012 — Claude Code configuration layout](0012-claude-code-setup.md)** — *Accepted (single-agent parts superseded by 0024)*
+- **[0028 — AGENTS.md as cross-agent standard](0028-multi-agent-rule-distribution.md)** — *Accepted*
+  — `AGENTS.md` is the canonical cross-agent brief; `CLAUDE.md` is a committed symlink to it. Skills move to `.agents/skills/<name>/SKILL.md` with per-agent symlinks. OpenCode hook parity via `opencode-claude-hooks` plugin (best-effort). Principles: toolchain-first, soft ~150-line cap, inline rationale, review-on-signal. Path-scoping via per-app `AGENTS.md`. Supersedes the single-agent parts of 0029.
+- **[0029 — Claude Code configuration layout](0029-claude-code-setup.md)** — *Accepted (single-agent parts superseded by 0028)*
   — Curated `.claude/` layout (agents, hooks, commands, skills, settings.json) plus root + per-app `CLAUDE.md` and `.mcp.json` (context7, playwright, chrome-devtools). Hooks split into content validators and command guards, no escape hatches.
-- **[0024 — AGENTS.md as cross-agent standard](0024-multi-agent-rule-distribution.md)** — *Proposed*
-  — `AGENTS.md` is the canonical cross-agent brief; `CLAUDE.md` is a committed symlink to it. Skills move to `.agents/skills/<name>/SKILL.md` with per-agent symlinks. OpenCode hook parity via `opencode-claude-hooks` plugin (best-effort). Principles: toolchain-first, soft ~150-line cap, inline rationale, review-on-signal. Path-scoping via per-app `AGENTS.md`. Supersedes the single-agent parts of 0012.
-- **[0025 — Child code layout: `apps/` and `repos/`](0025-child-apps-and-repos.md)** — *Proposed*
-  — Two parallel root directories, each optional: `apps/` for pnpm workspace members (existing monorepo), `repos/` for independent child git repos (new). Children in `repos/` are excluded from pnpm workspace and NX graph, own their own everything, work standalone. Capability is opt-in by population; no flag. Cross-repo agent context via running the agent at the parent root. No git-hook cascading. Extends 0024.
-- **[0026 — Team metadata in CODEOWNERS comments](0026-codeowners-team-metadata.md)** — *Proposed*
-  — Carry team-and-ops metadata in `# key: value` comments above CODEOWNERS rule lines. Required when block present: `PM` and `TechLead` (one person each). Free-form additional role lines (`# Frontend: @a @b`, `# DBA: @c`). Optional operational keys: `slack`, `alerting`, `monitoring`, `status`. No separate `TEAM.md` file. AGENTS.md gains a 3-sentence pointer telling the agent to consult CODEOWNERS on big edits. Extends 0018.
-- **[0027 — Runbook and SOP format](0027-runbook-and-sop-format.md)** — *Proposed*
-  — Procedure docs (runbooks for ops, SOPs for process) in version control, shared template. Co-located: `apps/<p>/<s>/runbooks|sops/`; cross-cutting at `docs/runbooks|sops/`. Kebab-case filenames, no `RUN-NNN`. Frontmatter only `triggers:` and `status:` (both optional). Required sections: Overview, Prerequisites, Steps, Related. Staleness via git mtime + agent point-of-use check + advisory CI script; no `last-reviewed` field.
-- **[0028 — Branching, releases, and environments](0028-branching-releases-environments.md)** — *Proposed*
-  — Two branches: `main` (trunk) + `release-candidate` (deliberate release branch, renamed from `stage` to disambiguate from the env). Mandatory envs: stage + prod; hosted dev optional with direction-of-travel toward "1% cutdown of stage". Tag-driven prod with merge-back on success. Hotfix from prod tag → PR into `release-candidate`. Per-service temp env as escape hatch (one at a time, off by default, social governance). Release-in-flight enforced by precondition + concurrency group. GitLab Flow + SemVer. Companion to 0029 (data flow).
-- **[0029 — Production data flow to lower environments](0029-production-data-flow.md)** — *Proposed*
-  — Data direction companion to 0028. Three hard rules: raw prod data never leaves its environment; sanitisation happens inside the prod boundary; prod credentials never reach CI runners or developer machines. Decoupled snapshot/restore pipeline (one job dumps + sanitises to artifact store; another reads to lower envs). SQL-level sanitisation, not stream parsing. Lower envs (stage, hosted dev, developer laptops, temp) see only sanitised data; hosted dev as 1% cutdown. Implementation (cloud, scheduler, store) per-fork.
-- **[0030 — Container build and local dev conventions](0030-container-conventions.md)** — *Proposed*
-  — Single `Dockerfile` per service, four targets (`deps`/`dev`/`builder`/`runtime`), `node:22-bookworm-slim` throughout (distroless deferred pending devops review). Same `runtime` image promotes through stage/temp/prod; `dev` target only used by local compose. `USER node`, `ENTRYPOINT ["node"]`, `HEALTHCHECK` on `GET /health`. CI tags `<service>:vX.Y.Z` + `<service>:<sha>`; no `latest`. Per-service `compose.yml` with `postgres:16-bookworm`, source bind + anonymous `node_modules`, healthcheck-gated `depends_on`. Connective tissue for 0015/0016/0017/0028/0029. First ADR in MADR-lite format.
+- **[0030 — Child code layout: `apps/` and `repos/`](0030-child-apps-and-repos.md)** — *Accepted*
+  — Two parallel root directories, each optional: `apps/` for pnpm workspace members (existing monorepo), `repos/` for independent child git repos (new). Children in `repos/` are excluded from pnpm workspace and NX graph, own their own everything, work standalone. Capability is opt-in by population; no flag. Cross-repo agent context via running the agent at the parent root. No git-hook cascading. Extends 0028.

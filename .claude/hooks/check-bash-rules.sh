@@ -15,7 +15,7 @@
 #   4. No absolute paths into the repo root. CLAUDE.md "Work from the repo root".
 #      Absolute paths bust permission-rule matching, forcing re-approval every
 #      call. cwd is always the repo root — use relative paths.
-#   5. Block: bare `grep` / `egrep` / `fgrep` (ADR 0020). Carve-outs for
+#   5. Block: bare `grep` / `egrep` / `fgrep` (ADR 0009). Carve-outs for
 #      `git grep`, `man grep`, `which grep`, `type grep`, `command -v grep`,
 #      `apropos grep`, `whatis grep`, `info grep` — these are *about* grep,
 #      not invocations of it.
@@ -165,7 +165,7 @@ if printf '%s' "$GREP_NORMALIZED" | rg -q '(^|[[:space:];|&(])(grep|egrep|fgrep)
   cat >&2 <<'EOF'
 🚫 BLOCKED: bare `grep` / `egrep` / `fgrep` in a Bash tool call.
 
-Use ripgrep instead (ADR 0020):
+Use ripgrep instead (ADR 0009):
   - the built-in Grep tool (ripgrep-backed, structured output) for ad-hoc searches.
   - `rg` in shell pipelines — same regex, faster, .gitignore-aware.
 
@@ -180,7 +180,7 @@ Carve-outs (not blocked): `git grep`, `man grep`, `which grep`,
 `type grep`, `command -v grep`, `apropos grep`, `whatis grep`,
 `info grep` — these are about grep, not invocations of it.
 
-See docs/adr/0020-ripgrep-over-grep.md.
+See docs/adr/0009-ripgrep-over-grep.md.
 EOF
   exit 2
 fi

@@ -8,7 +8,7 @@ Typical occupants:
 
 - `@shared/logger` — structured logger wrapper.
 - `@shared/config` — typed schema + layered YAML loader for backend
-  services (ADR 0021); web apps follow ADR 0019 instead, pairing a local
+  services (ADR 0015); web apps follow ADR 0016 instead, pairing a local
   zod schema with `@import-meta-env/unplugin`.
 - `@shared/auth` — cross-app authentication helpers.
 - `@shared/ui` — shared React/Svelte components.
@@ -29,4 +29,4 @@ Then expose public API from `src/index.ts` and consume in apps via
 - Strict TypeScript, no `any`, no re-exported third-party types where a
   domain type would do.
 - Tests live alongside source as `*.spec.ts` or `*.test.ts` and run via
-  Vitest (see ADR 0008).
+  Vitest (see ADR 0013).

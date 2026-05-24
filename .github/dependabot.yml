@@ -1,4 +1,4 @@
-# Dependabot configuration — see ADR 0018.
+# Dependabot configuration — see ADR 0020.
 # Four ecosystems on a staggered weekly cadence so review load spreads across
 # the week. Minor + patch grouped; majors open individually.
 

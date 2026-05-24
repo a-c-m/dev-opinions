@@ -1,9 +1,10 @@
-# ADR 0016: GitHub Actions with reusable workflows
+---
+date: 2026-04-19
+---
 
-- **Status**: Accepted
-- **Date**: 2026-04-19
+# ADR 0021: GitHub Actions with reusable workflows
 
-## Context
+## Context and Problem Statement
 
 CI is part of the quality gate, not a layer bolted on afterwards. Every check that exists locally (`pnpm check`, `pnpm security`) must run on every PR, and must run fast enough that contributors do not learn to ignore it. Two common failure modes to avoid:
 
@@ -12,7 +13,7 @@ CI is part of the quality gate, not a layer bolted on afterwards. Every check th
 
 The pattern that avoids both is a small library of **reusable workflows** (prefix `_`) plus thin app-specific workflows that call them.
 
-## Decision
+## Decision Outcome
 
 - **GitHub Actions** as the sole CI provider.
 - Repository layout:
@@ -37,17 +38,17 @@ The pattern that avoids both is a small library of **reusable workflows** (prefi
 
 ## Consequences
 
-**Positive**
+### Positive
 - Reusable workflows make per-app CI a one-line `uses:` invocation. Drift between apps becomes impossible in the shared layer.
 - `setup-monorepo` centralises the install path; changing Node version or switching package manager is one file.
 - Parameterised registry makes the container workflow reusable by consumers with any target — no rewrite on adoption.
 - Trivy on every PR keeps dependency/secret issues at the PR boundary, not discovered at release time.
 
-**Negative**
+### Negative
 - The prefix-`_` convention is a team convention, not enforced by GitHub. It has to be documented (this ADR) and reviewed in PRs.
 - Reusable workflows add a level of indirection that can be confusing to readers. Mitigation: the reusable workflow file is short and its inputs are documented at the top.
 
-## Alternatives
+## Alternatives considered
 
 - **GitLab CI, CircleCI, Buildkite** — capable alternatives, but repo lives on GitHub; keeping CI on the same platform removes a permissions and secrets integration layer.
 - **Inlined workflows per app** — simplest to write, painful to maintain. Rejected.

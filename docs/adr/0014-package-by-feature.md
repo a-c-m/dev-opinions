@@ -1,11 +1,12 @@
-# ADR 0022: Package by feature for application code
+---
+date: 2026-05-15
+decision-makers: [Repo platform]
+tags: [layout, conventions, frontend, backend]
+---
 
-- **Status**: Proposed
-- **Date**: 2026-05-15
-- **Deciders**: Repo platform
-- **Tags**: layout, conventions, frontend, backend
+# ADR 0014: Package by feature for application code
 
-## Context
+## Context and Problem Statement
 
 Two patterns exist for organising non-trivial application code:
 
@@ -14,7 +15,7 @@ Two patterns exist for organising non-trivial application code:
 
 Also called **vertical slice architecture** when the slice cuts through multiple layers.
 
-NestJS feature modules ([ADR 0006](0006-nestjs-backend.md)) already encode package-by-feature on the backend. Frontend frameworks ([ADR 0007](0007-frontend-frameworks.md)) don't enforce either pattern; without a convention, they drift into package-by-layer because that's what most tutorials show.
+NestJS feature modules ([ADR 0010](0010-nestjs-backend.md)) already encode package-by-feature on the backend. Frontend frameworks ([ADR 0011](0011-frontend-frameworks.md)) don't enforce either pattern; without a convention, they drift into package-by-layer because that's what most tutorials show.
 
 This ADR locks in one convention so every app scaffolded from base-app starts the right way.
 
@@ -26,7 +27,7 @@ This ADR locks in one convention so every app scaffolded from base-app starts th
 4. **Boundaries are visible.** Cross-feature imports (`lib/inventory/` → `lib/billing/`) show in the import path. In a layered layout, every import looks the same; coupling is invisible until it bites.
 5. **Refactor and rename are local.** Renaming a domain is one folder rename plus import-path updates, not a diff scattered across the tree.
 
-## Decision
+## Decision Outcome
 
 Adopt **package by feature** as the default file-organisation convention for application code.
 
@@ -106,6 +107,6 @@ base-app ships no application code today, so no migration. Future apps follow th
 
 - [Robert C. Martin — *Screaming Architecture*](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html) — origin of the package-by-feature framing.
 - [Jimmy Bogard — *Vertical Slice Architecture*](https://www.jimmybogard.com/vertical-slice-architecture/) — the layered → vertical reframing.
-- [ADR 0006](0006-nestjs-backend.md) — NestJS feature modules already encode this on the backend.
-- [ADR 0007](0007-frontend-frameworks.md) — frontend stack choices this rule applies to.
-- [ADR 0009](0009-drizzle-orm.md) — schema-location decision; same philosophy (product-owned things live with the product).
+- [ADR 0010](0010-nestjs-backend.md) — NestJS feature modules already encode this on the backend.
+- [ADR 0011](0011-frontend-frameworks.md) — frontend stack choices this rule applies to.
+- [ADR 0012](0012-drizzle-orm.md) — schema-location decision; same philosophy (product-owned things live with the product).

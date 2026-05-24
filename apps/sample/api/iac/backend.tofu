@@ -1,7 +1,7 @@
 # State backend + encryption.
 #
 # Pick ONE backend block below (uncomment and fill in), delete the others.
-# Encryption block stays as-is for every choice — see ADR 0017.
+# Encryption block stays as-is for every choice — see ADR 0022.
 
 terraform {
   # ----------------------------------------------------------------------

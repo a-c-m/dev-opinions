@@ -1,13 +1,14 @@
-# ADR 0004: Knip for dead code detection
+---
+date: 2026-04-19
+---
 
-- **Status**: Accepted
-- **Date**: 2026-04-19
+# ADR 0007: Knip for dead code detection
 
-## Context
+## Context and Problem Statement
 
 Unused exports, unreferenced files, and declared-but-unused dependencies accumulate invisibly. Left alone, they inflate bundles, slow installs, mislead readers about what the codebase actually uses, and make refactors harder because it is unclear what is live. No lint rule catches these at the repository level — it requires a tool that understands the whole dependency graph.
 
-## Decision
+## Decision Outcome
 
 - `knip ^5.62` at the repo root.
 - `knip.json` configures entry points derived from each project's `project.json` (NX targets) and `package.json` `main`/`bin`.
@@ -16,16 +17,16 @@ Unused exports, unreferenced files, and declared-but-unused dependencies accumul
 
 ## Consequences
 
-**Positive**
+### Positive
 - A single tool covers unused files, exports, types, and dependencies — no tool-sprawl.
 - Bundles and install trees stay lean without relying on reviewer vigilance.
 - Refactors become safer: it is clear what is still reachable.
 
-**Negative**
+### Negative
 - False positives happen for dynamic imports and side-effect-only modules. This requires per-app configuration tuning, not rule suppression.
 - CI time increases slightly. Worth it for the continual cleanup signal.
 
-## Alternatives
+## Alternatives considered
 
 - **ts-prune** — narrower: unused exports only.
 - **depcheck** — narrower: unused dependencies only.

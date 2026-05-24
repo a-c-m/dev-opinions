@@ -1,12 +1,14 @@
-# ADR 0021: Typed file-based config with secrets-only env vars (backend)
+---
+date: 2026-04-26
+decision-makers: [Backend platform]
+tags: [backend, nestjs, nest-commander, configuration, secrets]
+---
 
-- **Status**: Proposed
-- **Date**: 2026-04-26
-- **Supersedes**: [ADR 0013](0013-env-config.md) (per-app `src/env.ts` zod schema). The previous pattern is retired for backend services; web apps continue to use [ADR 0019](0019-web-runtime-env-tokens.md), which owns its in-browser zod validator directly.
-- **Deciders**: Backend platform
-- **Tags**: backend, nestjs, nest-commander, configuration, secrets
+# ADR 0015: Typed file-based config with secrets-only env vars (backend)
 
-## Context
+**Supersedes**: [ADR 0017](0017-env-config.md) (per-app `src/env.ts` zod schema). The previous pattern is retired for backend services; web apps continue to use [ADR 0016](0016-web-runtime-env-tokens.md), which owns its in-browser zod validator directly.
+
+## Context and Problem Statement
 
 Backend services (HTTP APIs, workers, CLIs) need configuration that is:
 
@@ -39,7 +41,7 @@ The 12-factor concern is really about *secrets and environment-specific values n
 
 Singleton with import-time side effects, no schema validation, opaque YAML precedence rules (notably: env vars beat `local.yaml` despite appearing later in the documented order — a perennial footgun), and `IConfig.get()` returns `unknown`. The file-based model is right; this implementation of it is not.
 
-## Decision
+## Decision Outcome
 
 Adopt a **typed schema + layered YAML files + secrets-only env vars** approach, with a thin NestJS adapter module for DI integration. Implementation lives in a shared package (`@shared/config`).
 
@@ -279,6 +281,7 @@ Secrets reach containers through normal env-var injection (orchestrator secrets,
 
 ### 1. `@nestjs/config` alone (no custom schema layer)
 
+
 - **Pro**: Zero custom code, well-documented, Nest-native.
 - **Con**: Env-var-centric; YAML loading requires manual `load:` callbacks per file with no layering helper; `ConfigService.get('a.b.c')` is string-path even with strict typing; no enforcement of the secret/file split. We'd write the same helpers anyway, just less coherently. Rejected as a complete solution; *adopted as the underlying lifecycle mechanism*.
 
@@ -312,10 +315,10 @@ Secrets reach containers through normal env-var injection (orchestrator secrets,
 - **Pro**: Single source of truth in git; per-environment diffs include secret rotations; no separate secrets manager.
 - **Con**: Requires KMS setup per environment; "who can decrypt" becomes an access-control question we'd rather leave to the secrets manager; rotation surface is now files + KMS keys instead of one env-var bag. Reconsider when we have a KMS dependency for other reasons.
 
-### 8. Reuse the per-app `src/env.ts` pattern from retired ADR 0013
+### 8. Reuse the per-app `src/env.ts` pattern from retired ADR 0017
 
 - **Pro**: Already established; minimal new code.
-- **Con**: Doesn't address file layering, env-block sprawl, or rotation-surface clarity. ADR 0013 explicitly listed "publish a shared env-config package" as a follow-up — this ADR is that follow-up, expanded.
+- **Con**: Doesn't address file layering, env-block sprawl, or rotation-surface clarity. ADR 0017 explicitly listed "publish a shared env-config package" as a follow-up — this ADR is that follow-up, expanded.
 
 ## Implementation plan
 
@@ -332,7 +335,7 @@ Secrets reach containers through normal env-var injection (orchestrator secrets,
 5. **Pilot on a nest-commander CLI** once one exists. Verify the CLI bootstrap path works without HTTP context.
 6. **Document the migration recipe** in `docs/development/`.
 7. **Roll out to remaining services** incrementally — each migration is independent.
-8. **Retire the legacy `src/env.ts` pattern** once all services have migrated; ADR 0013's status is already Superseded as of this ADR.
+8. **Retire the legacy `src/env.ts` pattern** once all services have migrated; ADR 0017's status is already Superseded as of this ADR.
 
 ## References
 
@@ -341,5 +344,5 @@ Secrets reach containers through normal env-var injection (orchestrator secrets,
 - [js-yaml](https://github.com/nodeca/js-yaml) — YAML parsing
 - [nest-commander](https://nest-commander.jaymcdoniel.dev/) — CLI framework
 - [12-factor: Config](https://12factor.net/config)
-- [ADR 0006](0006-nestjs-backend.md) — NestJS as the default backend framework
-- [ADR 0019](0019-web-runtime-env-tokens.md) — frontend counterpart (browser env injection + zod validation)
+- [ADR 0010](0010-nestjs-backend.md) — NestJS as the default backend framework
+- [ADR 0016](0016-web-runtime-env-tokens.md) — frontend counterpart (browser env injection + zod validation)

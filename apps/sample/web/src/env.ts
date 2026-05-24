@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Read each variable individually rather than passing `import.meta.env`
-// directly to safeParse. The @import-meta-env unplugin (ADR 0019) only
+// directly to safeParse. The @import-meta-env unplugin (ADR 0016) only
 // transforms property-access expressions like `import.meta.env.API_URL`
 // into the runtime global accessor; a bare `import.meta.env` reference
 // would be statically inlined by Vite as the build-time literal and the

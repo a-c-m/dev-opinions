@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # check-stale-procedures.sh — flag runbook and SOP files that haven't been
-# touched in a while (per ADR 0027).
+# touched in a while (per ADR 0026).
 #
 # Walks all committed *.md files under any runbooks/ or sops/ directory,
 # checks each file's last commit date via `git log --follow`, and lists

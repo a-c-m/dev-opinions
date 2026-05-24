@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Wrapper around `gh issue create` that uses the repo's issue templates.
 #
-# The templates live in .github/ISSUE_TEMPLATE/ (see ADR 0018). This wrapper
+# The templates live in .github/ISSUE_TEMPLATE/ (see ADR 0020). This wrapper
 # picks one by name and hands off to gh, so the template's body structure is
 # authoritative — the wrapper does not hand-roll a body.
 #

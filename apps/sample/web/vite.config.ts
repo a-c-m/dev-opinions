@@ -3,7 +3,7 @@ import ImportMetaEnvPlugin from "@import-meta-env/unplugin";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
 
-// ADR 0019: in production the unplugin rewrites `import.meta.env.X` to a
+// ADR 0016: in production the unplugin rewrites `import.meta.env.X` to a
 // global accessor; the placeholder script in index.html is swapped at
 // container start. In dev/build it reads `.env`, with `.env.example` as
 // the allowlist + committed defaults.
@@ -14,7 +14,7 @@ const isVitest = process.env.VITEST === "true";
 
 const ENV_KEY_LINE = /^[A-Za-z_][A-Za-z0-9_]*=/;
 
-// Build-time guard against the two ADR 0019 footguns that fail silently:
+// Build-time guard against the two ADR 0016 footguns that fail silently:
 //   1. index.html missing the runtime placeholder script
 //   2. env.ts using bare `import.meta.env` (which Vite inlines as
 //      built-ins only) instead of per-key property access
@@ -32,7 +32,7 @@ function envInjectionGuard(examplePath: string): Plugin {
       }
       if (!String(html.source).includes("import_meta_env_placeholder")) {
         throw new Error(
-          "[env-injection-guard] index.html is missing the runtime env placeholder. Add the <script> tag from ADR 0019 to <head> before the bundle script."
+          "[env-injection-guard] index.html is missing the runtime env placeholder. Add the <script> tag from ADR 0016 to <head> before the bundle script."
         );
       }
 
@@ -58,7 +58,7 @@ function envInjectionGuard(examplePath: string): Plugin {
 }
 
 export default defineConfig({
-  // ADR 0019: prevent Vite from auto-inlining custom env vars. Only Vite's
+  // ADR 0016: prevent Vite from auto-inlining custom env vars. Only Vite's
   // own built-ins (MODE/BASE_URL/DEV/PROD/SSR) are statically replaced;
   // every other variable flows through the unplugin's runtime accessor.
   // Without this, any var named `VITE_*` would be silently baked into the

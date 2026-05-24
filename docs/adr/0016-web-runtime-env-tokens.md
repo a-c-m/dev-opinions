@@ -1,12 +1,14 @@
-# ADR 0019: Web runtime env injection via `import-meta-env`
+---
+date: 2026-04-26
+decision-makers: [Frontend platform]
+tags: [frontend, vite, configuration, deployment]
+---
 
-- **Status**: Accepted
-- **Date**: 2026-04-26
-- **Supersedes**: prior 2026-04-19 revision of this ADR (bespoke `BUILD_MODE` + `___KEY___` tokens + runtime sed). No production callers existed; the only implementation was the throwaway `apps/sample-web` scaffold, which is migrated alongside this rewrite.
-- **Deciders**: Frontend platform
-- **Tags**: frontend, vite, configuration, deployment
+# ADR 0016: Web runtime env injection via `import-meta-env`
 
-## Context
+**Supersedes**: prior 2026-04-19 revision of this ADR (bespoke `BUILD_MODE` + `___KEY___` tokens + runtime sed). No production callers existed; the only implementation was the throwaway `apps/sample-web` scaffold, which is migrated alongside this rewrite.
+
+## Context and Problem Statement
 
 Single-page applications built by a bundler (Vite, Webpack, Rollup, esbuild) inline environment variables into the JavaScript bundle at **build time**. Any reference to `import.meta.env.FOO` (Vite) or `process.env.FOO` (Webpack/CRA) is replaced by the literal string value during compilation.
 
@@ -25,7 +27,7 @@ We need a mechanism that:
 - Provides **type safety** on the env surface.
 - Works across our bundlers (today: Vite; potentially Webpack/Rollup/esbuild for other apps).
 
-## Decision
+## Decision Outcome
 
 We use **[`@import-meta-env/unplugin`](https://github.com/iendeavor/import-meta-env)** as the standard runtime configuration mechanism for frontend applications. It is paired with a zod-validated `src/env.ts` module owned by this ADR: the plugin handles the build-time/deploy-time mechanics, and zod handles in-browser shape and value validation after the swap.
 
@@ -87,7 +89,7 @@ Every web app declares its env surface in a single `src/env.ts` module: a zod sc
 - The zod schema gives us **value** validation (e.g. `z.string().url()`, enums, defaults).
 - Validators can use their natural strict forms (URLs, enums) — no need to loosen them to admit placeholder strings, since by execution time the placeholders have been replaced.
 
-(Backend services follow a different approach — see [ADR 0021](0021-backend-config.md). The retired [ADR 0013](0013-env-config.md) previously covered both surfaces in a single shared pattern.)
+(Backend services follow a different approach — see [ADR 0015](0015-backend-config.md). The retired [ADR 0017](0017-env-config.md) previously covered both surfaces in a single shared pattern.)
 
 ### Required vs optional variables
 
@@ -125,6 +127,17 @@ Per CLAUDE.md ("Lock to exact versions"):
 
 Bumps to either version go through a PR that re-runs the full quality gate. Exact numbers live in the implementing app's `package.json` and Dockerfile rather than in this ADR.
 
+### Implementation plan
+
+The throwaway `apps/sample-web` scaffold has been migrated to this pattern as the reference implementation; subsequent frontend apps adopt the same shape as they are scaffolded. The reference layout is:
+
+- `apps/sample-web/.env.example` — allowlist + committed defaults.
+- `apps/sample-web/vite.config.ts` — `ImportMetaEnvPlugin.vite({ example: ".env.example" })`, conditionally excluded when `process.env.VITEST === "true"`.
+- `apps/sample-web/index.html` — the placeholder `<script>` in `<head>`, before the bundle's module script.
+- `apps/sample-web/src/env.ts` — zod schema with strict validators; reads each variable individually (not bare `import.meta.env`).
+- `apps/sample-web/Dockerfile` — pins the CLI via `IMV_CLI_VERSION` ARG and installs it into the runtime image.
+- `apps/sample-web/container/entrypoint.sh` — invokes `import-meta-env --disposable -x /etc/import-meta-env/.env.example -p /usr/share/nginx/html/index.html`.
+
 ## Consequences
 
 ### Positive
@@ -142,14 +155,14 @@ Bumps to either version go through a PR that re-runs the full quality gate. Exac
 
 ### Negative
 
-- **Frontend-only** — Does not address backend/Node service config (covered by [ADR 0021](0021-backend-config.md)).
+- **Frontend-only** — Does not address backend/Node service config (covered by [ADR 0015](0015-backend-config.md)).
 - **Runtime indirection** — Every env access is a property lookup on a global instead of an inlined literal. Negligible perf cost; slightly less amenable to dead-code elimination based on env values (e.g. `if (import.meta.env.DEV)` may not tree-shake at build time the way Vite's native handling does).
 - **HTML mutation step required** — Deploys must run the CLI (or equivalent) before serving. One step in the entrypoint.
 - **Placeholder must reach the browser unchanged** — Constraints listed in "HTML processing constraints" above.
 - **Inline script + CSP** — Strict-CSP apps need a hash or nonce, not a free pass.
 - **Adds a dependency** — Maintained by a small team; bus-factor is non-zero. See mitigation below.
 
-### Bus-factor mitigation
+#### Bus-factor mitigation
 
 The mechanism is small enough to fork or replace if the package were abandoned:
 
@@ -164,7 +177,7 @@ If the dependency disappears, an in-house replacement is small and isolated. We 
 - Production builds use the runtime-replacement mechanism; **dev builds use `import.meta.env` natively** via the plugin's dev mode. The two paths must stay in sync (the plugin handles this).
 - Vite built-ins (`import.meta.env.DEV` / `MODE` / `PROD` / `SSR`) are still inlined statically and behave normally.
 
-## Alternatives Considered
+## Alternatives considered
 
 ### 1. Build per environment
 
@@ -191,22 +204,11 @@ If the dependency disappears, an in-house replacement is small and isolated. We 
 - **Pro**: Native, zero deps.
 - **Con**: Build-time only — the original problem.
 
-## Implementation Plan
-
-The throwaway `apps/sample-web` scaffold has been migrated to this pattern as the reference implementation; subsequent frontend apps adopt the same shape as they are scaffolded. The reference layout is:
-
-- `apps/sample-web/.env.example` — allowlist + committed defaults.
-- `apps/sample-web/vite.config.ts` — `ImportMetaEnvPlugin.vite({ example: ".env.example" })`, conditionally excluded when `process.env.VITEST === "true"`.
-- `apps/sample-web/index.html` — the placeholder `<script>` in `<head>`, before the bundle's module script.
-- `apps/sample-web/src/env.ts` — zod schema with strict validators; reads each variable individually (not bare `import.meta.env`).
-- `apps/sample-web/Dockerfile` — pins the CLI via `IMV_CLI_VERSION` ARG and installs it into the runtime image.
-- `apps/sample-web/container/entrypoint.sh` — invokes `import-meta-env --disposable -x /etc/import-meta-env/.env.example -p /usr/share/nginx/html/index.html`.
-
 ## References
 
 - [import-meta-env documentation](https://import-meta-env.org/)
 - [GitHub: runtime-env/import-meta-env](https://github.com/runtime-env/import-meta-env)
 - [12-factor: Config](https://12factor.net/config)
 - [12-factor: Build, release, run](https://12factor.net/build-release-run)
-- [ADR 0021: Typed file-based config with secrets-only env vars (backend)](0021-backend-config.md) — server-side counterpart.
-- [ADR 0013: Env config via validated schema](0013-env-config.md) — superseded; previously covered both surfaces under a single per-app `src/env.ts` pattern.
+- [ADR 0015: Typed file-based config with secrets-only env vars (backend)](0015-backend-config.md) — server-side counterpart.
+- [ADR 0017: Env config via validated schema](0017-env-config.md) — superseded; previously covered both surfaces under a single per-app `src/env.ts` pattern.

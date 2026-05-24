@@ -22,7 +22,7 @@ install with:
   debian/ubuntu:   see https://aquasecurity.github.io/trivy/
   CI:              use aquasecurity/trivy-action
 
-security is part of the default quality gate (ADR 0015). Fix this rather than
+security is part of the default quality gate (ADR 0008). Fix this rather than
 skipping it.
 EOF
   exit 127

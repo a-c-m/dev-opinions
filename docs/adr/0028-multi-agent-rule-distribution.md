@@ -1,13 +1,14 @@
-# ADR 0024: AGENTS.md as the cross-agent context standard
+---
+date: 2026-05-22
+decision-makers: [Repo platform]
+tags: [ai-agents, claude-code, opencode, agents-md]
+---
 
-- **Status**: Proposed
-- **Date**: 2026-05-22
-- **Deciders**: Repo platform
-- **Tags**: ai-agents, claude-code, opencode, agents-md
+# ADR 0028: AGENTS.md as the cross-agent context standard
 
-## Context
+## Context and Problem Statement
 
-[ADR 0012](0012-claude-code-setup.md) configured this repo for
+[ADR 0029](0029-claude-code-setup.md) configured this repo for
 Claude Code only. We want to expand the set of agents the repo
 briefs — OpenCode now (model flexibility against the same project
 context), Codex CLI plausibly later. As a base-app template, forks
@@ -23,7 +24,7 @@ well-scoped hand-written `AGENTS.md` cuts agent runtime ~28% and
 output tokens ~17%. LLM-generated and over-long files actively
 *reduce* task success. Command-first, boundary-first, short.
 
-## Decision
+## Decision Outcome
 
 `AGENTS.md` is the single source of truth for cross-agent context.
 Tool-specific config is hand-maintained; OpenCode hook parity via
@@ -88,7 +89,7 @@ sometimes they hurt.
 - **Review on signal, not on calendar.** Update when a PR
   introduces a new convention or an agent makes the same mistake
   twice — same logic that killed `last-reviewed:` in
-  [ADR 0027](0027-runbook-and-sop-format.md).
+  [ADR 0026](0026-runbook-and-sop-format.md).
 
 ### Per-directory `AGENTS.md`
 
@@ -135,7 +136,7 @@ scripts around `pnpm`/`gh`.
 
 ### Skills layout migration
 
-[ADR 0012](0012-claude-code-setup.md) shipped flat
+[ADR 0029](0029-claude-code-setup.md) shipped flat
 `.claude/skills/*.md` files. Each skill is promoted to
 `.agents/skills/<name>/SKILL.md`; per-agent skill directories
 become per-entry symlinks.
@@ -165,9 +166,9 @@ layout, what's canonical vs symlinked, and pointing back here.
 loader globs `{agent,agents}/**/*.md` and would register a README
 as an agent named `README`.
 
-## Relationship to ADR 0012
+## Relationship to ADR 0029
 
-[ADR 0012](0012-claude-code-setup.md) remains authoritative for
+[ADR 0029](0029-claude-code-setup.md) remains authoritative for
 `.claude/` itself (hook philosophy, agents/commands shape). This
 ADR supersedes 0012's single-agent assumptions: the single-agent
 context model, the flat `.claude/skills/*.md` layout, and
@@ -237,7 +238,7 @@ context model, the flat `.claude/skills/*.md` layout, and
   generation-based alternative; right tool for 3+ agents.
 - [opencode-claude-hooks](https://github.com/magarcia/opencode-claude-hooks)
   — Claude Code hook compatibility shim for OpenCode. Best-effort.
-- [ADR 0012](0012-claude-code-setup.md) — original Claude-only
+- [ADR 0029](0029-claude-code-setup.md) — original Claude-only
   configuration; superseded in part.
-- [ADR 0020](0020-ripgrep-over-grep.md) — cross-agent rule
+- [ADR 0009](0009-ripgrep-over-grep.md) — cross-agent rule
   benefiting from single-source distribution.

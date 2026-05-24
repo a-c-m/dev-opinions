@@ -1,17 +1,18 @@
-# ADR 0026: Team metadata in CODEOWNERS comments
+---
+date: 2026-05-22
+tags: [ai-agents, codeowners, team, ownership]
+---
 
-- **Status**: Proposed
-- **Date**: 2026-05-22
-- **Tags**: ai-agents, codeowners, team, ownership
+# ADR 0027: Team metadata in CODEOWNERS comments
 
-## Context
+## Context and Problem Statement
 
-[ADR 0018](0018-github-repo-conventions.md) established CODEOWNERS
+[ADR 0020](0020-github-repo-conventions.md) established CODEOWNERS
 for PR review routing — *who reviews changes to this path*. But
 CODEOWNERS doesn't say *who is on the team* or *what each person
 does*. We want that answered in code, not in Slack.
 
-## Decision
+## Decision Outcome
 
 Carry team-and-ops metadata in **comment blocks above CODEOWNERS
 rule lines**. Blocks are opt-in — present where there's something
@@ -128,11 +129,11 @@ Trigger words ("big edits", "new modules"); incidental edits skip.
 
 ## Relationship to prior ADRs
 
-- **Extends [ADR 0018](0018-github-repo-conventions.md)**: same
+- **Extends [ADR 0020](0020-github-repo-conventions.md)**: same
   file, additional convention. Not superseding.
-- **Complements [ADR 0024](0024-multi-agent-rule-distribution.md)**:
+- **Complements [ADR 0028](0028-multi-agent-rule-distribution.md)**:
   `AGENTS.md` gains the three-sentence pointer above.
-- **Scope-bounded by [ADR 0025](0025-child-apps-and-repos.md)**:
+- **Scope-bounded by [ADR 0030](0030-child-apps-and-repos.md)**:
   applies to this repo's CODEOWNERS only. Children under `repos/`
   own their own files; the convention is recommended, not enforced
   for them.
@@ -140,5 +141,5 @@ Trigger words ("big edits", "new modules"); incidental edits skip.
 ## References
 
 - [CODEOWNERS documentation — GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
-- [ADR 0018](0018-github-repo-conventions.md) — established CODEOWNERS for review routing.
-- [ADR 0024](0024-multi-agent-rule-distribution.md) — receives the prompt addition.
+- [ADR 0020](0020-github-repo-conventions.md) — established CODEOWNERS for review routing.
+- [ADR 0028](0028-multi-agent-rule-distribution.md) — receives the prompt addition.

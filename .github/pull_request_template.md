@@ -1,5 +1,5 @@
 <!--
-PR template — see ADR 0018. Keep it short. Reviewers should be oriented in
+PR template — see ADR 0020. Keep it short. Reviewers should be oriented in
 under 30 seconds before they look at the diff.
 -->
 

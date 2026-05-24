@@ -1,10 +1,11 @@
-# ADR 0027: Runbook and SOP format
+---
+date: 2026-05-22
+tags: [ai-agents, runbooks, sops, operations]
+---
 
-- **Status**: Proposed
-- **Date**: 2026-05-22
-- **Tags**: ai-agents, runbooks, sops, operations
+# ADR 0026: Runbook and SOP format
 
-## Context
+## Context and Problem Statement
 
 Operational procedures (runbooks) and process procedures (SOPs)
 today live in wikis, heads, or nowhere — invisible to agents,
@@ -13,7 +14,7 @@ structurally identical (title, context, steps, sometimes rollback)
 and differ only in audience: on-call under pressure vs developer
 doing normal work. One ADR, one template, two folder conventions.
 
-## Decision
+## Decision Outcome
 
 Procedure docs live in version control as structured markdown,
 co-located with the code they describe, written to a shared
@@ -30,7 +31,7 @@ Filenames: **kebab-case**, descriptive, no `RUN-NNN` prefix. The
 path is the identity.
 
 A `runbooks/` or `sops/` folder may carry an `AGENTS.md` once it
-holds enough procedures to warrant a brief — per [ADR 0024](0024-multi-agent-rule-distribution.md)'s
+holds enough procedures to warrant a brief — per [ADR 0028](0028-multi-agent-rule-distribution.md)'s
 per-folder pattern, with `README.md` symlinked to it for human
 browsing.
 
@@ -134,13 +135,13 @@ naturally refresh them. Two mechanisms, both rooted in `git log`
 3. **Executable runbooks (`khalidx/runbook`, `braintree/runbook`).** Tooling dependency at incident time is the wrong bet. Rejected.
 4. **Central `/docs/runbooks/` only.** Flat dir doesn't scale; orphans on service deletion. Cross-cutting at root retained as carve-out.
 5. **`RUN-NNN-title.md` numbering.** Runbooks aren't chronological; path is identity. Rejected.
-6. **`last-reviewed:` field + CI block.** Touch-the-date theatre, rejected in [ADR 0026](0026-codeowners-team-metadata.md) for the same reason. Rejected.
+6. **`last-reviewed:` field + CI block.** Touch-the-date theatre, rejected in [ADR 0027](0027-codeowners-team-metadata.md) for the same reason. Rejected.
 
 ## Relationship to prior ADRs
 
-- **Complements [ADR 0024](0024-multi-agent-rule-distribution.md)**: AGENTS.md gains the prompt above.
-- **Cross-links [ADR 0026](0026-codeowners-team-metadata.md)**: Escalation points at CODEOWNERS metadata rather than duplicating contacts.
-- **Scope-bounded by [ADR 0025](0025-child-apps-and-repos.md)**: applies to this repo's layout. Children under `repos/` own their own; convention recommended, not enforced.
+- **Complements [ADR 0028](0028-multi-agent-rule-distribution.md)**: AGENTS.md gains the prompt above.
+- **Cross-links [ADR 0027](0027-codeowners-team-metadata.md)**: Escalation points at CODEOWNERS metadata rather than duplicating contacts.
+- **Scope-bounded by [ADR 0030](0030-child-apps-and-repos.md)**: applies to this repo's layout. Children under `repos/` own their own; convention recommended, not enforced.
 
 ## References
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PreToolUse hook for Edit/Write.
 #
-# Diagnostic-delta check — preserves ADR 0003's baseline-ratchet story:
+# Diagnostic-delta check — preserves ADR 0006's baseline-ratchet story:
 # block only when the proposed edit introduces NEW biome diagnostics that
 # were not already present in the on-disk file.
 #

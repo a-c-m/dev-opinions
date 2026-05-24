@@ -1,4 +1,4 @@
-# CODEOWNERS — see ADR 0018.
+# CODEOWNERS — see ADR 0020.
 #
 # Pattern: by path, not by file type. Last match wins — put more specific
 # rules below more general ones.

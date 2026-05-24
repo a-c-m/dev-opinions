@@ -1,11 +1,12 @@
-# ADR 0023: Package script conventions
+---
+date: 2026-05-15
+decision-makers: [Repo platform]
+tags: [tooling, conventions, nx, scripts]
+---
 
-- **Status**: Proposed
-- **Date**: 2026-05-15
-- **Deciders**: Repo platform
-- **Tags**: tooling, conventions, nx, scripts
+# ADR 0005: Package script conventions
 
-## Context
+## Context and Problem Statement
 
 NX's `run-many --target=<verb>` only does useful work when projects across
 the workspace share verb names. The same is true of `nx affected -t <verb>`
@@ -29,7 +30,7 @@ The cost of fixing this is small while the repo is a starter. The cost
 of *not* fixing it grows linearly with every new project that gets
 scaffolded against an inconsistent template.
 
-## Decision
+## Decision Outcome
 
 Adopt a fixed alphabet of script verbs across the workspace. Every leaf
 project that has a given concept exposes it under the canonical verb;
@@ -271,9 +272,9 @@ the cheat sheet.
 - [npm scripts spec](https://docs.npmjs.com/cli/v10/using-npm/scripts) —
   the privileged `start` / `test` / `restart` / `stop` names that this
   ADR's `start` is compatible with.
-- [ADR 0003](0003-biome-ultracite.md) — Biome + Ultracite, the linter
+- [ADR 0006](0006-biome-ultracite.md) — Biome + Ultracite, the linter
   this ADR's `lint` script wraps.
-- [ADR 0005](0005-nx-monorepo.md) — NX as the orchestrator that makes
+- [ADR 0004](0004-nx-monorepo.md) — NX as the orchestrator that makes
   these conventions load-bearing.
-- [ADR 0008](0008-vitest-playwright.md) — Vitest + Playwright, the
+- [ADR 0013](0013-vitest-playwright.md) — Vitest + Playwright, the
   runners this ADR's `test*` and `e2e` verbs invoke.

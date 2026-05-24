@@ -1,15 +1,16 @@
-# ADR 0028: Branching, releases, and environments
+---
+date: 2026-05-22
+tags: [branching, releases, environments, ci-cd]
+---
 
-- **Status**: Proposed
-- **Date**: 2026-05-22
-- **Tags**: branching, releases, environments, ci-cd
+# ADR 0024: Branching, releases, and environments
 
-## Context
+## Context and Problem Statement
 
 Setting up standards for forks/children. Following [GitLab Flow with release branches](https://docs.gitlab.com/ee/topics/gitlab_flow.html#release-branches-with-gitlab-flow)
-and [SemVer](https://semver.org/). [ADR 0029](0029-production-data-flow.md) covers the data direction (production → lower envs).
+and [SemVer](https://semver.org/). [ADR 0025](0025-production-data-flow.md) covers the data direction (production → lower envs).
 
-## Decision
+## Decision Outcome
 
 ### Environments
 
@@ -36,7 +37,7 @@ env. *"`release-candidate` HEAD ≠ last tag"* = release in flight;
 *"stage is broken"* = the running env. Two concepts, two names.
 
 Feature branch shape: `<type>/<ticket>-<short-description>`
-([ADR 0011](0011-conventional-commits.md)).
+([ADR 0019](0019-conventional-commits.md)).
 
 ### Standard release flow
 
@@ -63,7 +64,7 @@ workflow dispatch.
    via small PRs. Scope is `git log <last-tag>..release-candidate`.
 4. **Tag.** Workflow (`tag-release.yml`) bumps version, commits on
    `release-candidate`, pushes `vX.Y.Z`. Bump type auto-detected
-   from conventional commits ([ADR 0011](0011-conventional-commits.md)).
+   from conventional commits ([ADR 0019](0019-conventional-commits.md)).
 5. **Deploy prod.** Workflow (`deploy-prod.yml`) takes the tag,
    builds at tag SHA, rolls out. **On full success, merges the tag
    commit back to `main`.** A failed deploy leaves `main`
@@ -117,8 +118,8 @@ escape hatch when that's not yet practical.
 Mandated *what*; setup *how* is per-fork.
 
 - **`main` and `release-candidate`**: PR required, ≥1 approval,
-  CODEOWNERS review ([ADR 0026](0026-codeowners-team-metadata.md)),
-  required status checks ([ADR 0016](0016-github-actions-ci.md)),
+  CODEOWNERS review ([ADR 0027](0027-codeowners-team-metadata.md)),
+  required status checks ([ADR 0021](0021-github-actions-ci.md)),
   no force-push, no deletion.
 - **Bot/automation actor with bypass on both branches** —
   without it, merge-back fails and every release ends in a
@@ -190,14 +191,14 @@ Mandated *what*; setup *how* is per-fork.
 
 ## Relationship to prior ADRs
 
-- **Depends on [0011](0011-conventional-commits.md)** for the
+- **Depends on [0019](0019-conventional-commits.md)** for the
   commit conventions that drive auto-bump.
-- **Depends on [0016](0016-github-actions-ci.md)** for the
+- **Depends on [0021](0021-github-actions-ci.md)** for the
   workflow shape.
-- **Cross-references [0026](0026-codeowners-team-metadata.md)**
+- **Cross-references [0027](0027-codeowners-team-metadata.md)**
   for CODEOWNERS review.
-- **Companion to 0029** (production data flow).
-- **Recommended (not enforced) for children under [0025](0025-child-apps-and-repos.md)**.
+- **Companion to [0025](0025-production-data-flow.md)** (production data flow).
+- **Recommended (not enforced) for children under [0030](0030-child-apps-and-repos.md)**.
 
 ## References
 

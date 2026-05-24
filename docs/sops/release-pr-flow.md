@@ -4,7 +4,7 @@
 
 Procedure for cutting a release: from "change is on `main`"
 through "deployed to prod" and the automatic merge-back. Realises
-[ADR 0028](../adr/0028-branching-releases-environments.md). For
+[ADR 0024](../adr/0024-branching-releases-environments.md). For
 the preceding step (getting a change onto `main`), see
 [dev-pr-flow.md](dev-pr-flow.md).
 
@@ -73,7 +73,7 @@ from there.
    - Creates `vX.Y.Z` and pushes the tag.
 
    Bump type is auto-detected from Conventional Commits since the
-   last tag ([ADR 0011](../adr/0011-conventional-commits.md)).
+   last tag ([ADR 0019](../adr/0019-conventional-commits.md)).
    Verify the bump matches expectation; a `feat:` slipped in as
    `chore:` produces a patch when you wanted a minor.
 
@@ -84,7 +84,7 @@ from there.
 
    **A second human approves** the production environment step
    before regional rollout begins (GitHub Actions Environment
-   protection — [ADR 0028](../adr/0028-branching-releases-environments.md)).
+   protection — [ADR 0024](../adr/0024-branching-releases-environments.md)).
 
 7. **Watch the rollout.** Monitor dashboards, alerts, and the
    service's runbooks for the deploy phase. If something breaks
@@ -135,14 +135,14 @@ typical `fix:` commit; verify.
 
 ## Related
 
-- [ADR 0028](../adr/0028-branching-releases-environments.md) —
+- [ADR 0024](../adr/0024-branching-releases-environments.md) —
   the decisions this SOP realises.
-- [ADR 0011](../adr/0011-conventional-commits.md) — commit format
+- [ADR 0019](../adr/0019-conventional-commits.md) — commit format
   drives auto-bump.
-- [ADR 0026](../adr/0026-codeowners-team-metadata.md) — CODEOWNERS
+- [ADR 0027](../adr/0027-codeowners-team-metadata.md) — CODEOWNERS
   metadata; the Escalation contacts during a deploy incident.
 - [dev-pr-flow.md](dev-pr-flow.md) — the preceding flow that puts
   changes onto `main`.
 - Service-specific runbooks live under `apps/<product>/<service>/runbooks/`
-  per [ADR 0027](../adr/0027-runbook-and-sop-format.md) — check
+  per [ADR 0026](../adr/0026-runbook-and-sop-format.md) — check
   there for service-level operational context during a deploy.

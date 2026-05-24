@@ -1,11 +1,12 @@
-# ADR 0020: Ripgrep over grep for all search
+---
+date: 2026-04-26
+decision-makers: [Tooling / DX]
+tags: [tooling, search, claude-code, scripting]
+---
 
-- **Status**: Accepted
-- **Date**: 2026-04-26
-- **Deciders**: Tooling / DX
-- **Tags**: tooling, search, claude-code, scripting
+# ADR 0009: Ripgrep over grep for all search
 
-## Context
+## Context and Problem Statement
 
 Searching the working tree is one of the most frequent operations in this repo — by humans, by CI scripts, by the Claude Code agent and its sub-agents. Two tools could fill that role:
 
@@ -18,7 +19,7 @@ There is also a Claude Code-specific dimension. Claude Code's built-in `Grep` to
 
 We have, until now, allowed both. The result has been inconsistent: hooks and helper scripts use `grep`; ad-hoc agent searches sometimes use `grep`, sometimes use `rg`, sometimes use the `Grep` tool; CLAUDE.md mentions `grep` in passing as a way to inspect captured logs. This ADR makes the choice once.
 
-## Decision
+## Decision Outcome
 
 **All text and code search in this repo uses ripgrep, never POSIX `grep`.**
 
@@ -50,7 +51,7 @@ Or, more reliably, run the new bootstrap script:
 
 The script is idempotent; it skips anything already installed and surfaces optional tools (`opentofu`, `beads`) behind an `INCLUDE_OPTIONAL=1` flag. CI installs `ripgrep` the same way it installs Trivy — via the runner's package manager step, not as an npm dependency.
 
-We deliberately do **not** ship `ripgrep` as an npm wrapper (`@vscode/ripgrep` etc.). Adding a binary-shipping npm package introduces platform-specific download steps inside `pnpm install`, ties the version to npm's release cadence, and obscures the fact that this is a system tool. The same reasoning applies to `trivy` (see [ADR 0015](0015-trivy-security-scan.md)) and to `lefthook`'s binary (see [ADR 0010](0010-lefthook.md), where the npm package's bundled binaries are accepted because lefthook explicitly publishes them).
+We deliberately do **not** ship `ripgrep` as an npm wrapper (`@vscode/ripgrep` etc.). Adding a binary-shipping npm package introduces platform-specific download steps inside `pnpm install`, ties the version to npm's release cadence, and obscures the fact that this is a system tool. The same reasoning applies to `trivy` (see [ADR 0008](0008-trivy-security-scan.md)) and to `lefthook`'s binary (see [ADR 0018](0018-lefthook.md), where the npm package's bundled binaries are accepted because lefthook explicitly publishes them).
 
 ### The PreToolUse hook
 
@@ -90,6 +91,21 @@ CLAUDE.md says:
 
 That guidance is updated in CLAUDE.md alongside this ADR: capture to file first, then `tail` or `rg` the file. The principle (preserve the raw output) is unchanged; only the search tool changes.
 
+### Implementation plan
+
+1. Add `docs/adr/0009-ripgrep-over-grep.md` (this file) and link it from `docs/adr/README.md`.
+2. Add `ripgrep` to the system prerequisites table in [docs/QUICKSTART.md](../QUICKSTART.md).
+3. Create `scripts/setup-mac.sh` to install `ripgrep`, `jq`, and `trivy` via Homebrew (with `opentofu`/`beads` behind `INCLUDE_OPTIONAL=1`).
+4. Add the operating rule to `CLAUDE.md`; update the existing "Capture output for review" line to say `rg` instead of `grep`.
+5. Add `.claude/hooks/check-grep-commands.sh` and wire it into `.claude/settings.json` under the `PreToolUse` Bash matcher.
+6. Add `Bash(rg:*)` to the `.claude/settings.json` allow list so `rg` invocations don't prompt.
+7. Migrate the four existing in-repo `grep` callsites to `rg`:
+   - `.claude/hooks/check-biome-commands.sh`
+   - `.claude/hooks/commit-format.sh`
+   - `.claude/hooks/prevent-wait-for-timeout.sh`
+   - `.claude/commands/create-issue.sh`
+8. Verify: `pnpm check` still green; the hook fires a nudge on a synthetic `grep` Bash call and stays silent on `git grep` and `rg`.
+
 ## Consequences
 
 ### Positive
@@ -112,7 +128,7 @@ That guidance is updated in CLAUDE.md alongside this ADR: capture to file first,
 - **`git grep` is unaffected.** It remains the right tool for index-scoped or history-scoped queries.
 - **CI cost change is negligible** — installing `ripgrep` via the runner's package manager is sub-second and amortised across every job.
 
-## Alternatives Considered
+## Alternatives considered
 
 ### 1. Stay on POSIX `grep`
 
@@ -137,28 +153,13 @@ That guidance is updated in CLAUDE.md alongside this ADR: capture to file first,
 ### 5. Ship `ripgrep` as an npm wrapper
 
 - **Pro**: `pnpm install` would put `rg` on PATH automatically.
-- **Con**: Couples the tool's version to npm release cadence; introduces a binary-download step inside `pnpm install`; obscures that `rg` is a system tool used outside Node contexts (shell scripts, CI shell steps). Same reasoning we applied to Trivy in [ADR 0015](0015-trivy-security-scan.md).
-
-## Implementation Plan
-
-1. Add `docs/adr/0020-ripgrep-over-grep.md` (this file) and link it from `docs/adr/README.md`.
-2. Add `ripgrep` to the system prerequisites table in [docs/QUICKSTART.md](../QUICKSTART.md).
-3. Create `scripts/setup-mac.sh` to install `ripgrep`, `jq`, and `trivy` via Homebrew (with `opentofu`/`beads` behind `INCLUDE_OPTIONAL=1`).
-4. Add the operating rule to `CLAUDE.md`; update the existing "Capture output for review" line to say `rg` instead of `grep`.
-5. Add `.claude/hooks/check-grep-commands.sh` and wire it into `.claude/settings.json` under the `PreToolUse` Bash matcher.
-6. Add `Bash(rg:*)` to the `.claude/settings.json` allow list so `rg` invocations don't prompt.
-7. Migrate the four existing in-repo `grep` callsites to `rg`:
-   - `.claude/hooks/check-biome-commands.sh`
-   - `.claude/hooks/commit-format.sh`
-   - `.claude/hooks/prevent-wait-for-timeout.sh`
-   - `.claude/commands/create-issue.sh`
-8. Verify: `pnpm check` still green; the hook fires a nudge on a synthetic `grep` Bash call and stays silent on `git grep` and `rg`.
+- **Con**: Couples the tool's version to npm release cadence; introduces a binary-download step inside `pnpm install`; obscures that `rg` is a system tool used outside Node contexts (shell scripts, CI shell steps). Same reasoning we applied to Trivy in [ADR 0008](0008-trivy-security-scan.md).
 
 ## References
 
 - [ripgrep — GitHub](https://github.com/BurntSushi/ripgrep)
 - [ripgrep user guide](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md)
 - [Andrew Gallant — "ripgrep is faster than {grep, ag, git grep, ucg, pt, sift}"](https://blog.burntsushi.net/ripgrep/)
-- [ADR 0010: Lefthook for git hooks](0010-lefthook.md) — precedent for accepting a binary system dep.
-- [ADR 0012: Claude Code configuration layout](0012-claude-code-setup.md) — where the new hook lives.
-- [ADR 0015: Trivy for vulnerability scanning](0015-trivy-security-scan.md) — precedent for installing a Rust/Go system tool via Homebrew rather than npm.
+- [ADR 0018: Lefthook for git hooks](0018-lefthook.md) — precedent for accepting a binary system dep.
+- [ADR 0029: Claude Code configuration layout](0029-claude-code-setup.md) — where the new hook lives.
+- [ADR 0008: Trivy for vulnerability scanning](0008-trivy-security-scan.md) — precedent for installing a Rust/Go system tool via Homebrew rather than npm.
