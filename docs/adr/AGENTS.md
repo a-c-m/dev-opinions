@@ -98,6 +98,11 @@ Each ADR follows the MADR-lite shape:
 - **[0030 — Child code layout: `apps/` and `repos/`](0030-child-apps-and-repos.md)** — *Accepted*
   — Two parallel root directories, each optional: `apps/` for pnpm workspace members (existing monorepo), `repos/` for independent child git repos (new). Children in `repos/` are excluded from pnpm workspace and NX graph, own their own everything, work standalone. Capability is opt-in by population; no flag. Cross-repo agent context via running the agent at the parent root. No git-hook cascading. Extends 0028.
 
+### Secrets
+
+- **[0034 — Secrets injection at runtime](0034-secrets-runtime-injection.md)** — *Accepted*
+  — Pattern B (entrypoint shim, not platform-native): a vault CLI (`infisical run --` / `op run --` / `doppler run --` / Vault Agent) sits in the container `ENTRYPOINT`, authenticates as the workload via cloud-native identity (IRSA / Pod Identity / WIF), exports secrets as env vars, then exec's into node. Stacks with ADR 0032's OTel `--import`: `["<vault-cli>", "run", "--", "node", "--import", "./dist/instrumentation.mjs"]`. Local dev: same CLI wrapping `pnpm dev` (1Password `op run --` as named default, `.env` files retired). CI: OIDC-only (defense = cloud-side IAM posture + Trivy + PR review, not a lefthook hook). Store agnostic, advisory ladder: 1Password Secrets Automation → Doppler/Infisical Cloud → Infisical self-hosted (MIT) → OpenBao (MPL-2.0) → SPIFFE/SPIRE for ≥3 clouds. Static secrets default; dynamic secrets (Vault/OpenBao mints per-instance DB creds with 1h TTL) named as graduation when compliance / leak-rotation lag / multi-service-DB pain triggers it. Six hard rules surfaced from 2024–2026 incidents (no `.env` in git, no long-lived CI keys, etc.). Fills the gap ADR 0015 deliberately left open; supersedes its `.env`-based dev workflow.
+
 ### Observability
 
 - **[0031 — Structured logging contract](0031-structured-logging-contract.md)** — *Accepted*

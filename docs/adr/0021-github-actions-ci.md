@@ -34,7 +34,7 @@ The pattern that avoids both is a small library of **reusable workflows** (prefi
 - **Security runs on every PR**: Trivy fs-scan for HIGH/CRITICAL (dependencies, secrets, misconfigurations). Scheduled weekly full scan for drift detection.
 - **Container registry is parameterised**: `_container-build.yml` takes `registry`, `image`, `username`, `password` as inputs. The template's example wiring uses GHCR via `GITHUB_TOKEN`; consumers point it elsewhere (ECR, Harbor, Docker Hub) without editing the reusable workflow.
 - **Concurrency**: each workflow cancels in-progress runs for the same branch so a forced push does not queue stale CI.
-- **OIDC**: when consumers deploy to AWS/GCP, they wire OIDC in the calling workflow — never long-lived cloud credentials in repo secrets.
+- **OIDC**: cloud authentication is OIDC-only. Long-lived `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / equivalents must not be added as repo or environment secrets. The control is the cloud-side IAM posture (no long-lived-key users provisioned) plus Trivy secret scanning on every PR; PR review catches the shape mistake. See [ADR 0034](0034-secrets-runtime-injection.md) for the full secrets-injection model.
 
 ## Consequences
 

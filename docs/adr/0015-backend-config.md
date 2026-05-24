@@ -229,13 +229,14 @@ The default source is `{ kind: "files" }`. Test code never touches the filesyste
 
 1. `git clone <repo>`
 2. `cp config/local.example.yaml config/local.yaml` (optional — for non-secret overrides)
-3. `cp .env.example .env` and fill in secret values from 1Password
-4. `pnpm dev`
+3. `op signin` (once per machine — or the equivalent for your chosen vault CLI)
+4. `pnpm dev` — the `dev` script wraps `op run --env-file=.env.example -- …` so secrets are injected at process start; no `.env` file is ever written to disk. See [ADR 0034](0034-secrets-runtime-injection.md).
 
 Boot logs (dev):
 
 ```
 [ConfigModule] Loaded config from default.yaml + development.yaml + local.yaml
+[ConfigModule] Secrets from op run -- (10 keys injected from 1Password "base-app dev" vault)
 [ConfigModule] WARNING: secret 'database.password' was overridden by local.yaml (acceptable in dev only)
 ```
 
@@ -246,7 +247,7 @@ Boot logs (dev):
 - **Local docker-compose dev**: mount `./config/local.yaml:/app/config/local.yaml:ro` in the dev compose file.
 - **Stage / production images**: `local.yaml` simply does not exist in the container; the loader skips step 3 silently. This is the *structural* enforcement of "local.yaml is dev-only" — no `APP_ENV` guard required, the file isn't there to read.
 
-Secrets reach containers through normal env-var injection (orchestrator secrets, compose `env_file`, K8s secrets — out of scope here).
+Secrets reach containers via the entrypoint-shim CLI per [ADR 0034](0034-secrets-runtime-injection.md): a vault agent (`infisical run --` / `op run --` / etc.) runs inside the container at process start, authenticates as the workload, exports env vars, and `exec`s the app. `@shared/config` then reads `process.env` as normal.
 
 ## Consequences
 

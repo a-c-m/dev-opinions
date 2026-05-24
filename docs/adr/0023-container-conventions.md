@@ -69,7 +69,12 @@ CMD ["dist/main.js"]
   any `@nestjs/core` require, per
   [ADR 0032](0032-runtime-observability.md). Without it,
   bundlers reorder imports and controller spans silently
-  disappear. Services override `CMD` only.
+  disappear. Services override `CMD` only. When the secrets
+  shim from [ADR 0034](0034-secrets-runtime-injection.md) is
+  added, the ENTRYPOINT becomes
+  `["<vault-cli>", "run", "--", "node", "--import", "./dist/instrumentation.mjs"]`
+  — the vault agent runs first, exports env vars, then exec's
+  into node. Order: vault → OTel → app.
 - **`HEALTHCHECK` hits `GET /health`** — every deployable
   exposes that, 200 when ready. Contract is the URL, not the
   implementation.
