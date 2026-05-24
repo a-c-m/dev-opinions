@@ -97,3 +97,10 @@ Each ADR follows the MADR-lite shape:
   — Curated `.claude/` layout (agents, hooks, commands, skills, settings.json) plus root + per-app `CLAUDE.md` and `.mcp.json` (context7, playwright, chrome-devtools). Hooks split into content validators and command guards, no escape hatches.
 - **[0030 — Child code layout: `apps/` and `repos/`](0030-child-apps-and-repos.md)** — *Accepted*
   — Two parallel root directories, each optional: `apps/` for pnpm workspace members (existing monorepo), `repos/` for independent child git repos (new). Children in `repos/` are excluded from pnpm workspace and NX graph, own their own everything, work standalone. Capability is opt-in by population; no flag. Cross-repo agent context via running the agent at the parent root. No git-hook cascading. Extends 0028.
+
+### Observability
+
+- **[0031 — Structured logging contract](0031-structured-logging-contract.md)** — *Accepted*
+  — pino 10 + `nestjs-pino`; stdout-only JSON, no transports in app code (Biome rule enforces); fixed log shape including `trace_id`/`span_id` from `@opentelemetry/instrumentation-pino`; local dev tees raw JSON to `.ai-wip/logs/<product>-<service>.log` and pretty to terminal; `pnpm watch-logs` for humans.
+- **[0032 — Runtime observability: OTel, metrics, tracing](0032-runtime-observability.md)** — *Accepted*
+  — OpenTelemetry Node SDK with OTLP/HTTP to a local Collector (the swap point). `ENTRYPOINT ["node", "--import", "./dist/instrumentation.mjs"]` fixes boot order. W3C `traceparent` only. Metrics split: `prom-client` for runtime, OTel SDK for app (RED). 10% head-based sampling in prod, 100% local; tail-based at Collector as graduation. `pnpm dev` logs-only by default, `pnpm dev:obs` brings up Collector + Grafana + Tempo + Loki + Prometheus. Prod backend not prescribed; advised ladder New Relic Free → Grafana Cloud Free → self-host. Error/replay layer opt-in via SOPs (PostHog default-advised, Sentry alternative for backend-heavy). No OTel web SDK in template.

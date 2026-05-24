@@ -1,0 +1,60 @@
+# Local observability stack — opt-in via `pnpm dev:obs`.
+# See docs/adr/0032-runtime-observability.md.
+#
+# Apps send OTLP/HTTP to the Collector on :4318. Collector
+# fans out to Prometheus (metrics), Tempo (traces), Loki
+# (logs). Grafana reads all three.
+
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.119.0
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./config/otel-collector.dev.yaml:/etc/otel-collector.yaml:ro
+    ports:
+      - "4318:4318"   # OTLP/HTTP
+      - "4317:4317"   # OTLP/gRPC
+      - "8888:8888"   # Collector self-metrics
+    depends_on:
+      - prometheus
+      - tempo
+      - loki
+
+  prometheus:
+    image: prom/prometheus:v3.0.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --enable-feature=otlp-write-receiver
+    volumes:
+      - ./config/prometheus.dev.yaml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+
+  tempo:
+    image: grafana/tempo:2.7.0
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./config/tempo.dev.yaml:/etc/tempo.yaml:ro
+    ports:
+      - "3200:3200"   # Tempo HTTP
+
+  loki:
+    image: grafana/loki:3.3.0
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    ports:
+      - "3100:3100"
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - ./config/grafana-datasources.dev.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - tempo
+      - loki

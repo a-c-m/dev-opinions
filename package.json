@@ -11,6 +11,9 @@
   "scripts": {
     "prepare": "lefthook install",
     "dev": "nx run-many --target=dev --all --parallel",
+    "dev:obs": "podman compose -f docker-compose.observability.yml up -d",
+    "dev:obs:down": "podman compose -f docker-compose.observability.yml down",
+    "watch-logs": "tail -f .ai-wip/logs/*.log | pino-pretty",
     "build": "nx run-many --target=build --all",
     "test": "nx run-many --target=test --all",
     "test:e2e": "nx run-many --target=e2e --all",
@@ -49,6 +52,7 @@
     "cz-conventional-changelog": "3.3.0",
     "knip": "6.7.0",
     "lefthook": "2.1.6",
+    "pino-pretty": "11.3.0",
     "nx": "22.7.0",
     "typescript": "6.0.3",
     "ultracite": "5.4.5",

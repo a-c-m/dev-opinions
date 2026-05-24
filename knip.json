@@ -35,7 +35,9 @@
     "@nx/react",
     "@nx/vite",
     "@playwright/test",
+    "pino-pretty",
     "vitest"
   ],
+  "ignoreBinaries": ["pino-pretty", "podman", "tail"],
   "ignoreExportsUsedInFile": true
 }

@@ -55,7 +55,7 @@ COPY --from=builder /app/dist ./dist
 USER node
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
   CMD node -e "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1))"
-ENTRYPOINT ["node"]
+ENTRYPOINT ["node", "--import", "./dist/instrumentation.mjs"]
 CMD ["dist/main.js"]
 ```
 
@@ -64,9 +64,12 @@ CMD ["dist/main.js"]
   without rebuild flags). Distroless deferred pending devops review.
 - **`USER node`** (uid 1000, shipped by the official image —
   no `useradd` ceremony).
-- **`ENTRYPOINT ["node"]` + `CMD ["dist/main.js"]`** —
-  `ENTRYPOINT` consistent across services; services override
-  `CMD` only.
+- **`ENTRYPOINT ["node", "--import", "./dist/instrumentation.mjs"]`
+  + `CMD ["dist/main.js"]`** — `--import` loads OTel before
+  any `@nestjs/core` require, per
+  [ADR 0032](0032-runtime-observability.md). Without it,
+  bundlers reorder imports and controller spans silently
+  disappear. Services override `CMD` only.
 - **`HEALTHCHECK` hits `GET /health`** — every deployable
   exposes that, 200 when ready. Contract is the URL, not the
   implementation.
@@ -200,6 +203,9 @@ Build tool: `podman build` (or `buildah bud`) locally; CI uses
 - **References [0005](0005-package-script-conventions.md)** —
   `lint:container` lints this shape; `db:*` family wraps the
   per-service compose.
+- **References [0032](0032-runtime-observability.md)** —
+  `ENTRYPOINT` carries `--import ./dist/instrumentation.mjs`
+  to fix OTel boot order.
 
 ## References
 
