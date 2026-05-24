@@ -16,7 +16,12 @@ A modern TypeScript data layer should give the compiler full visibility into the
   - `drizzle-orm/better-sqlite3` for local-first/CLI apps and integration tests.
 - Schemas live in `shared/db-<domain>/src/schema.ts`; migrations in `shared/db-<domain>/drizzle/`.
 - **drizzle-kit** generates migrations and drives introspection.
-- DTO validation uses zod schemas derived from Drizzle tables via `drizzle-zod`.
+- **Vocabulary sets** (status enums, flow enums, role enums) are exported from the schema package as `readonly` tuples, with the matching string-literal-union type derived from the tuple. Consumers — validators, service domain rules, narrowed types — reference the tuple. Never re-typed inline.
+  ```typescript
+  export const PRODUCT_POST_RETURN_FLOWS = ['reimage', 'clean', 'inspect'] as const;
+  export type ProductPostReturnFlow = typeof PRODUCT_POST_RETURN_FLOWS[number];
+  ```
+- **DTO validation**: `drizzle-zod` for non-GraphQL ingress (REST endpoints, webhooks, queue consumers, CLI). GraphQL inputs use `class-validator` decorators on `@InputType` classes per [ADR 0033](0033-api-contracts-and-errors.md) — the `@InputType` class is mandatory, so the second runtime check Zod would provide is redundant.
 
 ## Consequences
 
