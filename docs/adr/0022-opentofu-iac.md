@@ -58,4 +58,3 @@ Terraform has been the industry default for a decade, but since its 2023 licence
 - **Pulumi** — real programming languages, smaller ecosystem, harder to review for non-authors.
 - **CDK** — same drawback as Pulumi, tied to one cloud.
 - **Plain cloud-native templates (CloudFormation, ARM, Deployment Manager)** — cloud lock-in, weaker module story.
-- **Helm / k8s manifests only** — covers workload, not platform. Pairs with IaC rather than replacing it.

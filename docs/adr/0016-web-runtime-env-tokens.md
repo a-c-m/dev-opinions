@@ -199,16 +199,11 @@ If the dependency disappears, an in-house replacement is small and isolated. We 
 - **Pro**: Same one-placeholder principle, no separate CLI step.
 - **Con**: Requires a server in front of every deploy (rules out static hosting); couples config to the rendering layer; we don't have SSR everywhere. Useful where we do have SSR, but not as a universal solution.
 
-### 5. Vite `define` / hardcoded env vars
+## Related
 
-- **Pro**: Native, zero deps.
-- **Con**: Build-time only — the original problem.
-
-## References
-
+- [ADR 0015: Typed file-based config with secrets-only env vars (backend)](0015-backend-config.md) — server-side counterpart.
+- [ADR 0017: Env config via validated schema](0017-env-config.md) — superseded; previously covered both surfaces under a single per-app `src/env.ts` pattern.
 - [import-meta-env documentation](https://import-meta-env.org/)
 - [GitHub: runtime-env/import-meta-env](https://github.com/runtime-env/import-meta-env)
 - [12-factor: Config](https://12factor.net/config)
 - [12-factor: Build, release, run](https://12factor.net/build-release-run)
-- [ADR 0015: Typed file-based config with secrets-only env vars (backend)](0015-backend-config.md) — server-side counterpart.
-- [ADR 0017: Env config via validated schema](0017-env-config.md) — superseded; previously covered both surfaces under a single per-app `src/env.ts` pattern.

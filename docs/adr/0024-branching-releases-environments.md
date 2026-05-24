@@ -182,25 +182,16 @@ Mandated *what*; setup *how* is per-fork.
    Rejected.
 3. **`stage` as branch name (no rename).** Conflates branch and
    env; "stage is broken" becomes ambiguous. Rejected.
-4. **Force-reset `release-candidate` to the tag for hotfixes.**
-   Silently destroys in-flight release work. The PR pattern
-   makes conflicts explicit. Rejected.
-5. **Mandatory hosted dev for every service.** Forces
+4. **Mandatory hosted dev for every service.** Forces
    infrastructure on services that don't have it. Rejected as
    mandate; kept as direction-of-travel.
 
-## Relationship to prior ADRs
+## Related
 
-- **Depends on [0019](0019-conventional-commits.md)** for the
-  commit conventions that drive auto-bump.
-- **Depends on [0021](0021-github-actions-ci.md)** for the
-  workflow shape.
-- **Cross-references [0027](0027-codeowners-team-metadata.md)**
-  for CODEOWNERS review.
-- **Companion to [0025](0025-production-data-flow.md)** (production data flow).
-- **Recommended (not enforced) for children under [0030](0030-child-apps-and-repos.md)**.
-
-## References
-
+- **[ADR 0019](0019-conventional-commits.md)** — commit conventions that drive auto-bump.
+- **[ADR 0021](0021-github-actions-ci.md)** — workflow shape this builds on.
+- **[ADR 0025](0025-production-data-flow.md)** — companion (production data flow).
+- **[ADR 0027](0027-codeowners-team-metadata.md)** — CODEOWNERS review.
+- **[ADR 0030](0030-child-apps-and-repos.md)** — recommended (not enforced) for children.
 - [GitLab Flow — release branches](https://docs.gitlab.com/ee/topics/gitlab_flow.html#release-branches-with-gitlab-flow)
 - [Semantic Versioning](https://semver.org/)

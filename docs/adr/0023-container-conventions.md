@@ -1,5 +1,4 @@
 ---
-status: proposed
 date: 2026-05-22
 decision-makers: [Repo platform]
 ---
@@ -52,29 +51,44 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
 COPY --from=builder /app/dist ./dist
+
+# Vault CLI shim per ADR 0034. Pick the fork's vendor at build time.
+ARG VAULT_CLI=infisical
+RUN /bin/bash -c '\
+  case "$VAULT_CLI" in \
+    infisical) curl -sSL https://infisical.com/install.sh | sh ;; \
+    op)        curl -sSL https://downloads.1password.com/linux/keys/1password.asc | gpg --dearmor -o /usr/share/keyrings/1password-archive-keyring.gpg \
+                 && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/amd64 stable main" \
+                    > /etc/apt/sources.list.d/1password.list \
+                 && apt-get update && apt-get install -y --no-install-recommends 1password-cli ;; \
+    doppler)   curl -sLf https://cli.doppler.com/install.sh | sh ;; \
+    none)      echo "skipping vault CLI install" ;; \
+  esac'
+
 USER node
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
   CMD node -e "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1))"
-ENTRYPOINT ["node", "--import", "./dist/instrumentation.mjs"]
+
+# Stacking order: vault shim → OTel boot → app. See ADR 0034 + 0032.
+ENTRYPOINT ["infisical", "run", "--", "node", "--import", "./dist/instrumentation.mjs"]
 CMD ["dist/main.js"]
 ```
+
+Forks that don't run a vault CLI in-container (e.g. platform-native
+injection via ECS `secrets:` block — see [ADR 0034](0034-secrets-runtime-injection.md))
+build with `--build-arg VAULT_CLI=none` and use `ENTRYPOINT ["node",
+"--import", "./dist/instrumentation.mjs"]`.
 
 - **Slim Debian** for every stage (glibc — `better-sqlite3` and
   other native modules from [ADR 0012](0012-drizzle-orm.md) work
   without rebuild flags). Distroless deferred pending devops review.
 - **`USER node`** (uid 1000, shipped by the official image —
   no `useradd` ceremony).
-- **`ENTRYPOINT ["node", "--import", "./dist/instrumentation.mjs"]`
-  + `CMD ["dist/main.js"]`** — `--import` loads OTel before
-  any `@nestjs/core` require, per
-  [ADR 0032](0032-runtime-observability.md). Without it,
-  bundlers reorder imports and controller spans silently
-  disappear. Services override `CMD` only. When the secrets
-  shim from [ADR 0034](0034-secrets-runtime-injection.md) is
-  added, the ENTRYPOINT becomes
-  `["<vault-cli>", "run", "--", "node", "--import", "./dist/instrumentation.mjs"]`
-  — the vault agent runs first, exports env vars, then exec's
-  into node. Order: vault → OTel → app.
+- **`ENTRYPOINT` stacks vault → OTel → app.** `infisical run --`
+  (or `op run --` / `doppler run --`) authenticates and exports
+  secrets ([ADR 0034](0034-secrets-runtime-injection.md)); `node --import` boots OTel before
+  `@nestjs/core` is required ([ADR 0032](0032-runtime-observability.md));
+  `CMD` is the only thing services override.
 - **`HEALTHCHECK` hits `GET /health`** — every deployable
   exposes that, 200 when ready. Contract is the URL, not the
   implementation.
@@ -192,27 +206,19 @@ Build tool: `podman build` (or `buildah bud`) locally; CI uses
 4. **Single root `compose.yml`** for the whole stack — forces
    every dev to bring up the whole monorepo. NX `run-many`
    composes per-service files when multi-service is needed.
-5. **`Containerfile`** (Podman/OCI convention) — semantically
-   correct but every tool defaults to `Dockerfile`. Compatibility
-   wins.
 
-## Relationship to prior ADRs
+## Related
 
-- **Consumed by [0008](0008-trivy-security-scan.md), [0021](0021-github-actions-ci.md),
-  [0024](0024-branching-releases-environments.md)** — Trivy scans
-  this; CI builds it; release flow deploys it.
-- **References [0012](0012-drizzle-orm.md)** — native modules
-  motivate slim/glibc over Alpine.
-- **References [0002](0002-node-22-lts.md)** — base image follows
-  the Node LTS pin.
-- **References [0005](0005-package-script-conventions.md)** —
+- **[ADR 0002](0002-node-22-lts.md)** — base image follows the Node LTS pin.
+- **[ADR 0005](0005-package-script-conventions.md)** —
   `lint:container` lints this shape; `db:*` family wraps the
   per-service compose.
-- **References [0032](0032-runtime-observability.md)** —
+- **[ADR 0008](0008-trivy-security-scan.md)** — Trivy scans this image.
+- **[ADR 0012](0012-drizzle-orm.md)** — native modules motivate slim/glibc over Alpine.
+- **[ADR 0021](0021-github-actions-ci.md)** — CI builds this image.
+- **[ADR 0024](0024-branching-releases-environments.md)** — release flow deploys it.
+- **[ADR 0032](0032-runtime-observability.md)** —
   `ENTRYPOINT` carries `--import ./dist/instrumentation.mjs`
   to fix OTel boot order.
-
-## References
-
 - [hadolint](https://github.com/hadolint/hadolint) — Dockerfile linter.
 - [pnpm in Docker](https://pnpm.io/docker) — corepack + lockfile patterns.

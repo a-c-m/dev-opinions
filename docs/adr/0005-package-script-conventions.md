@@ -221,20 +221,14 @@ whole workspace" is a per-product operation, not a per-workspace one. Use
   leaf packages the abstraction costs more than it saves. Revisit if the
   workspace grows past ~20. Rejected for now.
 
-### 3. Coverage as a vitest CLI flag, no `:cov` script
-
-- **Pro**: one less verb in the table.
-- **Con**: every CI workflow has to remember `--coverage`. Loses muscle
-  memory parity with `test:cov`. Rejected.
-
-### 4. Drop `start`, keep only `dev` and `serve`
+### 3. Drop `start`, keep only `dev` and `serve`
 
 - **Pro**: smaller alphabet.
 - **Con**: "build then run" is a real workflow (onboarding, CI smoke
   tests, bug repros). Forcing every caller to remember `nx run-many -t build,serve`
   with the right ordering is worse than naming the combo. Rejected.
 
-### 5. Tag-based exclusion of e2e from `run-many`
+### 4. Tag-based exclusion of e2e from `run-many`
 
 `nx run-many -t dev --exclude=tag:type:e2e`.
 
@@ -262,8 +256,14 @@ The root [CLAUDE.md](../../CLAUDE.md) "Core conventions" section should
 link to this ADR for the full contract, with the verb table inline as
 the cheat sheet.
 
-## References
+## Related
 
+- [ADR 0004](0004-nx-monorepo.md) — NX as the orchestrator that makes
+  these conventions load-bearing.
+- [ADR 0006](0006-biome-ultracite.md) — Biome + Ultracite, the linter
+  this ADR's `lint` script wraps.
+- [ADR 0013](0013-vitest-playwright.md) — Vitest + Playwright, the
+  runners this ADR's `test*` and `e2e` verbs invoke.
 - [NX targets concept](https://nx.dev/concepts/executors-and-configurations)
   — official guidance on consistent target naming for `run-many` and
   `affected`.
@@ -272,9 +272,3 @@ the cheat sheet.
 - [npm scripts spec](https://docs.npmjs.com/cli/v10/using-npm/scripts) —
   the privileged `start` / `test` / `restart` / `stop` names that this
   ADR's `start` is compatible with.
-- [ADR 0006](0006-biome-ultracite.md) — Biome + Ultracite, the linter
-  this ADR's `lint` script wraps.
-- [ADR 0004](0004-nx-monorepo.md) — NX as the orchestrator that makes
-  these conventions load-bearing.
-- [ADR 0013](0013-vitest-playwright.md) — Vitest + Playwright, the
-  runners this ADR's `test*` and `e2e` verbs invoke.

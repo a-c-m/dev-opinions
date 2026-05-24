@@ -114,19 +114,15 @@ any directory; agents read the files directly with `rg`/`jq`.
 3. **Timestamped log file per `pnpm dev` invocation** —
    agents need a stable path to re-read across tool calls.
 
-## Relationship to prior ADRs
+## Related
 
-- **Consumed by [0032](0032-runtime-observability.md)** —
-  runtime observability picks up where this leaves off
-  (traces, metrics, Collector, prod routing).
-- **References [0023](0023-container-conventions.md)** — the
+- **[ADR 0010](0010-nestjs-backend.md)** — `nestjs-pino` is the NestJS-side wiring.
+- **[ADR 0023](0023-container-conventions.md)** — the
   `dev` compose target writes to the same stdout pipeline;
   prod runtime drops the `tee` and routes via the orchestrator.
-- **References [0010](0010-nestjs-backend.md)** — `nestjs-pino`
-  is the NestJS-side wiring.
-
-## References
-
+- **[ADR 0032](0032-runtime-observability.md)** — runtime
+  observability picks up where this leaves off
+  (traces, metrics, Collector, prod routing).
 - [pino docs](https://getpino.io/)
 - [`nestjs-pino`](https://github.com/iamolegga/nestjs-pino)
 - [`@opentelemetry/instrumentation-pino`](https://www.npmjs.com/package/@opentelemetry/instrumentation-pino)

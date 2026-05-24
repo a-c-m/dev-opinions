@@ -134,16 +134,10 @@ naturally refresh them. Two mechanisms, both rooted in `git log`
 2. **Notion / Confluence.** Unavailable during outages; invisible to agents. Rejected.
 3. **Executable runbooks (`khalidx/runbook`, `braintree/runbook`).** Tooling dependency at incident time is the wrong bet. Rejected.
 4. **Central `/docs/runbooks/` only.** Flat dir doesn't scale; orphans on service deletion. Cross-cutting at root retained as carve-out.
-5. **`RUN-NNN-title.md` numbering.** Runbooks aren't chronological; path is identity. Rejected.
-6. **`last-reviewed:` field + CI block.** Touch-the-date theatre, rejected in [ADR 0027](0027-codeowners-team-metadata.md) for the same reason. Rejected.
+## Related
 
-## Relationship to prior ADRs
-
-- **Complements [ADR 0028](0028-multi-agent-rule-distribution.md)**: AGENTS.md gains the prompt above.
-- **Cross-links [ADR 0027](0027-codeowners-team-metadata.md)**: Escalation points at CODEOWNERS metadata rather than duplicating contacts.
-- **Scope-bounded by [ADR 0030](0030-child-apps-and-repos.md)**: applies to this repo's layout. Children under `repos/` own their own; convention recommended, not enforced.
-
-## References
-
+- **[ADR 0027](0027-codeowners-team-metadata.md)** — Escalation points at CODEOWNERS metadata rather than duplicating contacts.
+- **[ADR 0028](0028-multi-agent-rule-distribution.md)** — AGENTS.md gains the prompt above.
+- **[ADR 0030](0030-child-apps-and-repos.md)** — scope-bounded: applies to this repo's layout. Children under `repos/` own their own; convention recommended, not enforced.
 - [AWS Well-Architected — runbooks](https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/ops_ready_to_support_use_runbooks.html)
 - [SkeltonThatcher/run-book-template](https://github.com/SkeltonThatcher/run-book-template) — acknowledged shape, not adopted as standard.

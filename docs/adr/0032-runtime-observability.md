@@ -149,28 +149,20 @@ when the diagnostic need recurs.
    pricing reasons that age fast. Advice ages better.
 2. **OTel JS web SDK in template** — ~30 KB bundle per fork
    for correlation most won't use. Graduation.
-3. **Tail-based sampling at the Collector by default** —
-   doesn't fix throughput (span creation cost). Graduation.
-4. **`@sentry/nestjs` as the default error path** — leaves
+3. **`@sentry/nestjs` as the default error path** — leaves
    feature-flags orphaned; 1-user free-tier paywall.
-5. **Vendor proprietary agents** (Datadog, NR agent) — locks
+4. **Vendor proprietary agents** (Datadog, NR agent) — locks
    app code to the vendor; breaks "swap = config".
 
-## Relationship to prior ADRs
+## Related
 
-- **Builds on [0031](0031-structured-logging-contract.md)** —
-  log shape and capture.
-- **Updates [0023](0023-container-conventions.md)** — runtime
+- **[ADR 0010](0010-nestjs-backend.md)** — NestJS hooks for OTel.
+- **[ADR 0011](0011-frontend-frameworks.md)** — frontend SOPs over OTel web.
+- **[ADR 0015](0015-backend-config.md)** — OTel vars follow the config/secret split.
+- **[ADR 0022](0022-opentofu-iac.md)** — prod env vars set in Tofu.
+- **[ADR 0023](0023-container-conventions.md)** — runtime
   `ENTRYPOINT` adds `--import ./dist/instrumentation.mjs`.
-- **References [0010](0010-nestjs-backend.md),
-  [0011](0011-frontend-frameworks.md),
-  [0015](0015-backend-config.md),
-  [0022](0022-opentofu-iac.md)** — NestJS hooks, frontend
-  SOPs over OTel web, OTel vars follow the config/secret
-  split, prod env vars set in Tofu.
-
-## References
-
+- **[ADR 0031](0031-structured-logging-contract.md)** — log shape and capture.
 - [OpenTelemetry JS](https://opentelemetry.io/docs/languages/js/)
 - [OTel JS performance — Matteo Collina, Aug 2025](https://blog.platformatic.dev/the-hidden-cost-of-context)
 - [PostHog vs Sentry comparison](https://posthog.com/blog/posthog-vs-sentry)

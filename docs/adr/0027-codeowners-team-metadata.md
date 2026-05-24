@@ -121,25 +121,18 @@ Trigger words ("big edits", "new modules"); incidental edits skip.
 3. **Backstage `catalog-info.yaml`.** Couples to Backstage before
    it's adopted; same vendor-lock critique that ruled out
    PagerDuty-named keys. Rejected.
-4. **Individual `@handles` on rule lines only, no comments.**
-   Loses role differentiation entirely. Rejected.
-5. **`last-updated:` field + CI freshness warning.** Decorative
+4. **`last-updated:` field + CI freshness warning.** Decorative
    without enforcement; invites "touch the date" edits. Git
    already carries recency. Rejected.
 
-## Relationship to prior ADRs
+## Related
 
-- **Extends [ADR 0020](0020-github-repo-conventions.md)**: same
-  file, additional convention. Not superseding.
-- **Complements [ADR 0028](0028-multi-agent-rule-distribution.md)**:
+- **[ADR 0020](0020-github-repo-conventions.md)** — extends the
+  same file with an additional convention. Not superseding.
+- **[ADR 0028](0028-multi-agent-rule-distribution.md)** —
   `AGENTS.md` gains the three-sentence pointer above.
-- **Scope-bounded by [ADR 0030](0030-child-apps-and-repos.md)**:
+- **[ADR 0030](0030-child-apps-and-repos.md)** — scope-bounded:
   applies to this repo's CODEOWNERS only. Children under `repos/`
   own their own files; the convention is recommended, not enforced
   for them.
-
-## References
-
 - [CODEOWNERS documentation — GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
-- [ADR 0020](0020-github-repo-conventions.md) — established CODEOWNERS for review routing.
-- [ADR 0028](0028-multi-agent-rule-distribution.md) — receives the prompt addition.

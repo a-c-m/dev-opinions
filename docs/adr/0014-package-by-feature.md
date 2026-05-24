@@ -103,10 +103,10 @@ base-app ships no application code today, so no migration. Future apps follow th
 1. When `nx g` scaffolds a new app, the generator template starts with empty `ui/` (type-folder) rather than empty `components/` (layered). Tracked separately as a generator update.
 2. When an app from a downstream project arrives layered, the first non-trivial feature addition is the trigger to convert. Per-app `CLAUDE.md` should document its layout state.
 
-## References
+## Related
 
-- [Robert C. Martin — *Screaming Architecture*](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html) — origin of the package-by-feature framing.
-- [Jimmy Bogard — *Vertical Slice Architecture*](https://www.jimmybogard.com/vertical-slice-architecture/) — the layered → vertical reframing.
 - [ADR 0010](0010-nestjs-backend.md) — NestJS feature modules already encode this on the backend.
 - [ADR 0011](0011-frontend-frameworks.md) — frontend stack choices this rule applies to.
 - [ADR 0012](0012-drizzle-orm.md) — schema-location decision; same philosophy (product-owned things live with the product).
+- [Robert C. Martin — *Screaming Architecture*](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html) — origin of the package-by-feature framing.
+- [Jimmy Bogard — *Vertical Slice Architecture*](https://www.jimmybogard.com/vertical-slice-architecture/) — the layered → vertical reframing.

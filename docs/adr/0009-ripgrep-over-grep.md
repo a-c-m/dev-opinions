@@ -145,21 +145,16 @@ That guidance is updated in CLAUDE.md alongside this ADR: capture to file first,
 - **Pro**: Pure Perl, zero binary deps if Perl is present.
 - **Con**: Significantly slower than both `ag` and `rg`; weaker default filtering. Rejected.
 
-### 4. A linter rule (shellcheck plugin) instead of a hook
-
-- **Pro**: Catches `grep` in committed shell scripts deterministically.
-- **Con**: Does not catch ad-hoc `grep` invocations made by Claude through the Bash tool — the dominant use case this ADR targets. Worth adding later as a complement, not a replacement.
-
-### 5. Ship `ripgrep` as an npm wrapper
+### 4. Ship `ripgrep` as an npm wrapper
 
 - **Pro**: `pnpm install` would put `rg` on PATH automatically.
 - **Con**: Couples the tool's version to npm release cadence; introduces a binary-download step inside `pnpm install`; obscures that `rg` is a system tool used outside Node contexts (shell scripts, CI shell steps). Same reasoning we applied to Trivy in [ADR 0008](0008-trivy-security-scan.md).
 
-## References
+## Related
 
+- [ADR 0008: Trivy for vulnerability scanning](0008-trivy-security-scan.md) — precedent for installing a Rust/Go system tool via Homebrew rather than npm.
+- [ADR 0018: Lefthook for git hooks](0018-lefthook.md) — precedent for accepting a binary system dep.
+- [ADR 0029: Claude Code configuration layout](0029-claude-code-setup.md) — where the new hook lives.
 - [ripgrep — GitHub](https://github.com/BurntSushi/ripgrep)
 - [ripgrep user guide](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md)
 - [Andrew Gallant — "ripgrep is faster than {grep, ag, git grep, ucg, pt, sift}"](https://blog.burntsushi.net/ripgrep/)
-- [ADR 0018: Lefthook for git hooks](0018-lefthook.md) — precedent for accepting a binary system dep.
-- [ADR 0029: Claude Code configuration layout](0029-claude-code-setup.md) — where the new hook lives.
-- [ADR 0008: Trivy for vulnerability scanning](0008-trivy-security-scan.md) — precedent for installing a Rust/Go system tool via Homebrew rather than npm.

@@ -117,25 +117,16 @@ services), and per-service sanitisation tables / columns.
    construction. Rejected.
 3. **CI runner pulls and sanitises.** Hands prod credentials
    outside the prod trust boundary. Rejected on rule 3.
-4. **Lambda / short-lived function only.** 15-min hard timeout
-   doesn't scale to large DBs. Acceptable per-service for small
-   DBs within the constraints; not a default.
-5. **Manual on-demand only, no schedule.** Saves automation
+4. **Manual on-demand only, no schedule.** Saves automation
    cost; lower envs drift further from prod shape over time and
    the "let me just pull prod quickly" temptation grows.
    Rejected as a default.
 
-## Relationship to prior ADRs
+## Related
 
-- **Companion to [ADR 0024](0024-branching-releases-environments.md)**
-  — code direction; data direction.
-- **Builds on [ADR 0008](0008-trivy-security-scan.md)** at the
-  principle level: prod-data containment is security-adjacent.
-- **Consumed by [ADR 0026](0026-runbook-and-sop-format.md)** —
-  per-service sanitisation and restore may carry their own
-  runbooks.
-
-## References
-
-- [ADR 0024](0024-branching-releases-environments.md) — code direction.
-- [ADR 0008](0008-trivy-security-scan.md) — security gate.
+- **[ADR 0008](0008-trivy-security-scan.md)** — security gate;
+  prod-data containment is security-adjacent.
+- **[ADR 0024](0024-branching-releases-environments.md)** —
+  companion: code direction; data direction.
+- **[ADR 0026](0026-runbook-and-sop-format.md)** — per-service
+  sanitisation and restore may carry their own runbooks.

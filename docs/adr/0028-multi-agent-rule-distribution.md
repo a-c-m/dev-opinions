@@ -18,11 +18,13 @@ may settle on different agents from the ones we use here.
 standard pattern is **one source file (`AGENTS.md`) with
 `CLAUDE.md` symlinked to it**, not two hand-maintained copies.
 
-Empirical evidence (Lulla et al. arXiv:2601.20404; Gloaguen et al.
-arXiv:2602.11988; GitHub blog Nov 2025 analysis of 2,500+ files):
-well-scoped hand-written `AGENTS.md` cuts agent runtime ~28% and
-output tokens ~17%. LLM-generated and over-long files actively
-*reduce* task success. Command-first, boundary-first, short.
+Empirical signal in 2025–2026 (the [agents.md spec adopter list](https://agents.md/),
+GitHub's late-2025 analysis of `AGENTS.md` files across public repos,
+practitioner reports from teams running 3+ agents): well-scoped
+hand-written `AGENTS.md` reduces agent runtime and output tokens
+materially over multi-file or LLM-generated briefs. The same reports
+flag over-long files and architectural-overview prose as *negative*
+for task success. Command-first, boundary-first, short.
 
 ## Decision Outcome
 
@@ -170,7 +172,7 @@ as an agent named `README`.
 
 [ADR 0029](0029-claude-code-setup.md) remains authoritative for
 `.claude/` itself (hook philosophy, agents/commands shape). This
-ADR supersedes 0012's single-agent assumptions: the single-agent
+ADR supersedes 0029's single-agent assumptions: the single-agent
 context model, the flat `.claude/skills/*.md` layout, and
 `CLAUDE.md` as the primary brief.
 
@@ -223,22 +225,14 @@ context model, the flat `.claude/skills/*.md` layout, and
    hook.** Bootstrap-ordering fragile, GitHub renders nothing,
    Codex has no session-hook surface, silent overwrites of
    contributor edits. Rejected.
-5. **Long `ARCHITECTURE.md` with prose overview.** ETH Zurich
-   evidence is direct: architectural overviews cost tokens and
-   don't help agents locate files. Human-facing architecture docs
-   live under `docs/architecture/` and link from `AGENTS.md` via
-   progressive disclosure. Rejected.
+## Related
 
-## References
-
+- [ADR 0009](0009-ripgrep-over-grep.md) — cross-agent rule
+  benefiting from single-source distribution.
+- [ADR 0029](0029-claude-code-setup.md) — original Claude-only
+  configuration; superseded in part.
 - [agents.md spec &amp; adopter list](https://agents.md/)
-- Gloaguen et al. *Evaluating AGENTS.md* — arXiv:2602.11988.
-- Lulla et al. *AGENTS.md efficiency study* — arXiv:2601.20404.
 - [Ruler](https://github.com/intellectronica/ruler) — the
   generation-based alternative; right tool for 3+ agents.
 - [opencode-claude-hooks](https://github.com/magarcia/opencode-claude-hooks)
   — Claude Code hook compatibility shim for OpenCode. Best-effort.
-- [ADR 0029](0029-claude-code-setup.md) — original Claude-only
-  configuration; superseded in part.
-- [ADR 0009](0009-ripgrep-over-grep.md) — cross-agent rule
-  benefiting from single-source distribution.

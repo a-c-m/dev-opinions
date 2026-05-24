@@ -132,33 +132,20 @@ No upstream sync from base-app. Forks diverge from day one.
    `node_modules` and tool versions, but contradicts "independent
    children" (lockfile, version pins). pnpm can't natively exclude
    `.git`-bearing dirs from a workspace glob. Rejected.
-3. **Marker-file discovery (`.umbrella-marker`)** — no runtime needs
-   discovery when the agent always starts at the parent root.
-   Rejected.
-4. **Git-hook cascade via `lefthook extends:`** — breaks for
-   standalone children, and the parent's `nx affected` hooks don't
-   work inside a child anyway. Wrong layer. Rejected.
-5. **Generated child overview in `AGENTS.md`** — another sync
-   mechanism for negligible benefit at small child counts. Curated
-   one-liners are cheap. Rejected; reconsider past ~10 children.
-6. **Hook-enforced ADR guardrails** — a generic "ADR validator"
+3. **Hook-enforced ADR guardrails** — a generic "ADR validator"
    produces false positives faster than catches. Specific ADRs get
    specific hooks; there is no general validator. Rejected.
-7. **Published npm config package (`@org/base-app-config`)** — heavy
+4. **Published npm config package (`@org/base-app-config`)** — heavy
    infrastructure for prose markdown; contradicts the "template you
    fork and own" model. Rejected.
 
-## Relationship to prior ADRs
+## Related
 
-- **Extends [ADR 0028](0028-multi-agent-rule-distribution.md)**:
-  cross-agent context now spans multiple repos. No supersedence.
-- **Depends on [ADR 0029](0029-claude-code-setup.md)**: Claude
-  Code's project-root model is the load-bearing primitive.
-- **Parallel to [ADR 0004](0004-nx-monorepo.md)**: `apps/`
+- **[ADR 0004](0004-nx-monorepo.md)** — parallel: `apps/`
   (workspace monorepo) and `repos/` (independent siblings) are
   sibling capabilities.
-
-## References
-
+- **[ADR 0028](0028-multi-agent-rule-distribution.md)** — extends
+  cross-agent context to span multiple repos. No supersedence.
+- **[ADR 0029](0029-claude-code-setup.md)** — Claude Code's
+  project-root model is the load-bearing primitive.
 - [agents.md spec](https://agents.md/) — `AGENTS.md` format.
-- [ADR 0028](0028-multi-agent-rule-distribution.md) — extended here.

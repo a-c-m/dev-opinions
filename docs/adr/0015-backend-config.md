@@ -291,35 +291,15 @@ Secrets reach containers via the entrypoint-shim CLI per [ADR 0034](0034-secrets
 - **Pro**: Familiar, layered YAML, widely used and actively maintained.
 - **Con**: Singleton with import-time I/O; opaque precedence rules (env vars beat `local.yaml` despite documented order — a known footgun); no schema validation; `IConfig.get()` returns `unknown`. The file-based model is right; this implementation is not. Rejected.
 
-### 3. `convict` (Mozilla)
-
-- **Pro**: Schema-based, mature, supports layering.
-- **Con**: Its own DSL for schemas in a project that already standardises on zod; less idiomatic in TS; smaller ecosystem than zod-based tooling. Rejected on consistency grounds.
-
-### 4. `t3-env` / `znv`
+### 3. `t3-env` / `znv`
 
 - **Pro**: Zod-based, type-safe, popular.
 - **Con**: Designed for env-var-only flat structures; doesn't address file layering, the secret/file boundary, or NestJS DI integration. Solves a strictly smaller problem. Rejected.
 
-### 5. Env-vars-only (strict 12-factor)
+### 4. Env-vars-only (strict 12-factor)
 
 - **Pro**: Smallest possible loader.
 - **Con**: Loses everything in the Context section: no diffable artifact, no review-friendly changes, env block sprawl, no rotation-surface clarity. Rejected.
-
-### 6. JSON instead of YAML
-
-- **Pro**: Native parser; no `js-yaml` dependency; no YAML quirks (1.1 vs 1.2, the Norway problem, etc.).
-- **Con**: No comments, worse for human authoring of nested structures. Worth revisiting if YAML quirks bite us, but YAML wins on DX today.
-
-### 7. SOPS-encrypted secrets in repo
-
-- **Pro**: Single source of truth in git; per-environment diffs include secret rotations; no separate secrets manager.
-- **Con**: Requires KMS setup per environment; "who can decrypt" becomes an access-control question we'd rather leave to the secrets manager; rotation surface is now files + KMS keys instead of one env-var bag. Reconsider when we have a KMS dependency for other reasons.
-
-### 8. Reuse the per-app `src/env.ts` pattern from retired ADR 0017
-
-- **Pro**: Already established; minimal new code.
-- **Con**: Doesn't address file layering, env-block sprawl, or rotation-surface clarity. ADR 0017 explicitly listed "publish a shared env-config package" as a follow-up — this ADR is that follow-up, expanded.
 
 ## Implementation plan
 
@@ -338,12 +318,12 @@ Secrets reach containers via the entrypoint-shim CLI per [ADR 0034](0034-secrets
 7. **Roll out to remaining services** incrementally — each migration is independent.
 8. **Retire the legacy `src/env.ts` pattern** once all services have migrated; ADR 0017's status is already Superseded as of this ADR.
 
-## References
+## Related
 
+- [ADR 0010](0010-nestjs-backend.md) — NestJS as the default backend framework
+- [ADR 0016](0016-web-runtime-env-tokens.md) — frontend counterpart (browser env injection + zod validation)
 - [zod](https://zod.dev/) — schema and validation
 - [@nestjs/config](https://docs.nestjs.com/techniques/configuration) — DI lifecycle (used as the underlying mechanism)
 - [js-yaml](https://github.com/nodeca/js-yaml) — YAML parsing
 - [nest-commander](https://nest-commander.jaymcdoniel.dev/) — CLI framework
 - [12-factor: Config](https://12factor.net/config)
-- [ADR 0010](0010-nestjs-backend.md) — NestJS as the default backend framework
-- [ADR 0016](0016-web-runtime-env-tokens.md) — frontend counterpart (browser env injection + zod validation)

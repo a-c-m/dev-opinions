@@ -28,8 +28,13 @@ consumes via DI:
 
 ```typescript
 type AuthProvider = {
-  authenticate(req: AuthRequest): Promise<TokenClaims>;
+  authenticate(req: AuthRequest): Promise<AuthOutcome>;
 };
+
+type AuthOutcome =
+  | { kind: 'authenticated'; claims: TokenClaims }
+  | { kind: 'unauthenticated' }            // no credentials presented
+  | { kind: 'failed'; error: AuthError };  // credentials presented, verify failed
 
 type TokenClaims = {
   userId: string;
@@ -37,11 +42,16 @@ type TokenClaims = {
 };
 
 type AuthError = {
-  code: 'missing_credentials' | 'expired' | 'invalid_signature'
-      | 'wrong_issuer' | 'wrong_audience' | 'malformed_claims';
+  code: 'expired' | 'invalid_signature' | 'wrong_issuer'
+      | 'wrong_audience' | 'malformed_claims';
   message: string;
 };
 ```
+
+The provider returns the outcome; it does not throw on bad
+credentials. Guards consume the outcome directly. Throwing
+would conflate "no credentials presented" with "verification
+failed" — see below.
 
 `TokenClaims` is deliberately minimal — only what every fork
 needs. Forks adding multi-tenancy widen with `tenantId` /
@@ -75,21 +85,11 @@ auth:
 
 No `process.env` reading in app code.
 
-### `AuthOutcome` discriminated union — never conflate "missing" with "bad"
+### `AuthOutcome` — never conflate "missing" with "bad"
 
-Guards consume an `AuthOutcome`, not raw `TokenClaims |
-undefined`. Three states, distinguished:
-
-```typescript
-type AuthOutcome =
-  | { kind: 'authenticated'; claims: TokenClaims }
-  | { kind: 'unauthenticated' }            // no credentials presented
-  | { kind: 'failed'; error: AuthError };  // credentials presented, verify failed
-```
-
-`missing_credentials` → `unauthenticated`; every other
-`AuthError` → `failed`. Public routes pass on `unauthenticated`;
-`failed` must always reject with 401.
+The three states above (`authenticated` / `unauthenticated` /
+`failed`) are the load-bearing distinction. Public routes pass
+on `unauthenticated`; `failed` must always reject with 401.
 
 **Conflating the two turns every public route into a token
 bypass** — the foot-gun caught by the  security review.
