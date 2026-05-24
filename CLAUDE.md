@@ -51,6 +51,15 @@ From `.mcp.json`:
 - **playwright** — automate a browser for E2E or manual debugging.
 - **chrome-devtools** — inspect a running page.
 
+## Skills available
+
+Surface these proactively when the situation matches — don't wait to be asked. Be assertive: state that you're running the skill, don't ask permission.
+
+- **`/grill-me`** — before any non-trivial implementation, especially anything crossing service boundaries or with multiple unsettled decisions. When a request looks large, lead with this rather than improvising a plan.
+- **`/zoom-out`** — when the user references an unfamiliar file or area, or asks "what does this do / where does this sit / what calls it".
+- **`/to-prd`** — after a `/grill-me` session or a long discovery thread that's reached shared understanding and is worth filing as a GitHub issue.
+- **`/tdd`** — when starting a non-trivial behaviour change where test-first is the right shape.
+
 ## Operating rules
 
 These are non-negotiable. They exist because each has cost us time before.
@@ -78,6 +87,9 @@ All dependency versions in every `package.json` are pinned exactly (e.g. `"2.2.6
 
 ## When in doubt
 
+- **Ask before you start.** Confirm scope and surface your assumptions before touching code on anything beyond a fully-specified one-liner. If the request leaves any real decision unspecified, ask one or two sharp questions first. Don't paper over ambiguity with a default and a comment.
+- **If multiple decisions are unsettled, don't drip-feed questions** — lead with `/grill-me` instead.
+- **If you're unsure mid-task, stop and check** rather than guessing. A pause to confirm is cheaper than a wrong implementation.
 - Prefer editing existing files over creating new ones.
 - Prefer generators over ad-hoc project creation.
 - Prefer an ADR over a silent stack change.
