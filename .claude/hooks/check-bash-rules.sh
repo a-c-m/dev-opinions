@@ -15,8 +15,10 @@
 #   4. No absolute paths into the repo root. CLAUDE.md "Work from the repo root".
 #      Absolute paths bust permission-rule matching, forcing re-approval every
 #      call. cwd is always the repo root — use relative paths.
-#   5. Nudge: bare `grep` / `egrep` / `fgrep`. Prefer the Grep tool or `rg`
-#      (ADR 0020). Advisory — exits 0 with a stderr nudge.
+#   5. Block: bare `grep` / `egrep` / `fgrep` (ADR 0020). Carve-outs for
+#      `git grep`, `man grep`, `which grep`, `type grep`, `command -v grep`,
+#      `apropos grep`, `whatis grep`, `info grep` — these are *about* grep,
+#      not invocations of it.
 #   6. Nudge: lazy `echo >`, `cat <<`, `sed -i`, `awk … >` — these should be
 #      Write/Edit tool calls, not shelled-out file mutations. Advisory.
 #
@@ -149,17 +151,23 @@ EOF
   exit 2
 fi
 
-# ---- 5. bare grep nudge (advisory) -----------------------------------------
-# Strip `git grep` so it's not counted as bare grep — git grep operates on
-# git's index/history and isn't replaceable by rg.
-NORMALIZED="$(printf '%s' "$COMMAND" | sed 's/git grep/git_grep_/g')"
-if printf '%s' "$NORMALIZED" | rg -q '(^|[[:space:];|&(])(grep|egrep|fgrep)([[:space:];|&)]|$)'; then
-  cat >&2 <<'EOF'
-nudge: bare `grep` detected. Prefer:
-  - the built-in Grep tool (ripgrep-backed, structured output) for ad-hoc searches.
-  - `rg` over `grep` in shell pipelines — same regex, faster, .gitignore-aware.
+# ---- 5. bare grep (blocking) -----------------------------------------------
+# Neutralise non-invocation references (carve-outs) before scanning for
+# bare grep. These are *about* grep, not invocations of it:
+#   - `git grep`         — operates on git's index/history; rg can't replace it.
+#   - `command -v grep`  — capability check.
+#   - `man|which|type|apropos|whatis|info grep` — docs/lookup.
+GREP_NORMALIZED="$(printf '%s' "$COMMAND" \
+  | sed -E 's/command[[:space:]]+-v[[:space:]]+(e|f)?grep/_grep_about_/g' \
+  | sed -E 's/(git|man|which|type|apropos|whatis|info)[[:space:]]+(e|f)?grep/_grep_about_/g')"
 
-See docs/adr/0020-ripgrep-over-grep.md.
+if printf '%s' "$GREP_NORMALIZED" | rg -q '(^|[[:space:];|&(])(grep|egrep|fgrep)([[:space:];|&)]|$)'; then
+  cat >&2 <<'EOF'
+🚫 BLOCKED: bare `grep` / `egrep` / `fgrep` in a Bash tool call.
+
+Use ripgrep instead (ADR 0020):
+  - the built-in Grep tool (ripgrep-backed, structured output) for ad-hoc searches.
+  - `rg` in shell pipelines — same regex, faster, .gitignore-aware.
 
 Quick mapping:
   grep -E pat       →  rg pat
@@ -168,8 +176,13 @@ Quick mapping:
   grep -r pat dir   →  rg pat dir
   printf … | grep -Eq …  →  printf … | rg -q …
 
-`git grep` is unaffected — use it when you need git's index or history.
+Carve-outs (not blocked): `git grep`, `man grep`, `which grep`,
+`type grep`, `command -v grep`, `apropos grep`, `whatis grep`,
+`info grep` — these are about grep, not invocations of it.
+
+See docs/adr/0020-ripgrep-over-grep.md.
 EOF
+  exit 2
 fi
 
 # ---- 6. echo / cat / sed / awk file-mutation nudges (advisory) -------------
