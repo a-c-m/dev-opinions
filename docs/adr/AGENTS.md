@@ -98,6 +98,11 @@ Each ADR follows the MADR-lite shape:
 - **[0030 — Child code layout: `apps/` and `repos/`](0030-child-apps-and-repos.md)** — *Accepted*
   — Two parallel root directories, each optional: `apps/` for pnpm workspace members (existing monorepo), `repos/` for independent child git repos (new). Children in `repos/` are excluded from pnpm workspace and NX graph, own their own everything, work standalone. Capability is opt-in by population; no flag. Cross-repo agent context via running the agent at the parent root. No git-hook cascading. Extends 0028.
 
+### Auth
+
+- **[0037 — Authentication](0037-authentication.md)** — *Accepted*
+  — Vendor-agnostic `AuthProvider` interface in `shared/auth/` with three impls: `OidcAuthProvider` (canonical, via `jose` direct, not `@nestjs/passport`), `ManagedIdpAuthProvider` (thin vendor adapter), `DevAuthProvider` (header shim — refused under `NODE_ENV=production` unless explicit override). `TokenClaims` is minimal: `{userId, roles}` only; multi-tenancy is a fork extension. **`AuthOutcome` discriminated union** (`authenticated | unauthenticated | failed`) — never conflate "no credentials" with "bad credentials"; conflation = public-route bypass ( security review finding adopted verbatim). JWT hardening defaults: `algorithms: ['RS256','ES256','PS256']` allow-list, `clockTolerance: 30s`, issuer/audience pinned per service. **Session model**: BFF cookie default (HttpOnly Secure SameSite=Lax + Postgres-backed `sessions` table + double-submit CSRF; no Redis dependency); Bearer JWT graduation for cross-domain / mobile / S2S (≤15min access + rotating refresh, never in `localStorage`). Entitlements off-token (separate `EntitlementResolver` seam). `openid-client` (panva) for OAuth/OIDC flows; never HS256 across services. **Vendor ladder**: `DevAuthProvider` → Better Auth self-hosted (greenfield, batteries) → WorkOS managed (named default when enterprise SSO triggers it) → Logto Cloud (cheaper alternative). Authz, service-to-service, RFC 8693 staff impersonation, SCIM all deferred to follow-up ADRs.
+
 ### Secrets
 
 - **[0034 — Secrets injection at runtime](0034-secrets-runtime-injection.md)** — *Accepted*

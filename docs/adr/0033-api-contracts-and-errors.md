@@ -311,9 +311,11 @@ different on-the-wire mechanism.
 | **Sunset** | Route returns 410 `code: 'route_sunset'` | Field removed; codegen breaks clients at compile time |
 | **Major rewrite** | `/v2/` alongside `/v1/`; Stripe-style date headers as graduation | New field name; old deprecated. Shopify-style date-pinned endpoint as last-resort. |
 
-External-facing routes: 6-month minimum sunset window.
-Internal: team's call. `shared/nest-versioning/` holds the
-decorator, interceptor, and `route_sunset` wiring.
+Sunset windows by audience: **public APIs** (anonymous /
+partners without active contract) — 6 months minimum;
+**internal-only** APIs — 2 months minimum.
+`shared/nest-versioning/` holds the decorator, interceptor,
+and `route_sunset` wiring.
 
 ### Subscriptions — shape now, operations later
 
