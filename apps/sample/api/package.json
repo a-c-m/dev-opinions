@@ -13,9 +13,9 @@
     "lint": "bs check --write ."
   },
   "dependencies": {
-    "@nestjs/common": "11.1.19",
-    "@nestjs/core": "11.1.19",
-    "@nestjs/platform-fastify": "11.1.19",
+    "@nestjs/common": "11.1.24",
+    "@nestjs/core": "11.1.24",
+    "@nestjs/platform-fastify": "11.1.24",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
     "zod": "3.24.1"
@@ -24,7 +24,7 @@
     "@nestjs/cli": "11.0.21",
     "@nestjs/schematics": "11.1.0",
     "@types/node": "22.19.17",
-    "@vitest/coverage-v8": "4.1.5",
-    "vitest": "4.1.5"
+    "@vitest/coverage-v8": "4.1.7",
+    "vitest": "4.1.7"
   }
 }
