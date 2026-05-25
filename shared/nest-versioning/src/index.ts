@@ -6,14 +6,14 @@
  * Real impl: a NestJS method/class decorator that attaches metadata read
  * by `DeprecationInterceptor`.
  */
-export type DeprecatedOptions = {
+export interface DeprecatedOptions {
   /** ISO date the deprecation was announced. */
   since: string;
-  /** ISO date after which the route returns 410. */
-  sunset: string;
   /** URL or route that replaces this one (sets `Link` header). */
   successor?: string;
-};
+  /** ISO date after which the route returns 410. */
+  sunset: string;
+}
 
 /**
  * Interceptor signature. The real impl adds RFC 9745 `Deprecation`,
@@ -21,6 +21,6 @@ export type DeprecatedOptions = {
  * on every response from a `@Deprecated`-marked route. After the
  * sunset date, returns 410 + `code: 'route_sunset'`.
  */
-export type DeprecationInterceptor = {
+export interface DeprecationInterceptor {
   intercept(context: unknown, next: unknown): unknown;
-};
+}

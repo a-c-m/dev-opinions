@@ -2,7 +2,8 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "types": ["vite/client", "vitest/globals"]
+    "types": ["vite/client", "vitest/globals"],
+    "strictNullChecks": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "e2e/**/*.ts"],
   "exclude": ["node_modules", "dist"]

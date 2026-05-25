@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { env } from "./env.js";
 
-type Props = { greeting?: string };
+interface Props {
+  greeting?: string;
+}
 
 export function App({ greeting = "hello" }: Props) {
   const [count, setCount] = useState(0);

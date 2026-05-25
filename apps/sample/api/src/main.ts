@@ -10,7 +10,7 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().catch((err: unknown) => {
-  // biome-ignore lint/suspicious/noConsole: boot-time error reporting before logger is attached
+  // Boot-time error reporting before logger is attached.
   console.error("failed to bootstrap", err);
   process.exit(1);
 });

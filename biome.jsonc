@@ -1,6 +1,11 @@
 {
+  "extends": [
+    "ultracite/biome/core",
+    "ultracite/biome/react",
+    "ultracite/biome/nestjs",
+    "ultracite/biome/vitest"
+  ],
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite"],
   "files": {
     "includes": [
       "**/*.ts",
@@ -71,13 +76,21 @@
       }
     },
     {
-      // OTel + pino spec field names (trace_id, span_id, trace_flags, etc.) are
-      // snake_case by spec. shared/logger/ and any pino serialisers must keep them.
       "includes": ["**/shared/logger/**", "**/*.logger.ts"],
       "linter": {
         "rules": {
           "style": {
             "useNamingConvention": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/shared/*/src/index.ts"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noBarrelFile": "off"
           }
         }
       }

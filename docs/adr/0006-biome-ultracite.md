@@ -12,8 +12,9 @@ An opinionated, strict preset applied to an existing codebase produces a wall of
 
 ## Decision Outcome
 
-- `@biomejs/biome` (exact `2.2.6`) as the single lint + format tool.
-- `ultracite` (exact `5.4.5`) as the shared rule preset (imported via `"extends": ["ultracite"]` in `biome.jsonc`). This pair is known-compatible — newer biome minors rename rules that older ultracite releases reference.
+- `@biomejs/biome` (exact `2.4.15`) as the single lint + format tool.
+- `ultracite` (exact `7.7.0`) as the shared rule preset. v7 layout requires extending **both** `ultracite` and `ultracite/biome/core` in `biome.jsonc` — `npx ultracite@latest init` sets this up. The pair is known-compatible: newer biome minors rename rules that older ultracite releases reference.
+- **Agent priming**: `npx ultracite@latest init --agents claude --agents opencode` appends the rule-summary section to `AGENTS.md`. Future agents read this on session start; saves rediscovering rules error-by-error.
 - `biome-suppressed` (exact `1.3.0`) provides the `bs` CLI, used by every lint script. The baseline is stored in `.biome-suppressed.json` and committed.
 - Scripts in `package.json`:
   - `lint` = `bs check --write` — format and fix.

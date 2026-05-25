@@ -11,25 +11,25 @@
  * owning feature module.
  */
 export type ApiErrorCode =
-  | "validation_failed"
-  | "unauthorized"
   | "forbidden"
+  | "internal_error"
   | "rate_limit_exceeded"
   | "route_sunset"
-  | "internal_error";
+  | "unauthorized"
+  | "validation_failed";
 
 /**
  * RFC 9457 Problem Details with `code` / `traceId` / `errors[]` extensions
  * per ADR 0033. The real Zod schema lands when first service consumes;
  * this type describes the wire shape.
  */
-export type ApiError = {
-  type: string;
-  title: string;
-  status: number;
-  detail: string;
-  instance?: string;
+export interface ApiError {
   code: ApiErrorCode;
+  detail: string;
+  errors?: Array<{ code: string; message: string; path: string }>;
+  instance?: string;
+  status: number;
+  title: string;
   traceId: string;
-  errors?: Array<{ path: string; code: string; message: string }>;
-};
+  type: string;
+}

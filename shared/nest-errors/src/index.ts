@@ -7,13 +7,13 @@ import type { ApiErrorCode } from "@shared/contracts";
  * Options-bag for `ApiException`. The real class extends NestJS 11's
  * `IntrinsicException` (silences the auto-logger for expected 4xx).
  */
-export type ApiExceptionOptions = {
-  status: number;
+export interface ApiExceptionOptions {
   code: ApiErrorCode;
-  title: string;
   detail?: string;
-  errors?: Array<{ path: string; code: string; message: string }>;
-};
+  errors?: Array<{ code: string; message: string; path: string }>;
+  status: number;
+  title: string;
+}
 
 /**
  * Throwable. Both filters (REST + GraphQL) catch it and emit the
@@ -22,18 +22,18 @@ export type ApiExceptionOptions = {
  * Stub: declared as an interface here so the contract is visible;
  * real impl in the implementation PR extends `IntrinsicException`.
  */
-export type ApiException = {
+export interface ApiException {
   readonly options: ApiExceptionOptions;
-};
+}
 
 /**
  * Filter shapes. Real impls register via `APP_FILTER` providers and
  * carry the mapping logic for `ApiException` / `ZodError` / unknown.
  */
-export type AllExceptionsFilter = {
+export interface AllExceptionsFilter {
   catch(exception: unknown, host: unknown): void;
-};
+}
 
-export type GqlExceptionFilter = {
+export interface GqlExceptionFilter {
   catch(exception: unknown, host: unknown): unknown;
-};
+}

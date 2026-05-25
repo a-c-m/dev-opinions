@@ -5,17 +5,20 @@
  * Marks a config field as file-sourced (read from layered YAML only).
  * Env vars are never consulted for these fields.
  */
-export type FileField<T> = { readonly __source: "file"; readonly schema: T };
+export interface FileField<T> {
+  readonly __source: "file";
+  readonly schema: T;
+}
 
 /**
  * Marks a config field as secret-sourced (read from `process.env[name]` only).
  * May appear in `local.yaml` for dev-only override (warning logged).
  */
-export type SecretField<T> = {
+export interface SecretField<T> {
   readonly __source: "secret";
   readonly envVar: string;
   readonly schema: T;
-};
+}
 
 /**
  * Top-level keys must be objects (sections). Bare scalars at the top level

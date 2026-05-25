@@ -5,30 +5,29 @@
  * Required fields on every log line per ADR 0031's table.
  * `trace_id` / `span_id` / `trace_flags` are injected by
  * `@opentelemetry/instrumentation-pino` inside an active span.
+ * biome.jsonc disables useNamingConvention for shared/logger/ so OTel
+ * spec snake_case names are allowed.
  */
-export type LogLine = {
+export interface LogLine {
+  err?: { message: string; stack?: string; type: string };
+  event?: string;
   level: number;
-  severity: "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL";
-  time: number;
   msg: string;
   "service.name": string;
   "service.version": string;
-  // OTel spec field names — snake_case to match what
-  // @opentelemetry/instrumentation-pino emits. biome.jsonc disables
-  // useNamingConvention for shared/logger/ to allow this.
-  trace_id?: string;
+  severity: "DEBUG" | "ERROR" | "FATAL" | "INFO" | "TRACE" | "WARN";
   span_id?: string;
+  time: number;
   trace_flags?: string;
-  err?: { type: string; message: string; stack?: string };
-  event?: string;
-};
+  trace_id?: string;
+}
 
 /**
  * Base pino `LoggerOptions` shape — formatters, serialisers, LOG_LEVEL.
  * Services import and extend. Real impl wraps `pino` + `pino.stdSerializers.err`.
  */
-export type BaseLoggerOptions = {
-  level: string;
+export interface BaseLoggerOptions {
   formatters: { level: (label: string) => { level: string; severity: string } };
+  level: string;
   serializers: Record<string, (err: unknown) => unknown>;
-};
+}
