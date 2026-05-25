@@ -21,6 +21,30 @@ This template is designed to host multiple apps plus shared packages, while rema
 - CI uses `nx affected --target=…` to skip unchanged projects.
 - Independent release strategy (`nx release`): each publishable project versions and releases on its own cadence rather than one repo-wide version.
 
+### `package.json`-only — no `project.json`
+
+Every workspace member declares its NX project metadata in **`package.json`**. Scripts become NX targets automatically (via NX's package-script inference); per-project tags and other NX metadata live in a `"nx"` field on `package.json`. **`project.json` is not used in this repo.**
+
+```json
+{
+  "name": "sample-api",
+  "scripts": { "dev": "nest start --watch", "build": "nest build", "...": "..." },
+  "nx": {
+    "tags": ["scope:sample", "type:app"],
+    "projectType": "application"
+  }
+}
+```
+
+Why:
+
+- **One config per project**, in the file every Node tool already reads (pnpm filters, IDE, npm, biome).
+- **`pnpm --filter <name>` and `nx run <name>:…` agree on identity** — both resolve via `package.json#name`. With `project.json`, you can end up with one identity in each file and the divergence isn't obvious.
+- **Removes the `nx:run-script` shim layer** — a typical `project.json` in this monorepo is a forwarder that maps every NX target to the `package.json` script of the same name. The shim adds a config layer that exists only to forward to scripts already written.
+- **Matches every `shared/*` and `tools/*` package in the repo today** — consistency by default rather than by exception.
+
+If a project needs a target that *isn't* a `package.json` script (e.g. a generator invocation, or a target with multiple configurations), define it under `"nx"."targets"` in `package.json` rather than splitting metadata across two files.
+
 ### Script verb conventions
 
 A fixed alphabet of script verbs is the contract that makes `run-many`/`affected` load-bearing. Every leaf project exposing a given concept uses the canonical verb; projects without the concept omit the script and `run-many` skips them naturally. The full verb table and per-project-type contract live in [docs/conventions/scripts.md](../conventions/scripts.md) — that's the cheat sheet for authors and the NX generator template.
@@ -39,7 +63,7 @@ Two design choices in that table are architecturally significant and recorded he
 - The orchestrator overhead is the same whether the repo has one app or fifty, so starting small is not penalised.
 
 ### Negative
-- NX introduces its own vocabulary — `project.json`, executors, plugins — that has a learning curve for new contributors.
+- NX introduces its own vocabulary — `targetDefaults`, executors, plugins, inferred targets — that has a learning curve for new contributors.
 - Some NX plugins lag behind upstream framework majors. Occasionally this forces a short wait before adopting a new framework version.
 - Auto-fixing `lint` surprises npm-veterans (`lint:fix` is the more common convention). CI still gates via `lint:ci` so the policy isn't compromised.
 

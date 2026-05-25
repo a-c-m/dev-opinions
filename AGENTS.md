@@ -18,7 +18,7 @@ This repo is a monorepo starter (pnpm + NX). See [docs/adr/AGENTS.md](docs/adr/A
 
 ## Repo layout
 
-- `apps/<product>/<service>/` — deployable units, two-tier. Second tier is the product (e.g. `tool1`, `funnels`, `marketing`); third tier is the service within it (e.g. `web`, `api`, `worker`). Each leaf has a `project.json`, `src/main.ts`(x), and a scoped `package.json`.
+- `apps/<product>/<service>/` — deployable units, two-tier. Second tier is the product (e.g. `tool1`, `funnels`, `marketing`); third tier is the service within it (e.g. `web`, `api`, `worker`). Each leaf has `src/main.ts(x)` and a scoped `package.json` (no `project.json` — NX metadata goes in `package.json` `"nx"`, see [ADR 0004](docs/adr/0004-nx-monorepo.md)).
 - `shared/*` — reusable libraries, imported as `@shared/<name>`.
 - `tools/*` — workspace-internal tooling (custom reporters, generators).
 - `docs/adr/` — architecture decision records. New significant decisions get a new ADR.
