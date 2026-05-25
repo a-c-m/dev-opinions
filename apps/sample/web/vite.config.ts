@@ -73,16 +73,12 @@ export default defineConfig({
   server: {
     port: 5173,
   },
+  // Coverage policy lives in the root vitest.config.ts (ADR 0039).
+  // Per-package coverage blocks are ignored when the root runs.
   test: {
     globals: true,
     environment: "jsdom",
     setupFiles: ["src/test-setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "lcov"],
-      include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/**/*.{test,spec}.{ts,tsx}", "src/main.tsx", "src/test-setup.ts"],
-    },
   },
 });
