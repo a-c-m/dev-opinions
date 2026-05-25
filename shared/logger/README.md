@@ -1,7 +1,67 @@
 # @shared/logger
 
-Base pino `LoggerOptions` per the structured logging contract.
+Base pino `LoggerOptions` + NestJS wiring per the structured logging contract ([ADR 0024](../../docs/adr/0024-structured-logging-contract.md)).
 
-**Status:** stub. The interface lives in `src/index.ts`; the actual `pino` config (level formatter, `severity` mirror, `err` serialiser, `LOG_LEVEL` env binding) lands when the first service consumes this package.
+## Public surface
 
-See [ADR 0024](../../docs/adr/0024-structured-logging-contract.md). Production routing is per [ADR 0025](../../docs/adr/0025-runtime-observability.md) — this package never imports a pino transport.
+```ts
+import { baseLoggerOptions } from "@shared/logger/base-options";
+import { PlatformLoggerModule, platformLoggerModule } from "@shared/logger/nest";
+import type { ServiceMeta } from "@shared/logger/types";
+```
+
+No barrel — each sub-path is declared in `package.json` `exports`. Biome's `noBarrelFile` rule enforces this.
+
+## Log shape
+
+Per ADR 0024's required-fields table:
+
+| Field | Source |
+|---|---|
+| `level` (numeric) | pino default |
+| `severity` (string) | `formatters.level` mapping (OTel SeverityText) |
+| `time` (epoch ms) | `pino.stdTimeFunctions.epochTime` |
+| `msg` | pino default |
+| `service.name`, `service.version` | `base` bindings from `ServiceMeta` |
+| `trace_id`, `span_id`, `trace_flags` | injected by `@opentelemetry/instrumentation-pino` ([ADR 0025](../../docs/adr/0025-runtime-observability.md), separate package) |
+| `err.type`, `err.message`, `err.stack` | `pino.stdSerializers.err` on the `err` key |
+| `event` (string) | caller-supplied — e.g. `logger.log({ event: 'http.request.completed' }, 'msg')` |
+
+## Wiring a NestJS service
+
+`app.module.ts`:
+
+```ts
+import { platformLoggerModule } from "@shared/logger/nest";
+
+imports: [
+  platformLoggerModule({ name: "sample-api", version: "0.0.0" }),
+  // …
+],
+```
+
+`main.ts`:
+
+```ts
+import { Logger } from "nestjs-pino";
+
+const app = await NestFactory.create(appModule(config), adapter, {
+  bufferLogs: true,
+});
+app.useLogger(app.get(Logger));
+app.flushLogs();
+```
+
+`bufferLogs: true` is required so framework boot logs route through pino once `useLogger` lands — otherwise the controller-mapping banner emits via the default Nest logger and never appears in the JSON stream.
+
+## Local capture
+
+Per [ADR 0024](../../docs/adr/0024-structured-logging-contract.md) dev scripts pipe pino's stdout JSON through `tee` to `.ai-wip/logs/<product>-<service>.log` (raw JSON, agent-readable) and through `pino-pretty` to the terminal (human-readable). The repo-root `pnpm watch-logs` script tails the log files through `pino-pretty` for human eyes:
+
+```sh
+tail -f .ai-wip/logs/*.log | pino-pretty
+```
+
+## Transport rule
+
+Pino writes JSON to stdout. **No transport packages are imported.** Routing to a backend (CloudWatch, Loki, New Relic, …) is the infrastructure's job — see [ADR 0025](../../docs/adr/0025-runtime-observability.md).
