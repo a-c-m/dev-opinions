@@ -11,7 +11,7 @@ Schema migrations are high-blast-radius operations: a bad one
 takes the service down and rarely warns first. Most ship fine
 as a routine deploy step, but two situations need explicit
 handling and aren't covered by [ADR 0012](0012-drizzle-orm.md)
-or [ADR 0005](0005-package-script-conventions.md):
+or [ADR 0004](0004-nx-monorepo.md) (script verbs — see [docs/conventions/scripts.md](../conventions/scripts.md)):
 
 1. **High-risk or long-running migrations** — drops, type
    changes, populated-table backfills. The migration command
@@ -241,7 +241,8 @@ views during a rolling deploy and (b) pgroll ships 1.0 stable
 
 One migration history per `shared/db-<domain>/` package per
 [ADR 0012](0012-drizzle-orm.md). Each package's `package.json`
-per [ADR 0005](0005-package-script-conventions.md):
+per the script-verb contract ([ADR 0004](0004-nx-monorepo.md) /
+[docs/conventions/scripts.md](../conventions/scripts.md)):
 
 - `db:generate` — `drizzle-kit generate`
 - `db:migrate` — the wrapper above (advisory lock + timeouts +
@@ -318,8 +319,8 @@ CI workflows:
 
 - **Builds on [0012](0012-drizzle-orm.md)** — schemas + per-package
   migration histories
-- **Realises [0005](0005-package-script-conventions.md)** —
-  `db:migrate` is now a defined, safe verb
+- **Realises [0004](0004-nx-monorepo.md)** —
+  `db:migrate` is now a defined, safe verb (see [docs/conventions/scripts.md](../conventions/scripts.md))
 - **Consumed by [0024](0024-branching-releases-environments.md)**
   — `deploy-prod.yml` runs migrations before pod promotion
 - **References [0025](0025-production-data-flow.md)** — sanitised

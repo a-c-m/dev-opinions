@@ -73,7 +73,7 @@ from there.
    - Creates `vX.Y.Z` and pushes the tag.
 
    Bump type is auto-detected from Conventional Commits since the
-   last tag ([ADR 0019](../adr/0019-conventional-commits.md)).
+   last tag ([ADR 0020](../adr/0020-github-repo-conventions.md#commit-conventions)).
    Verify the bump matches expectation; a `feat:` slipped in as
    `chore:` produces a patch when you wanted a minor.
 
@@ -137,10 +137,9 @@ typical `fix:` commit; verify.
 
 - [ADR 0024](../adr/0024-branching-releases-environments.md) —
   the decisions this SOP realises.
-- [ADR 0019](../adr/0019-conventional-commits.md) — commit format
-  drives auto-bump.
-- [ADR 0027](../adr/0027-codeowners-team-metadata.md) — CODEOWNERS
-  metadata; the Escalation contacts during a deploy incident.
+- [ADR 0020](../adr/0020-github-repo-conventions.md) — commit format
+  drives auto-bump; CODEOWNERS team metadata is the escalation contact
+  during a deploy incident.
 - [dev-pr-flow.md](dev-pr-flow.md) — the preceding flow that puts
   changes onto `main`.
 - Service-specific runbooks live under `apps/<product>/<service>/runbooks/`

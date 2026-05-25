@@ -37,7 +37,7 @@ env. *"`release-candidate` HEAD ≠ last tag"* = release in flight;
 *"stage is broken"* = the running env. Two concepts, two names.
 
 Feature branch shape: `<type>/<ticket>-<short-description>`
-([ADR 0019](0019-conventional-commits.md)).
+(Conventional Commits — [ADR 0020](0020-github-repo-conventions.md)).
 
 ### Standard release flow
 
@@ -64,7 +64,7 @@ workflow dispatch.
    via small PRs. Scope is `git log <last-tag>..release-candidate`.
 4. **Tag.** Workflow (`tag-release.yml`) bumps version, commits on
    `release-candidate`, pushes `vX.Y.Z`. Bump type auto-detected
-   from conventional commits ([ADR 0019](0019-conventional-commits.md)).
+   from conventional commits ([ADR 0020](0020-github-repo-conventions.md)).
 5. **Deploy prod.** Workflow (`deploy-prod.yml`) takes the tag,
    builds at tag SHA, rolls out. **On full success, merges the tag
    commit back to `main`.** A failed deploy leaves `main`
@@ -118,7 +118,7 @@ escape hatch when that's not yet practical.
 Mandated *what*; setup *how* is per-fork.
 
 - **`main` and `release-candidate`**: PR required, ≥1 approval,
-  CODEOWNERS review ([ADR 0027](0027-codeowners-team-metadata.md)),
+  CODEOWNERS review ([ADR 0020](0020-github-repo-conventions.md)),
   required status checks ([ADR 0021](0021-github-actions-ci.md)),
   no force-push, no deletion.
 - **Bot/automation actor with bypass on both branches** —
@@ -188,10 +188,9 @@ Mandated *what*; setup *how* is per-fork.
 
 ## Related
 
-- **[ADR 0019](0019-conventional-commits.md)** — commit conventions that drive auto-bump.
+- **[ADR 0020](0020-github-repo-conventions.md)** — Conventional Commits that drive auto-bump + CODEOWNERS review.
 - **[ADR 0021](0021-github-actions-ci.md)** — workflow shape this builds on.
 - **[ADR 0025](0025-production-data-flow.md)** — companion (production data flow).
-- **[ADR 0027](0027-codeowners-team-metadata.md)** — CODEOWNERS review.
 - **[ADR 0030](0030-child-apps-and-repos.md)** — recommended (not enforced) for children.
 - [GitLab Flow — release branches](https://docs.gitlab.com/ee/topics/gitlab_flow.html#release-branches-with-gitlab-flow)
 - [Semantic Versioning](https://semver.org/)

@@ -15,8 +15,7 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 - **[0001 — pnpm](0001-package-manager.md)** — pnpm 9 sole package manager; enforced via `packageManager` + `engines.pnpm`.
 - **[0002 — Node 22 LTS](0002-node-22-lts.md)** — pinned via `.nvmrc`; CI uses `actions/setup-node@v4`.
 - **[0003 — TypeScript strict + tsgo](0003-typescript-strict-tsgo.md)** — TS 5.8 strict; typecheck via tsgo (`@typescript/native-preview --noEmit`); `tsc` only for `.d.ts` emission.
-- **[0004 — NX monorepo](0004-nx-monorepo.md)** — NX 22 with `apps/<product>/<service>/` two-tier, `shared/*`, `tools/*`; CI runs `nx affected`.
-- **[0005 — Package script conventions](0005-package-script-conventions.md)** — fixed alphabet of verbs (`dev` / `build` / `lint` / `typecheck` / `test*` / `e2e` / `codegen` / `db:*`); `lint` writes, CI uses `lint:ci`.
+- **[0004 — NX monorepo](0004-nx-monorepo.md)** — NX 22 with `apps/<product>/<service>/` two-tier, `shared/*`, `tools/*`; CI runs `nx affected`; canonical script-verb alphabet (`dev` / `build` / `lint` / `typecheck` / `test*` / `e2e` / `codegen` / `db:*`) detailed in [docs/conventions/scripts.md](../conventions/scripts.md).
 - **[0006 — Biome + Ultracite](0006-biome-ultracite.md)** — Biome 2 + Ultracite; `biome-suppressed` (`bs`) for baseline-aware checks.
 - **[0007 — Knip](0007-knip-dead-code.md)** — Knip 5 at repo root; CI-blocks new issues.
 - **[0008 — Trivy](0008-trivy-security-scan.md)** — single scanner via `pnpm security`; fs/image/config; HIGH+CRITICAL fail.
@@ -30,6 +29,7 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 - **[0012 — Drizzle ORM](0012-drizzle-orm.md)** — Drizzle with `node-postgres` (prod) + `better-sqlite3` (local); schemas in `shared/db-<domain>/`; vocabulary as `readonly` tuples; `drizzle-zod` for non-GraphQL ingress only.
 - **[0013 — Vitest + Playwright](0013-vitest-playwright.md)** — Vitest for unit/integration; Playwright for E2E; no Jest.
 - **[0014 — Package by feature](0014-package-by-feature.md)** — vertical-slice layout; cross-domain primitives go in type-folders (`ui/`, `gql/`); extract to shared only on second consumer.
+- **[0039 — Test coverage policy](0039-test-coverage-policy.md)** — `@vitest/coverage-v8` on Vitest ≥4; single root `vitest.config.ts` with glob-keyed thresholds; `shared/*` 100/100/100 lines/functions/statements + hard-95 branches (paradox-honest, `/* v8 ignore next -- @preserve */` as escape valve); services 80/80; resolvers/controllers smoke-only via E2E; mutation testing (StrykerJS) documented as graduation.
 
 ### Configuration
 
@@ -42,7 +42,7 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 
 ### API surface
 
-- **[0033 — API contracts & error shapes](0033-api-contracts-and-errors.md)** — class-validator on `@InputType` for GraphQL, Zod 4 for non-GraphQL boundaries; RFC 9457 Problem Details with `code`/`traceId`/`errors[]` extensions; `ApiException` + global filters in `shared/nest-errors/`; Yoga + code-first GraphQL; URL `/v1/` for REST; field-level `@deprecated` for GraphQL; four-layer per-feature shape (Drizzle / `*.input.ts` / `*.types.ts` / `*.service.ts`).
+- **[0033 — API contracts & error shapes](0033-api-contracts-and-errors.md)** — class-validator on `@InputType` for GraphQL, Zod 4 for non-GraphQL boundaries; RFC 9457 Problem Details with `code`/`traceId`/`errors[]` extensions; `ApiException` + global filters in `shared/nest-errors/`; Yoga + code-first GraphQL; URL `/v1/` for REST; field-level `@deprecated` for GraphQL; `graphql-inspector` diff in CI as the lightweight contract check (Pact deferred until ≥3 consumers); four-layer per-feature shape (Drizzle / `*.input.ts` / `*.types.ts` / `*.service.ts`).
 
 ### Runtime services
 
@@ -56,18 +56,16 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 ### CI / CD / releases
 
 - **[0018 — Lefthook for git hooks](0018-lefthook.md)** — YAML runner; pre-commit (biome, knip, commitlint), pre-push (`nx affected`), commit-msg gates.
-- **[0019 — Conventional Commits](0019-conventional-commits.md)** — commitlint via `commit-msg`; scope = NX project name; mandatory `#<n>` / `PROJ-<n>` ticket suffix for AI commits (PreToolUse hook blocks).
-- **[0020 — GitHub repo conventions](0020-github-repo-conventions.md)** — PR template + 5 issue templates + path-based CODEOWNERS + staggered weekly Dependabot + SECURITY.md.
+- **[0020 — GitHub repo conventions](0020-github-repo-conventions.md)** — PR template + 5 issue templates + path-based CODEOWNERS (with team-metadata comment blocks) + Conventional Commits + mandatory `#N` / `PROJ-N` ticket suffix for AI commits + staggered weekly Dependabot + SECURITY.md.
 - **[0021 — GitHub Actions](0021-github-actions-ci.md)** — reusable workflows (`_` prefix) + `setup-monorepo` composite; PR CI runs `nx affected` + Trivy; OIDC-only cloud auth.
 - **[0022 — OpenTofu IaC](0022-opentofu-iac.md)** — per-app `apps/<name>/iac/`; remote encrypted state; environments via `-var-file`; deploys via `_infra-deploy.yml`.
-- **[0023 — Container conventions](0023-container-conventions.md)** — single `Dockerfile` per service, four targets, `node:22-bookworm-slim`; `USER node`; `HEALTHCHECK` on `/health`; `ENTRYPOINT` stacks vault → OTel → app.
+- **[0023 — Container conventions](0023-container-conventions.md)** — single `Dockerfile` per service, four targets, `node:22-bookworm-slim`; `USER node`; `HEALTHCHECK` on `/healthz` (liveness, no DB) + `/readyz` (readiness, DB + downstreams) via `@nestjs/terminus`; `ENTRYPOINT` stacks vault → OTel → app.
 - **[0024 — Branches, releases, environments](0024-branching-releases-environments.md)** — two branches (`main` + `release-candidate`); tag-driven prod with merge-back on success; hotfix from prod tag → PR into `release-candidate`; GitLab Flow + SemVer.
 
 ### Operations & security
 
 - **[0025 — Production data flow](0025-production-data-flow.md)** — companion to 0024; three hard rules (raw prod data never leaves prod; sanitisation inside prod boundary; prod creds never reach CI / dev); decoupled snapshot/restore pipeline; SQL-level sanitisation.
 - **[0026 — Runbook and SOP format](0026-runbook-and-sop-format.md)** — shared template; co-located (`apps/<p>/<s>/runbooks|sops/`) or cross-cutting (`docs/runbooks|sops/`); kebab-case; required sections Overview / Prerequisites / Steps / Related.
-- **[0027 — CODEOWNERS team metadata](0027-codeowners-team-metadata.md)** — `# key: value` comments above CODEOWNERS rule lines (`PM` + `TechLead` required when block present; optional `slack` / `alerting` / `monitoring`); extends 0020.
 
 ### AI agents (meta)
 

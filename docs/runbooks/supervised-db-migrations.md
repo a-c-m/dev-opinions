@@ -149,7 +149,7 @@ Abort the migration if any of these is sustained for 60s:
 
 Contacts: CODEOWNERS for the affected `shared/db-<domain>/`
 package — Slack + on-call alerting per the file's `# slack:` /
-`# alerting:` metadata ([ADR 0027](../adr/0027-codeowners-team-metadata.md)).
+`# alerting:` metadata ([ADR 0020 → CODEOWNERS](../adr/0020-github-repo-conventions.md#codeowners-githubcodeowners)).
 
 ## Related
 
@@ -160,6 +160,6 @@ package — Slack + on-call alerting per the file's `# slack:` /
   `_db-migrate.yml` workflow lives here
 - [ADR 0024](../adr/0024-branching-releases-environments.md) — release flow
 - [ADR 0025](../adr/0025-production-data-flow.md) — sanitised stage clones
-- [ADR 0027](../adr/0027-codeowners-team-metadata.md) — escalation contacts
+- [ADR 0020](../adr/0020-github-repo-conventions.md) — CODEOWNERS team metadata = escalation contacts
 - [release-pr-flow.md](../sops/release-pr-flow.md) — the
   default release path (Path A); this runbook is the deviation

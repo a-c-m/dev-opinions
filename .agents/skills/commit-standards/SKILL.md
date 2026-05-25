@@ -3,7 +3,7 @@ name: commit-standards
 description: Auto-triggers when the user asks to commit, when a git commit is about to run, or when reviewing a commit message. Enforces Conventional Commits format and the repo's scope conventions.
 ---
 
-The commit format for this repo (ADR 0019):
+The commit format for this repo (ADR 0020 → Commit conventions):
 
 ```
 type(scope): description #NNN          ← GitHub issue

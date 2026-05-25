@@ -3,10 +3,9 @@
 ## Overview
 
 End-to-end procedure for landing a change: from picking up work
-through PR-merged. Synthesises [ADR 0019](../adr/0019-conventional-commits.md)
-(commits), [ADR 0028](../adr/0028-multi-agent-rule-distribution.md)
-(definition of done), [ADR 0027](../adr/0027-codeowners-team-metadata.md)
-(review routing), and [ADR 0024](../adr/0024-branching-releases-environments.md)
+through PR-merged. Synthesises [ADR 0020](../adr/0020-github-repo-conventions.md)
+(commits + CODEOWNERS review routing), [ADR 0028](../adr/0028-multi-agent-rule-distribution.md)
+(definition of done), and [ADR 0024](../adr/0024-branching-releases-environments.md)
 (branching). For the release procedure that follows merge to
 `main`, see [release-pr-flow.md](release-pr-flow.md).
 
@@ -62,7 +61,7 @@ flowchart LR
 
    Scope is the NX project name. Ticket suffix is **required** —
    the pre-commit hook blocks commits without one
-   ([ADR 0019](../adr/0019-conventional-commits.md)).
+   ([ADR 0020 → Commit conventions](../adr/0020-github-repo-conventions.md#commit-conventions)).
 
 5. **Before claiming done.** Run the Definition of Done:
 
@@ -85,7 +84,7 @@ flowchart LR
    `Closes #N` / `Refs PROJ-N` into the body.
 
 7. **Review.** CODEOWNERS routes reviewers automatically
-   ([ADR 0027](../adr/0027-codeowners-team-metadata.md)). Address
+   ([ADR 0020 → CODEOWNERS](../adr/0020-github-repo-conventions.md#codeowners-githubcodeowners)). Address
    feedback by pushing follow-up commits to the branch (don't
    force-push unless rebasing is necessary).
 
@@ -100,12 +99,10 @@ flowchart LR
 
 ## Related
 
-- [ADR 0019](../adr/0019-conventional-commits.md) — commit format
-  and the auto-bump that depends on it.
+- [ADR 0020](../adr/0020-github-repo-conventions.md) — commit format
+  + CODEOWNERS routing and team metadata; underpins auto-bump and review.
 - [ADR 0028](../adr/0028-multi-agent-rule-distribution.md) —
   agent context, definition of done.
-- [ADR 0027](../adr/0027-codeowners-team-metadata.md) — review
-  routing and team metadata in CODEOWNERS.
 - [ADR 0024](../adr/0024-branching-releases-environments.md) —
   branching model and release flow this PR feeds into.
 - [release-pr-flow.md](release-pr-flow.md) — what happens after

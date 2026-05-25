@@ -11,7 +11,7 @@ Use `./.claude/commands/create-pr.sh` — direct `gh pr create` is blocked by `c
 
 `<ticket>` is `123` / `#123` (GitHub) or `PROJ-123` (Jira/Linear). The wrapper appends the ref to the title and writes `Closes #N` (GitHub) or `Refs PROJ-N` (Jira/Linear) at the top of the body.
 
-The PR title must match the Conventional Commits subject pattern (ADR 0019) — the same pattern commits use. For squash-merge repos this means the PR title becomes a commit subject on merge, so the ticket suffix carries over.
+The PR title must match the Conventional Commits subject pattern (ADR 0020 → Commit conventions) — the same pattern commits use. For squash-merge repos this means the PR title becomes a commit subject on merge, so the ticket suffix carries over.
 
 If the PR genuinely has no ticket, ask the human to run `gh pr create` themselves. There is no AI-side escape hatch.
 

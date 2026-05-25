@@ -10,7 +10,7 @@ decision-makers: [Repo platform]
 [ADR 0008](0008-trivy-security-scan.md) (Trivy scans),
 [ADR 0021](0021-github-actions-ci.md) (CI builds),
 [ADR 0022](0022-opentofu-iac.md) (IaC deploys),
-[ADR 0005](0005-package-script-conventions.md) (`lint:container`),
+[ADR 0004](0004-nx-monorepo.md) (`lint:container` verb — see [docs/conventions/scripts.md](../conventions/scripts.md)),
 and [ADR 0025](0025-production-data-flow.md) (in-VPC sanitisation
 container) all assume a `Dockerfile` shape that no ADR defines.
 Each service inventing its own = different base images,
@@ -67,7 +67,7 @@ RUN /bin/bash -c '\
 
 USER node
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD node -e "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1))"
+  CMD node -e "fetch('http://localhost:3000/healthz').then(r=>process.exit(r.ok?0:1))"
 
 # Stacking order: vault shim → OTel boot → app. See ADR 0034 + 0032.
 ENTRYPOINT ["infisical", "run", "--", "node", "--import", "./dist/instrumentation.mjs"]
@@ -89,11 +89,49 @@ build with `--build-arg VAULT_CLI=none` and use `ENTRYPOINT ["node",
   secrets ([ADR 0034](0034-secrets-runtime-injection.md)); `node --import` boots OTel before
   `@nestjs/core` is required ([ADR 0032](0032-runtime-observability.md));
   `CMD` is the only thing services override.
-- **`HEALTHCHECK` hits `GET /health`** — every deployable
-  exposes that, 200 when ready. Contract is the URL, not the
-  implementation.
+- **`HEALTHCHECK` hits `GET /healthz`** (liveness). See
+  **Health probe contract** below for the `/healthz` vs `/readyz`
+  split. Contract is the URLs, not the implementation.
 - **Layer order**: lockfile first, source last. Maximises cache hits.
 - **`--prod` in runtime stage** — dev deps don't ship.
+
+### Health probe contract — `/healthz` + `/readyz`
+
+Two endpoints, not one. Both implemented via `@nestjs/terminus`
+11.x:
+
+```ts
+@Controller()
+export class HealthController {
+  constructor(private h: HealthCheckService, private db: TypeOrmHealthIndicator) {}
+
+  @Get('healthz') @HealthCheck() // liveness — cheap, never touches DB
+  live() { return this.h.check([async () => ({ self: { status: 'up' } })]); }
+
+  @Get('readyz') @HealthCheck()  // readiness — DB + critical downstreams
+  ready() {
+    return this.h.check([
+      () => this.db.pingCheck('postgres', { timeout: 300 }),
+      // add HttpHealthIndicator for critical synchronous downstreams
+    ]);
+  }
+}
+```
+
+- **Liveness (`/healthz`)** must **not** depend on the DB. A bad
+  DB does not mean the pod should be restarted — only readiness
+  should fail. The Dockerfile `HEALTHCHECK` above probes this.
+- **Readiness (`/readyz`)** checks the DB ping plus any
+  synchronous downstream the service cannot serve without.
+  Async-only dependencies (queues, S3) should be circuit-broken
+  inside the app, not gated here. K8s `readinessProbe` and
+  synthetic monitors (when adopted) target `/readyz`.
+- A deep-health mode (e.g. `?detail=full` returning the
+  indicator tree) is fine for ops dashboards but **must not**
+  be wired to k8s probes.
+
+The legacy `/health` URL stays out of the contract — every new
+service ships both `/healthz` and `/readyz`.
 
 ### Targets → environments
 
@@ -152,8 +190,8 @@ services:
 - **postgres pinned `postgres:16-bookworm`** — Debian-based,
   matches the slim alignment. Major pinned; patch via PR.
 
-[ADR 0005](0005-package-script-conventions.md)'s `db:up`/`db:down`/`db:reset`
-verbs wrap this compose file per service.
+The `db:up`/`db:down`/`db:reset` verbs from [ADR 0004](0004-nx-monorepo.md)
+(see [docs/conventions/scripts.md](../conventions/scripts.md)) wrap this compose file per service.
 
 ### Out of scope
 
@@ -172,16 +210,16 @@ Build tool: `podman build` (or `buildah bud`) locally; CI uses
   stage/temp/prod unchanged.
 - **Trivy scan surface is bounded** ([ADR 0008](0008-trivy-security-scan.md))
   — same base across services means findings dedupe.
-- **Hadolint contract from [ADR 0005](0005-package-script-conventions.md)
-  is concrete** — there's a shape to lint against.
+- **Hadolint contract from [ADR 0004](0004-nx-monorepo.md)
+  (`lint:container` verb) is concrete** — there's a shape to lint against.
 - **`podman compose up` is the whole local dev story.**
 
 ### Negative
 
 - **Slim is ~200 MB; distroless would be ~150** — accepted for
   now, follow-up after devops review.
-- **`/health` discipline required** of every service. No silent
-  omissions.
+- **`/healthz` + `/readyz` discipline required** of every
+  service. No silent omissions; no DB calls on liveness.
 - **Hot reload depends on the framework's watch mode** (NestJS,
   Vite, etc. all support; verify per service).
 
@@ -210,9 +248,9 @@ Build tool: `podman build` (or `buildah bud`) locally; CI uses
 ## Related
 
 - **[ADR 0002](0002-node-22-lts.md)** — base image follows the Node LTS pin.
-- **[ADR 0005](0005-package-script-conventions.md)** —
+- **[ADR 0004](0004-nx-monorepo.md)** —
   `lint:container` lints this shape; `db:*` family wraps the
-  per-service compose.
+  per-service compose. See [docs/conventions/scripts.md](../conventions/scripts.md).
 - **[ADR 0008](0008-trivy-security-scan.md)** — Trivy scans this image.
 - **[ADR 0012](0012-drizzle-orm.md)** — native modules motivate slim/glibc over Alpine.
 - **[ADR 0021](0021-github-actions-ci.md)** — CI builds this image.

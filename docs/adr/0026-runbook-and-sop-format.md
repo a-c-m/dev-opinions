@@ -136,7 +136,7 @@ naturally refresh them. Two mechanisms, both rooted in `git log`
 4. **Central `/docs/runbooks/` only.** Flat dir doesn't scale; orphans on service deletion. Cross-cutting at root retained as carve-out.
 ## Related
 
-- **[ADR 0027](0027-codeowners-team-metadata.md)** — Escalation points at CODEOWNERS metadata rather than duplicating contacts.
+- **[ADR 0020](0020-github-repo-conventions.md)** — Escalation points at CODEOWNERS team-metadata blocks rather than duplicating contacts.
 - **[ADR 0028](0028-multi-agent-rule-distribution.md)** — AGENTS.md gains the prompt above.
 - **[ADR 0030](0030-child-apps-and-repos.md)** — scope-bounded: applies to this repo's layout. Children under `repos/` own their own; convention recommended, not enforced.
 - [AWS Well-Architected — runbooks](https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/ops_ready_to_support_use_runbooks.html)
