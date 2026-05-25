@@ -36,6 +36,8 @@
     "test": "nx run-many --target=test --all",
     "test:cov": "vitest run --coverage",
     "test:e2e": "nx run-many --target=e2e --all",
+    "cov:check": "node tools/coverage-baseline/src/cli.ts check",
+    "cov:promote": "node tools/coverage-baseline/src/cli.ts promote",
     "lint": "bs check --write",
     "lint:check": "bs check",
     "lint:ci": "bs check --suppression-fail-on-improvement",

@@ -83,6 +83,22 @@ The branch-coverage paradox is real: in typed TypeScript most `?.` / `??` short-
 - Local: add `html` (gitignored).
 - PR comment via `davelosert/vitest-coverage-report-action@v2`; reads thresholds straight from the root config and diffs against `main` via `json-summary-compare-path`. Hardened fork `step-security/vitest-coverage-report-action` is the named supply-chain graduation.
 
+### Adoption ratchet — `coverage-baseline`
+
+Vitest's threshold check is a **floor**: every file must hit the threshold every run. That's the wrong shape for adopting this policy into a codebase that already ships at mixed coverage — you either drop the policy to today's worst-coverage file or invest weeks raising coverage before you can merge anything.
+
+The companion tool [`tools/coverage-baseline/`](../../tools/coverage-baseline/) inverts the gate, matching the mental model of `bs` (biome-suppressed) for lint:
+
+- A committed `coverage-baseline.json` records every file's current percentages.
+- `pnpm cov:check` (run after `pnpm test:cov`) fails when **any** file drops below its baseline (within a small `epsilon` tolerance).
+- **New files** (no baseline entry) are gated by glob rules in `.coverage-baseline.json`. The glob rules mirror the tiers above (`shared/**` → 100/95/100/100, `apps/**` and `tools/**` → 80/80/80/80).
+- `pnpm cov:promote` regenerates the baseline from the latest run. **Safe by default** — refuses to write a baseline that would lower any file's metric or accept a sub-threshold new file. AI agents may run safe-mode `promote` freely.
+- `pnpm cov:promote -- --allow-decrease` is the human-only override for deliberate regressions (e.g. a refactor that legitimately drops a tested file's coverage). A PreToolUse hook (`.claude/hooks/check-bash-rules.sh`) blocks AI from passing the flag — lowering the floor is always an audited human decision.
+
+Net effect: existing files keep shipping at today's coverage, new code is gated, accepted improvements are explicit, and only humans can accept regressions. The tool is library-shaped (~150 LOC core, pure comparison logic + thin CLI) and designed for extraction to npm later.
+
+CI gates `pnpm cov:check` in addition to Vitest's own threshold check — both run, both must pass. Vitest's floor catches a regression in *aggregate*; `cov:check` catches a regression in *any specific file*.
+
 ### Mutation testing — off, documented graduation
 
 StrykerJS works against Vitest 4 (`@stryker-mutator/core` v9.6.x, Vitest runner PR #5928 landed Feb 2026), but a full-monorepo run on a ~5k-LOC NestJS service typically takes 20–60 min even with `--incremental`. **Default: off.** **Graduation 1**: weekly cron on `shared/*` only, mutation score gate 70%. **Graduation 2**: Stryker on PRs that touch `shared/*`, scoped via `--mutate` glob.

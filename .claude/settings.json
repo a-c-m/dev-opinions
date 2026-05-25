@@ -15,7 +15,9 @@
       "Bash(pnpm check:*)",
       "Bash(pnpm commit:*)",
       "Bash(pnpm exec:*)",
+      "Bash(pnpm view *)",
       "Bash(pnpm nx:*)",
+      "Bash(pnpm --version)",
       "Bash(nx:*)",
       "Bash(git status)",
       "Bash(git diff:*)",
@@ -29,8 +31,9 @@
       "Bash(./.claude/commands/create-issue.sh:*)",
       "Bash(./.claude/commands/create-pr.sh:*)",
       "Bash(bd:*)",
-      "Bash(pnpm view *)",
+      "Bash(echo \"exit=$?\")",
       "Bash(rg:*)",
+      "Bash(node .ai-wip/*)",
       "Bash(./scripts/setup-mac.sh:*)"
     ],
     "deny": [

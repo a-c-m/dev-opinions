@@ -1,0 +1,84 @@
+{
+  "files": {
+    "apps/sample/api/src/env.ts": {
+      "branches": 0,
+      "functions": 0,
+      "lines": 0,
+      "statements": 0
+    },
+    "apps/sample/web/src/app.tsx": {
+      "branches": 100,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    "apps/sample/web/src/env.ts": {
+      "branches": 50,
+      "functions": 100,
+      "lines": 80,
+      "statements": 80
+    },
+    "shared/auth/src/dev-auth-provider.ts": {
+      "branches": 100,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    "shared/auth/src/managed-idp-auth-provider.ts": {
+      "branches": 100,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    "shared/auth/src/oidc-auth-provider.ts": {
+      "branches": 100,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    "shared/authz/src/ability.factory.ts": {
+      "branches": 100,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    "shared/authz/src/audit.service.ts": {
+      "branches": 100,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    "shared/authz/src/authz.guard.ts": {
+      "branches": 100,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    "shared/authz/src/check-ability.decorator.ts": {
+      "branches": 100,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    "tools/coverage-baseline/src/cli.ts": {
+      "branches": 0,
+      "functions": 0,
+      "lines": 0,
+      "statements": 0
+    },
+    "tools/coverage-baseline/src/compare.ts": {
+      "branches": 100,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    "tools/coverage-baseline/src/reader.ts": {
+      "branches": 75,
+      "functions": 100,
+      "lines": 94.44,
+      "statements": 94.44
+    }
+  },
+  "generated": "2026-05-25T21:42:55.910Z",
+  "schema": 1
+}

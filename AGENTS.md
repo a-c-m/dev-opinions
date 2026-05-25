@@ -81,6 +81,9 @@ For ad-hoc searches, use the built-in `Grep` tool (ripgrep-backed). In shell scr
 ### Work from the repo root
 Don't pass absolute paths into commands where a relative path from the current directory would do. If you need to work inside a subdirectory repeatedly, `cd` to it first. Keeps commands readable and diffable.
 
+### Coverage baseline — ratchet up only
+The `pnpm cov:check` gate compares per-file coverage against a committed `coverage-baseline.json` (ratchet — see ADR 0014). `pnpm cov:promote` (safe mode) is fine to run when nothing regresses. `pnpm cov:promote -- --allow-decrease` writes a baseline that *lowers* a file's coverage; that's a deliberate human call. The PreToolUse hook blocks AI from passing `--allow-decrease`. If a refactor genuinely needs to drop coverage, hand the command to the human.
+
 ### Mini scripts: Node, written to `.ai-wip/`
 For one-shot verification / batch-transform / regex-sweep scripts, write a `.mjs` file under `.ai-wip/` and run it with `node`. Don't reach for Python — the team's primary language is TS/JS, Node is on every machine, and the script is easier to re-read and amend later. Reach for Python only if a Node equivalent would be materially harder. Never write the script to `/tmp/` (PreToolUse hook blocks it; `.ai-wip/` is the documented scratch location).
 

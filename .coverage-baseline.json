@@ -1,0 +1,28 @@
+{
+  "coverageFile": "coverage/coverage-summary.json",
+  "baselineFile": "coverage-baseline.json",
+  "epsilon": 0.1,
+  "thresholds": [
+    {
+      "glob": "shared/**",
+      "branches": 95,
+      "functions": 100,
+      "lines": 100,
+      "statements": 100
+    },
+    {
+      "glob": "apps/**",
+      "branches": 80,
+      "functions": 80,
+      "lines": 80,
+      "statements": 80
+    },
+    {
+      "glob": "tools/**",
+      "branches": 80,
+      "functions": 80,
+      "lines": 80,
+      "statements": 80
+    }
+  ]
+}

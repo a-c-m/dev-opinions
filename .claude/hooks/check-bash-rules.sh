@@ -19,7 +19,10 @@
 #      `git grep`, `man grep`, `which grep`, `type grep`, `command -v grep`,
 #      `apropos grep`, `whatis grep`, `info grep` — these are *about* grep,
 #      not invocations of it.
-#   6. Nudge: lazy `echo >`, `cat <<`, `sed -i`, `awk … >` — these should be
+#   6. Block: `coverage-baseline … --allow-decrease` (or `pnpm cov:promote …
+#      --allow-decrease`). Lowering the committed coverage floor is a human
+#      call; AI may ratchet up but not accept regressions.
+#   7. Nudge: lazy `echo >`, `cat <<`, `sed -i`, `awk … >` — these should be
 #      Write/Edit tool calls, not shelled-out file mutations. Advisory.
 #
 # Blocking checks run first and short-circuit with exit 2. Nudges run last
@@ -185,7 +188,40 @@ EOF
   exit 2
 fi
 
-# ---- 6. echo / cat / sed / awk file-mutation nudges (advisory) -------------
+# ---- 6. coverage-baseline --allow-decrease is human-only --------------------
+# Lowering the committed coverage floor is a deliberate human call. AI may
+# ratchet up (pnpm cov:promote, when nothing regresses) but must not pass
+# --allow-decrease, which writes a baseline accepting a regression.
+#
+# Strip heredoc bodies and quoted strings first so the flag appearing in
+# documentation/commit-message text doesn't false-positive.
+COV_STRIPPED="$(CMD="$COMMAND" python3 - <<'PY'
+import os, re
+cmd = os.environ.get("CMD", "")
+cmd = re.sub(
+    r"<<-?\s*['\"]?(\w+)['\"]?[^\n]*\n.*?^\s*\1\s*$",
+    "",
+    cmd,
+    flags=re.DOTALL | re.MULTILINE,
+)
+cmd = re.sub(r"'(?:[^'\\]|\\.)*'", "", cmd)
+cmd = re.sub(r'"(?:[^"\\]|\\.)*"', "", cmd)
+print(cmd)
+PY
+)"
+if printf '%s' "$COV_STRIPPED" | rg -q '(^|[[:space:];|&(])(coverage-baseline|cov:promote)\b.*--allow-decrease'; then
+  cat >&2 <<'EOF'
+🚫 BLOCKED: `coverage-baseline … --allow-decrease` is human-only.
+
+The flag overrides the safe `promote` mode and writes a baseline that lowers a file's
+coverage. Intentional regressions are a human decision — they shouldn't slip in via an
+agent. Run `pnpm cov:promote` (without the flag) to ratchet up safely, or ask the
+human to run `pnpm cov:promote -- --allow-decrease` themselves.
+EOF
+  exit 2
+fi
+
+# ---- 7. echo / cat / sed / awk file-mutation nudges (advisory) -------------
 WARN=""
 case "$COMMAND" in
   *"echo"*">"*)           WARN="Writing a file with 'echo >' — use the Write tool for clarity and permission-prompt consistency." ;;
