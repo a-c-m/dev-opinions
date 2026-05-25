@@ -13,8 +13,7 @@ Passport strategies, tokens in `localStorage`, bespoke session
 schemes. Getting it wrong = total account compromise.
 
 This ADR settles the architectural shape (interface, verification,
-session vs token, claims) without prescribing a vendor. The
- Auth ADR is the empirical reference.
+session vs token, claims) without prescribing a vendor.
 
 Authorization (can-this-user-do-X), service-to-service auth,
 and staff impersonation are **out of scope**.
@@ -92,8 +91,7 @@ The three states above (`authenticated` / `unauthenticated` /
 on `unauthenticated`; `failed` must always reject with 401.
 
 **Conflating the two turns every public route into a token
-bypass** — the foot-gun caught by the  security review.
-Adopted verbatim.
+bypass.**
 
 ### JWT verification — hardening defaults
 
@@ -263,8 +261,6 @@ Auth.js / NextAuth is off the ladder — Next.js-shaped only.
 
 ## References
 
-- [ ADR 0028 — Auth architecture](../../..//docs/adr/0028-auth-architecture.md)
-  (the empirical reference)
 - [`jose`](https://github.com/panva/jose) — JWT verification
 - [`openid-client`](https://github.com/panva/node-openid-client) — OIDC client (panva, OpenID-certified)
 - [Better Auth](https://github.com/better-auth/better-auth)

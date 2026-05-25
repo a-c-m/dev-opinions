@@ -12,7 +12,7 @@ decision-makers: [Repo platform]
 | GraphQL (primary) | `class-validator` on `@InputType` | `errors[].extensions.{code,traceId,…}` via `GqlExceptionFilter` | Field-level `@deprecated` |
 | REST (narrow: webhooks, uploads, partner) | Zod 4 | `application/problem+json` body via `AllExceptionsFilter` | URL path `/v1/` |
 
-Same `code` taxonomy across both. Same `ApiException`. Same  IMS four-layer per-feature shape (`<feature>.input.ts` / `.types.ts` / `.service.ts`).
+Same `code` taxonomy across both. Same `ApiException`. Same four-layer per-feature shape (`<feature>.input.ts` / `.types.ts` / `.service.ts`).
 
 ## Context
 
@@ -94,8 +94,6 @@ Two filters share mapping logic:
 - **Client**: `graphql-codegen` + TanStack Query (not Apollo Client — codegen + TanStack matches Yoga's ecosystem and unifies with the REST fetch layer)
 
 ### Contract composition — four-layer per feature
-
-Empirical pattern from the  IMS project (six feature modules in production).
 
 | Layer | File | Library | Role |
 |---|---|---|---|
