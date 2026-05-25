@@ -42,8 +42,8 @@ CLAUDE.md -> AGENTS.md                      # symlink (committed)
 .claude/skills/<name>   -> ../../.agents/skills/<name>     (symlink)
 .opencode/skills/<name> -> ../../.agents/skills/<name>     (symlink)
 
-.claude/agents/<name>.md                    # canonical agent source
-.opencode/agents/<name>.md -> ../../.claude/agents/<name>.md  (symlink)
+.claude/agents/<name>.md                    # canonical Claude subagents (per-harness)
+.opencode/agent/<name>.md                   # canonical OpenCode agents (translated, NOT symlinked)
 
 .mcp.json                                   # canonical MCP servers
 opencode.json                               # hand-maintained; mirrors mcp block
@@ -52,8 +52,9 @@ opencode.json                               # hand-maintained; mirrors mcp block
 opencode.json plugin: [opencode-claude-hooks]   # OpenCode hook bridge
 ```
 
-Symlinks are the OS primitive. Git tracks them; GitHub renders the
-target so discoverability is preserved.
+Symlink only where the format is a shared standard (agents.md for
+context; Agent Skills for skills). Subagents diverge per harness —
+translate, don't symlink. Git tracks symlinks; GitHub renders them.
 
 ### What goes in `AGENTS.md`
 
@@ -141,7 +142,24 @@ scripts around `pnpm`/`gh`.
 [ADR 0029](0029-claude-code-setup.md) shipped flat
 `.claude/skills/*.md` files. Each skill is promoted to
 `.agents/skills/<name>/SKILL.md`; per-agent skill directories
-become per-entry symlinks.
+become per-entry symlinks. Safe because the Agent Skills open
+standard defines a shared `SKILL.md` format.
+
+### Subagent files don't symlink
+
+Claude Code and OpenCode subagent frontmatter diverges — model
+identifiers, tool flags, permissions. A symlink would silently
+load broken configs.
+
+- Each harness keeps its own canonical copy
+  (`.claude/agents/`, `.opencode/agent/`).
+- Only `.claude/agents/` exists until OpenCode is onboarded.
+- When OpenCode lands, add a generator
+  ([Ruler](https://github.com/intellectronica/ruler) or a bespoke
+  `make generate`). Pick then.
+
+Same rule for any slash-command Markdown with harness-specific
+frontmatter. Shell-script commands are unaffected.
 
 ### Shell-script commands
 
@@ -200,6 +218,8 @@ context model, the flat `.claude/skills/*.md` layout, and
   warns; doesn't prevent. Past ~6 servers, revisit.
 - **OpenCode hook parity is unverified** — bridge plugin barely
   adopted. Load-bearing risk of the OpenCode-supported claim.
+- **Subagents need a generator, not a symlink** — frontmatter
+  diverges per harness; deferred until OpenCode lands.
 
 ### Neutral
 
