@@ -1,4 +1,4 @@
-# Deploy a tagged version to production per ADR 0024.
+# Deploy a tagged version to production per ADR 0035.
 # - Validates the tag exists
 # - Runs DB migrations (Path A inline call to _db-migrate.yml) BEFORE pods
 # - Builds + promotes the runtime image from the tag SHA
@@ -49,7 +49,7 @@ jobs:
   build-and-deploy:
     needs: migrate
     runs-on: ubuntu-latest
-    environment: production    # human approval gate per ADR 0024
+    environment: production    # human approval gate per ADR 0035
     steps:
       - uses: actions/checkout@v4
         with:

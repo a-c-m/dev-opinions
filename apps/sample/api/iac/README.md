@@ -1,6 +1,6 @@
 # sample-api / iac
 
-OpenTofu skeleton for the sample app. See [ADR 0022](../../../docs/adr/0022-opentofu-iac.md) for the rationale and conventions.
+OpenTofu skeleton for the sample app. See [ADR 0033](../../../docs/adr/0033-opentofu-iac.md) for the rationale and conventions.
 
 This skeleton ships with **no provider resources** — only the structure. On
 adoption you fill in the target cloud (AWS, GCP, Azure, Kubernetes, …) and

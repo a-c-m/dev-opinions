@@ -1,5 +1,5 @@
-// Stub per ADR 0015. Implementation lands when first service consumes.
-// See docs/adr/0015-backend-config.md for the full contract.
+// Stub per ADR 0016. Implementation lands when first service consumes.
+// See docs/adr/0016-backend-config.md for the full contract.
 
 /**
  * Marks a config field as file-sourced (read from layered YAML only).

@@ -3,7 +3,7 @@
 ## Overview
 
 **This runbook is for the supervised exception path
-(Path B per [ADR 0036](../adr/0036-safe-database-migrations.md)),
+(Path B per [ADR 0018](../adr/0018-safe-database-migrations.md)),
 not the everyday automated path.**
 
 The default flow (Path A): migrations apply automatically as a
@@ -48,7 +48,7 @@ service before starting Path B; resume after step 6.
 ## Prerequisites
 
 - **Dry-run done** on a sanitised stage clone of comparable
-  size ([ADR 0025](../adr/0025-production-data-flow.md)).
+  size ([ADR 0036](../adr/0036-production-data-flow.md)).
 - **Backup window confirmed.** Postgres has Point-In-Time
   Recovery (PITR) — restore to any second within a retention
   window (cloud-provider dependent, typically 24h–35 days).
@@ -118,7 +118,7 @@ service before starting Path B; resume after step 6.
 
 ## Rollback
 
-**Forward-only** per [ADR 0036](../adr/0036-safe-database-migrations.md).
+**Forward-only** per [ADR 0018](../adr/0018-safe-database-migrations.md).
 No `down.sql`; drizzle-kit 1.x has no `down` command. Three
 escalating responses:
 
@@ -149,17 +149,17 @@ Abort the migration if any of these is sustained for 60s:
 
 Contacts: CODEOWNERS for the affected `shared/db-<domain>/`
 package — Slack + on-call alerting per the file's `# slack:` /
-`# alerting:` metadata ([ADR 0020 → CODEOWNERS](../adr/0020-github-repo-conventions.md#codeowners-githubcodeowners)).
+`# alerting:` metadata ([ADR 0031 → CODEOWNERS](../adr/0031-github-repo-conventions.md#codeowners-githubcodeowners)).
 
 ## Related
 
-- [ADR 0036](../adr/0036-safe-database-migrations.md) — the design,
+- [ADR 0018](../adr/0018-safe-database-migrations.md) — the design,
   including the Path A / Path B split and idempotency rationale
-- [ADR 0012](../adr/0012-drizzle-orm.md) — Drizzle schemas / migrations
-- [ADR 0021](../adr/0021-github-actions-ci.md) — the reusable
+- [ADR 0011](../adr/0011-drizzle-orm.md) — Drizzle schemas / migrations
+- [ADR 0032](../adr/0032-github-actions-ci.md) — the reusable
   `_db-migrate.yml` workflow lives here
-- [ADR 0024](../adr/0024-branching-releases-environments.md) — release flow
-- [ADR 0025](../adr/0025-production-data-flow.md) — sanitised stage clones
-- [ADR 0020](../adr/0020-github-repo-conventions.md) — CODEOWNERS team metadata = escalation contacts
+- [ADR 0035](../adr/0035-branching-releases-environments.md) — release flow
+- [ADR 0036](../adr/0036-production-data-flow.md) — sanitised stage clones
+- [ADR 0031](../adr/0031-github-repo-conventions.md) — CODEOWNERS team metadata = escalation contacts
 - [release-pr-flow.md](../sops/release-pr-flow.md) — the
   default release path (Path A); this runbook is the deviation

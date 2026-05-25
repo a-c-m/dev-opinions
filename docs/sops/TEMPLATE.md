@@ -5,7 +5,7 @@
 # <Title>
 
 > Copy this file (don't edit it in place) when authoring a new SOP.
-> Shape per [ADR 0026](../adr/0026-runbook-and-sop-format.md).
+> Shape per [`sops/AGENTS.md`](AGENTS.md).
 > Filename: kebab-case, descriptive — the path is the identity.
 
 ## Overview

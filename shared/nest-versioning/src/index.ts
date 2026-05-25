@@ -1,5 +1,5 @@
-// Stub per ADR 0033. Implementation lands when first service consumes.
-// See docs/adr/0033-api-contracts-and-errors.md for the full contract.
+// Stub per ADR 0019. Implementation lands when first service consumes.
+// See docs/adr/0019-api-contracts-and-errors.md for the full contract.
 
 /**
  * Decorator options for marking a route deprecated.

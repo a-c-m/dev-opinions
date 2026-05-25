@@ -26,7 +26,7 @@ If AGPL doesn't work for what you're building and you'd rather not share back, *
 
 ---
 
-> AI agents read [`AGENTS.md`](AGENTS.md) instead of this README. `CLAUDE.md` is a symlink to it ([ADR 0028](docs/adr/0028-multi-agent-rule-distribution.md)).
+> AI agents read [`AGENTS.md`](AGENTS.md) instead of this README. `CLAUDE.md` is a symlink to it ([ADR 0037](docs/adr/0037-multi-agent-rule-distribution.md)).
 
 ## Proposed stack
 
@@ -46,8 +46,8 @@ One concrete implementation of the opinions. Deviate as needed — the ADRs in [
 | ORM             | Drizzle (Postgres / SQLite)                                                                     |
 | Git hooks       | Lefthook                                                                                        |
 | Commits         | Conventional Commits + commitlint + commitizen                                                  |
-| Backend config  | Typed schema + layered YAML + secrets-only env vars ([ADR 0015](docs/adr/0015-backend-config.md))  |
-| Web env         | `@import-meta-env/unplugin` at deploy time ([ADR 0016](docs/adr/0016-web-runtime-env-tokens.md)) |
+| Backend config  | Typed schema + layered YAML + secrets-only env vars ([ADR 0016](docs/adr/0016-backend-config.md))  |
+| Web env         | `@import-meta-env/unplugin` at deploy time ([ADR 0017](docs/adr/0017-web-runtime-env-tokens.md)) |
 | Node            | 22 LTS (`.nvmrc`)                                                                             |
 | Containers      | `node:22-bookworm-slim` four-stage Dockerfile, podman                                         |
 | IaC             | OpenTofu, per-app `iac/`                                                                      |

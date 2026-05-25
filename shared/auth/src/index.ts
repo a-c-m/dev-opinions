@@ -1,5 +1,5 @@
-// @shared/auth — vendor-agnostic authentication seam per ADR 0037.
-// See docs/adr/0037-authentication.md for the full contract.
+// @shared/auth — vendor-agnostic authentication seam per ADR 0027.
+// See docs/adr/0027-authentication.md for the full contract.
 
 import type { DevAuthConfigWithLogger } from "./dev-auth-provider.ts";
 import { DevAuthProvider } from "./dev-auth-provider.ts";
@@ -24,7 +24,7 @@ export type {
 
 /**
  * Discriminated config for `createAuthProvider`. The `provider` field
- * selects the impl; selection is config-driven per ADR 0015.
+ * selects the impl; selection is config-driven per ADR 0016.
  */
 export type AuthProviderConfig =
   | ({ provider: "dev" } & DevAuthConfigWithLogger)

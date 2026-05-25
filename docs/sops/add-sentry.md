@@ -4,7 +4,7 @@
 
 Wire Sentry as the error/replay/APM layer for a service.
 Alternative to PostHog per
-[ADR 0032](../adr/0032-runtime-observability.md).
+[ADR 0025](../adr/0025-runtime-observability.md).
 
 Adopt Sentry when: the service has no end-users (worker,
 batch), or async/distributed-trace debugging dominates your
@@ -15,10 +15,10 @@ error-triage UX. For everything else, prefer
 ## Prerequisites
 
 - Sentry account + DSN for the service (one per environment).
-- Service follows [ADR 0031](../adr/0031-structured-logging-contract.md)
-  and [ADR 0032](../adr/0032-runtime-observability.md).
+- Service follows [ADR 0024](../adr/0024-structured-logging-contract.md)
+  and [ADR 0025](../adr/0025-runtime-observability.md).
 - Backend secret store wired per
-  [ADR 0015](../adr/0015-backend-config.md).
+  [ADR 0016](../adr/0016-backend-config.md).
 
 ## Steps
 
@@ -38,7 +38,7 @@ error-triage UX. For everything else, prefer
 2. **Initialise Sentry in `instrumentation.ts`** — before any
    `@nestjs/core` import. Co-existence with the OTel SDK:
    pass `skipOpenTelemetrySetup: true` because OTel is already
-   configured per [ADR 0032](../adr/0032-runtime-observability.md).
+   configured per [ADR 0025](../adr/0025-runtime-observability.md).
 
    ```typescript
    // src/instrumentation.ts
@@ -49,7 +49,7 @@ error-triage UX. For everything else, prefer
      dsn: process.env.SENTRY_DSN,
      environment: process.env.APP_ENV,
      release: process.env.SERVICE_VERSION,
-     tracesSampleRate: 0.1,            // matches ADR 0032 prod default
+     tracesSampleRate: 0.1,            // matches ADR 0025 prod default
      profilesSampleRate: 0.1,
      integrations: [nodeProfilingIntegration()],
      skipOpenTelemetrySetup: true,
@@ -110,7 +110,7 @@ error-triage UX. For everything else, prefer
    ```
 
 7. **Add env-var schema** in `src/env.ts` per
-   [ADR 0016](../adr/0016-web-runtime-env-tokens.md).
+   [ADR 0017](../adr/0017-web-runtime-env-tokens.md).
 
 8. **Upload source maps** at build time (CI job — see Sentry
    CLI docs; one-time per release).
@@ -124,7 +124,7 @@ error-triage UX. For everything else, prefer
 
 ## Related
 
-- [ADR 0032](../adr/0032-runtime-observability.md) — the
+- [ADR 0025](../adr/0025-runtime-observability.md) — the
   decision this SOP implements.
 - [add-posthog.md](add-posthog.md) — the default alternative.
 - [Sentry NestJS docs](https://docs.sentry.io/platforms/javascript/guides/nestjs/)

@@ -3,9 +3,9 @@
 ## Overview
 
 End-to-end procedure for landing a change: from picking up work
-through PR-merged. Synthesises [ADR 0020](../adr/0020-github-repo-conventions.md)
-(commits + CODEOWNERS review routing), [ADR 0028](../adr/0028-multi-agent-rule-distribution.md)
-(definition of done), and [ADR 0024](../adr/0024-branching-releases-environments.md)
+through PR-merged. Synthesises [ADR 0031](../adr/0031-github-repo-conventions.md)
+(commits + CODEOWNERS review routing), [ADR 0037](../adr/0037-multi-agent-rule-distribution.md)
+(definition of done), and [ADR 0035](../adr/0035-branching-releases-environments.md)
 (branching). For the release procedure that follows merge to
 `main`, see [release-pr-flow.md](release-pr-flow.md).
 
@@ -61,7 +61,7 @@ flowchart LR
 
    Scope is the NX project name. Ticket suffix is **required** —
    the pre-commit hook blocks commits without one
-   ([ADR 0020 → Commit conventions](../adr/0020-github-repo-conventions.md#commit-conventions)).
+   ([ADR 0031 → Commit conventions](../adr/0031-github-repo-conventions.md#commit-conventions)).
 
 5. **Before claiming done.** Run the Definition of Done:
 
@@ -84,7 +84,7 @@ flowchart LR
    `Closes #N` / `Refs PROJ-N` into the body.
 
 7. **Review.** CODEOWNERS routes reviewers automatically
-   ([ADR 0020 → CODEOWNERS](../adr/0020-github-repo-conventions.md#codeowners-githubcodeowners)). Address
+   ([ADR 0031 → CODEOWNERS](../adr/0031-github-repo-conventions.md#codeowners-githubcodeowners)). Address
    feedback by pushing follow-up commits to the branch (don't
    force-push unless rebasing is necessary).
 
@@ -99,11 +99,11 @@ flowchart LR
 
 ## Related
 
-- [ADR 0020](../adr/0020-github-repo-conventions.md) — commit format
+- [ADR 0031](../adr/0031-github-repo-conventions.md) — commit format
   + CODEOWNERS routing and team metadata; underpins auto-bump and review.
-- [ADR 0028](../adr/0028-multi-agent-rule-distribution.md) —
+- [ADR 0037](../adr/0037-multi-agent-rule-distribution.md) —
   agent context, definition of done.
-- [ADR 0024](../adr/0024-branching-releases-environments.md) —
+- [ADR 0035](../adr/0035-branching-releases-environments.md) —
   branching model and release flow this PR feeds into.
 - [release-pr-flow.md](release-pr-flow.md) — what happens after
   the PR lands on `main`.

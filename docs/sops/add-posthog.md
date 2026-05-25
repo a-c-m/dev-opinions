@@ -4,7 +4,7 @@
 
 Wire PostHog as the error/replay/analytics/feature-flags layer
 for a service. Default-advised choice per
-[ADR 0032](../adr/0032-runtime-observability.md).
+[ADR 0025](../adr/0025-runtime-observability.md).
 
 Adopt PostHog when at least two of these are true: you want
 session replay; you'll need feature flags soon; product
@@ -17,11 +17,11 @@ dominant), prefer [add-sentry.md](add-sentry.md) instead.
 ## Prerequisites
 
 - PostHog account (cloud or self-hosted) and a project API key.
-- Service follows [ADR 0031](../adr/0031-structured-logging-contract.md)
-  (pino + stdout) and [ADR 0032](../adr/0032-runtime-observability.md)
+- Service follows [ADR 0024](../adr/0024-structured-logging-contract.md)
+  (pino + stdout) and [ADR 0025](../adr/0025-runtime-observability.md)
   (OTel SDK + `--import` boot order).
 - Backend secret store wired per
-  [ADR 0015](../adr/0015-backend-config.md).
+  [ADR 0016](../adr/0016-backend-config.md).
 
 ## Steps
 
@@ -147,7 +147,7 @@ dominant), prefer [add-sentry.md](add-sentry.md) instead.
    ```
 
 8. **Add the env-var schema** in `src/env.ts` per
-   [ADR 0016](../adr/0016-web-runtime-env-tokens.md):
+   [ADR 0017](../adr/0017-web-runtime-env-tokens.md):
 
    ```typescript
    VITE_POSTHOG_KEY: z.string().min(1),
@@ -165,9 +165,9 @@ dominant), prefer [add-sentry.md](add-sentry.md) instead.
 
 ## Related
 
-- [ADR 0032](../adr/0032-runtime-observability.md) — the
+- [ADR 0025](../adr/0025-runtime-observability.md) — the
   decision this SOP implements.
-- [ADR 0031](../adr/0031-structured-logging-contract.md) —
+- [ADR 0024](../adr/0024-structured-logging-contract.md) —
   `trace_id` injection that makes the cross-tool correlation
   work.
 - [add-sentry.md](add-sentry.md) — the alternative.

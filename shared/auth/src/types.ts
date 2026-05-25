@@ -1,4 +1,4 @@
-// Type surface per ADR 0037. See docs/adr/0037-authentication.md.
+// Type surface per ADR 0027. See docs/adr/0027-authentication.md.
 // Interface members alphabetised per ultracite useSortedInterfaceMembers.
 
 /**

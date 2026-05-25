@@ -1,5 +1,5 @@
-// Stub per ADR 0033. Implementation lands when first service consumes.
-// See docs/adr/0033-api-contracts-and-errors.md for the full contract.
+// Stub per ADR 0019. Implementation lands when first service consumes.
+// See docs/adr/0019-api-contracts-and-errors.md for the full contract.
 
 /**
  * Closed set of error codes across REST and GraphQL surfaces.
@@ -20,7 +20,7 @@ export type ApiErrorCode =
 
 /**
  * RFC 9457 Problem Details with `code` / `traceId` / `errors[]` extensions
- * per ADR 0033. The real Zod schema lands when first service consumes;
+ * per ADR 0019. The real Zod schema lands when first service consumes;
  * this type describes the wire shape.
  */
 export interface ApiError {

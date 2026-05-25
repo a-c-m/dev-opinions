@@ -14,7 +14,7 @@ This template is designed to host multiple apps plus shared packages, while rema
 
 - **NX 22** (pinned exact to `22.6.5` — see ADR 0001 on exact pins) as the monorepo orchestrator.
 - Workspace layout:
-  - `apps/*` — deployable units (APIs, frontends, CLIs, worker processes). In practice apps follow a two-tier `apps/<product>/<service>/` layout (per [ADR 0014](0014-package-by-feature.md) and [ADR 0030](0030-child-apps-and-repos.md)); the original flat `apps/*` shape is the conceptual root rather than the on-disk layout.
+  - `apps/*` — deployable units (APIs, frontends, CLIs, worker processes). In practice apps follow a two-tier `apps/<product>/<service>/` layout (per [ADR 0013](0013-package-by-feature.md) and [ADR 0005](0005-child-apps-and-repos.md)); the original flat `apps/*` shape is the conceptual root rather than the on-disk layout.
   - `shared/*` — reusable libraries (logging, env config, auth, HTTP clients, domain models).
   - `tools/*` — workspace-internal tooling (custom reporters, codegen, generators).
 - `nx.json` defines `targetDefaults` for `build`, `test`, `lint`, `typecheck` so every project gets the same shape for free.
@@ -54,6 +54,6 @@ Two design choices in that table are architecturally significant and recorded he
 ## Related
 
 - [ADR 0006](0006-biome-ultracite.md) — Biome + Ultracite; the linter `lint`/`lint:ci` wrap.
-- [ADR 0013](0013-vitest-playwright.md) — Vitest + Playwright; the runners `test*` and `e2e` invoke.
+- [ADR 0012](0012-vitest-playwright.md) — Vitest + Playwright; the runners `test*` and `e2e` invoke.
 - [docs/conventions/scripts.md](../conventions/scripts.md) — the verb table and per-project-type contract.
 - [NX targets concept](https://nx.dev/concepts/executors-and-configurations) — official guidance on consistent target naming for `run-many` and `affected`.

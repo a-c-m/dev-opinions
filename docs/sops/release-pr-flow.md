@@ -4,7 +4,7 @@
 
 Procedure for cutting a release: from "change is on `main`"
 through "deployed to prod" and the automatic merge-back. Realises
-[ADR 0024](../adr/0024-branching-releases-environments.md). For
+[ADR 0035](../adr/0035-branching-releases-environments.md). For
 the preceding step (getting a change onto `main`), see
 [dev-pr-flow.md](dev-pr-flow.md).
 
@@ -73,7 +73,7 @@ from there.
    - Creates `vX.Y.Z` and pushes the tag.
 
    Bump type is auto-detected from Conventional Commits since the
-   last tag ([ADR 0020](../adr/0020-github-repo-conventions.md#commit-conventions)).
+   last tag ([ADR 0031](../adr/0031-github-repo-conventions.md#commit-conventions)).
    Verify the bump matches expectation; a `feat:` slipped in as
    `chore:` produces a patch when you wanted a minor.
 
@@ -84,7 +84,7 @@ from there.
 
    **A second human approves** the production environment step
    before regional rollout begins (GitHub Actions Environment
-   protection — [ADR 0024](../adr/0024-branching-releases-environments.md)).
+   protection — [ADR 0035](../adr/0035-branching-releases-environments.md)).
 
 7. **Watch the rollout.** Monitor dashboards, alerts, and the
    service's runbooks for the deploy phase. If something breaks
@@ -135,13 +135,13 @@ typical `fix:` commit; verify.
 
 ## Related
 
-- [ADR 0024](../adr/0024-branching-releases-environments.md) —
+- [ADR 0035](../adr/0035-branching-releases-environments.md) —
   the decisions this SOP realises.
-- [ADR 0020](../adr/0020-github-repo-conventions.md) — commit format
+- [ADR 0031](../adr/0031-github-repo-conventions.md) — commit format
   drives auto-bump; CODEOWNERS team metadata is the escalation contact
   during a deploy incident.
 - [dev-pr-flow.md](dev-pr-flow.md) — the preceding flow that puts
   changes onto `main`.
 - Service-specific runbooks live under `apps/<product>/<service>/runbooks/`
-  per [ADR 0026](../adr/0026-runbook-and-sop-format.md) — check
+  ([`docs/runbooks/AGENTS.md`](../runbooks/AGENTS.md) for format) — check
   there for service-level operational context during a deploy.

@@ -1,6 +1,6 @@
 # Project context
 
-Canonical cross-agent brief per [ADR 0028](docs/adr/0028-multi-agent-rule-distribution.md). `CLAUDE.md` is a symlink to this file — edits to either path edit one file.
+Canonical cross-agent brief per [ADR 0027](docs/adr/0037-multi-agent-rule-distribution.md). `CLAUDE.md` is a symlink to this file — edits to either path edit one file.
 
 This repo is a monorepo starter (pnpm + NX). See [docs/adr/AGENTS.md](docs/adr/AGENTS.md) for the decisions behind every tool and framework here — read them before proposing a change to stack choices.
 
@@ -35,7 +35,7 @@ This repo is a monorepo starter (pnpm + NX). See [docs/adr/AGENTS.md](docs/adr/A
 
 ## Env variables
 
-Backend services follow ADR 0015: typed schema + layered YAML files in `config/`, with secrets-only living in env vars and injected via `@shared/config`. Web apps follow ADR 0016: a zod schema in `src/env.ts` validating values injected at deploy time via `@import-meta-env/unplugin`. Do not read `process.env` directly in application code in either tier.
+Backend services follow ADR 0016: typed schema + layered YAML files in `config/`, with secrets-only living in env vars and injected via `@shared/config`. Web apps follow ADR 0017: a zod schema in `src/env.ts` validating values injected at deploy time via `@import-meta-env/unplugin`. Do not read `process.env` directly in application code in either tier.
 
 ## Task tracking — local vs team
 
@@ -76,7 +76,7 @@ Don't chain unrelated Bash commands with `&&` or `;`. Each step should be runnab
 Prefer `cmd > .ai-wip/<name>.log 2>&1` over `cmd | rg …` or `cmd | jq …` inline. The user can re-read the file later. Inline pipes discard the raw output. If the file is small, `cat` it after. If large, `tail` or `rg` it — but the full output stays on disk. `.ai-wip/` is gitignored — one known location, survives across sessions, never committed. Don't use `/tmp/` (PreToolUse hook blocks it).
 
 ### Search with ripgrep, never grep
-For ad-hoc searches, use the built-in `Grep` tool (ripgrep-backed). In shell scripts and Bash tool calls, use `rg`, not POSIX `grep`. Ripgrep is faster and respects `.gitignore`, which matters in this monorepo. `git grep` is fine when you specifically need git's index or history. See [docs/adr/0009-ripgrep-over-grep.md](docs/adr/0009-ripgrep-over-grep.md). The PreToolUse hook **blocks** Bash calls that invoke `grep`/`egrep`/`fgrep` (exit 2). Carve-outs for `git grep`, `man grep`, `which grep`, `type grep`, `command -v grep`, `apropos grep`, `whatis grep`, `info grep` — these are *about* grep, not invocations of it.
+For ad-hoc searches, use the built-in `Grep` tool (ripgrep-backed). In shell scripts and Bash tool calls, use `rg`, not POSIX `grep`. Ripgrep is faster and respects `.gitignore`, which matters in this monorepo. `git grep` is fine when you specifically need git's index or history. The PreToolUse hook **blocks** Bash calls that invoke `grep`/`egrep`/`fgrep` (exit 2). Carve-outs for `git grep`, `man grep`, `which grep`, `type grep`, `command -v grep`, `apropos grep`, `whatis grep`, `info grep` — these are *about* grep, not invocations of it.
 
 ### Work from the repo root
 Don't pass absolute paths into commands where a relative path from the current directory would do. If you need to work inside a subdirectory repeatedly, `cd` to it first. Keeps commands readable and diffable.

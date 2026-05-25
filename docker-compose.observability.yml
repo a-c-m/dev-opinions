@@ -1,5 +1,5 @@
 # Local observability stack — opt-in via `pnpm dev:obs`.
-# See docs/adr/0032-runtime-observability.md.
+# See docs/adr/0025-runtime-observability.md.
 #
 # Apps send OTLP/HTTP to the Collector on :4318. Collector
 # fans out to Prometheus (metrics), Tempo (traces), Loki

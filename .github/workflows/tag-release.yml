@@ -1,6 +1,6 @@
-# Tag a release: bump version + create vX.Y.Z tag per ADR 0024.
+# Tag a release: bump version + create vX.Y.Z tag per ADR 0035.
 # Run AFTER QA on stage sign-off. Bump type auto-detected from
-# Conventional Commits since last tag per ADR 0020.
+# Conventional Commits since last tag per ADR 0031.
 # See docs/sops/release-pr-flow.md.
 
 name: tag-release

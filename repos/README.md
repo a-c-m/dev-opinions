@@ -2,7 +2,7 @@
 
 Optional sibling to [`apps/`](../apps/). Holds **independent child git repositories** that share parent-level agent context but live in their own version-controlled repos.
 
-Per [ADR 0030](../docs/adr/0030-child-apps-and-repos.md):
+Per [ADR 0005](../docs/adr/0005-child-apps-and-repos.md):
 
 - Children in `repos/<name>/` are NOT pnpm workspace members and are excluded from the NX project graph.
 - Each child owns its own `package.json`, lockfile, ADRs, hooks, CI — works standalone.

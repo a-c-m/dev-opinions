@@ -1,11 +1,11 @@
-# Operator-triggered migration (Path B per ADR 0036).
+# Operator-triggered migration (Path B per ADR 0018).
 # Use for risky / large / incident-investigation migrations — runs the
 # migration *before* the deploy. The deploy's inline migrate step then
 # no-ops (drizzle-kit migrate is idempotent; the advisory lock catches
 # any concurrent triggers).
 #
 # Runbook: docs/runbooks/supervised-db-migrations.md
-# See docs/adr/0036-safe-database-migrations.md for the Path A/B model.
+# See docs/adr/0018-safe-database-migrations.md for the Path A/B model.
 
 name: db-migrate (supervised)
 

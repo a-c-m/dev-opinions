@@ -1,4 +1,4 @@
-# Cut a release: merge main → release-candidate per ADR 0024.
+# Cut a release: merge main → release-candidate per ADR 0035.
 # Triggers a deploy to stage by virtue of release-candidate updating.
 # Preconditions: release-candidate HEAD == last v* tag (no release in flight).
 # See docs/sops/release-pr-flow.md for the human-side procedure.

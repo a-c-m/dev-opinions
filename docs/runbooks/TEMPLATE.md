@@ -7,7 +7,7 @@
 # <Title>
 
 > Copy this file (don't edit it in place) when authoring a new runbook.
-> Shape per [ADR 0026](../adr/0026-runbook-and-sop-format.md).
+> Shape per [`runbooks/AGENTS.md`](AGENTS.md).
 > Filename: kebab-case, descriptive, no `RUN-NNN` prefix — the path is the identity.
 
 ## Overview
@@ -50,7 +50,7 @@ How to undo, in the same numbered/fenced form.
 
 <!-- OPTIONAL — keep when on-call escalation paths are relevant. Delete otherwise. -->
 
-See `.github/CODEOWNERS` for current TechLead, Slack channel, and alerting URL via the team-metadata block ([ADR 0020 → CODEOWNERS](../adr/0020-github-repo-conventions.md#codeowners-githubcodeowners)).
+See `.github/CODEOWNERS` for current TechLead, Slack channel, and alerting URL via the team-metadata block ([ADR 0031 → CODEOWNERS](../adr/0031-github-repo-conventions.md#codeowners-githubcodeowners)).
 
 ## Related
 

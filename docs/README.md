@@ -8,8 +8,8 @@ This tree carries the decisions, conventions, and operational procedures for the
 |---|---|
 | [`adr/`](adr/AGENTS.md) | Architecture Decision Records — the *why* behind every load-bearing choice. Indexed in [`adr/AGENTS.md`](adr/AGENTS.md). New significant decisions get a new ADR per the MADR-lite shape described there. |
 | [`conventions/`](conventions/) | Reference material for conventions that an ADR ratified but doesn't need to inline (e.g. the script-verb table for [ADR 0004](adr/0004-nx-monorepo.md)). |
-| [`runbooks/`](runbooks/) | Operational procedures — on-call under pressure. Cross-cutting runbooks live here; service-specific ones live under `apps/<product>/<service>/runbooks/`. Format per [ADR 0026](adr/0026-runbook-and-sop-format.md). Start from [`runbooks/TEMPLATE.md`](runbooks/TEMPLATE.md). |
-| [`sops/`](sops/) | Standard Operating Procedures — developer doing normal work. Same shape as runbooks; different audience. Cross-cutting SOPs live here; service-specific ones (rare) live under `apps/<product>/<service>/sops/`. Format per [ADR 0026](adr/0026-runbook-and-sop-format.md). Start from [`sops/TEMPLATE.md`](sops/TEMPLATE.md). |
+| [`runbooks/`](runbooks/) | Operational procedures — on-call under pressure. Cross-cutting runbooks live here; service-specific ones live under `apps/<product>/<service>/runbooks/`. Format per [`runbooks/AGENTS.md`](runbooks/AGENTS.md); start from [`runbooks/TEMPLATE.md`](runbooks/TEMPLATE.md). |
+| [`sops/`](sops/) | Standard Operating Procedures — developer doing normal work. Same shape as runbooks; different audience. Cross-cutting SOPs live here; service-specific ones (rare) live under `apps/<product>/<service>/sops/`. Format per [`sops/AGENTS.md`](sops/AGENTS.md); start from [`sops/TEMPLATE.md`](sops/TEMPLATE.md). |
 | [`QUICKSTART.md`](QUICKSTART.md) | First-clone bootstrap — system prerequisites, `pnpm install`, smoke check. |
 
 ## When in doubt
