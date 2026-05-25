@@ -28,6 +28,13 @@
     "indentWidth": 2,
     "lineWidth": 100
   },
+  "javascript": {
+    "parser": {
+      // NestJS uses parameter decorators (@Inject, @Body, @Param, ...).
+      // Ultracite v7's nestjs preset omits this; we enable it explicitly.
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
   "linter": {
     "rules": {
       "style": {
