@@ -38,6 +38,11 @@ playwright/.cache/
 # for review" — one known location, survives across sessions, never committed.
 .ai-wip/
 
+# "Wrap an existing setup" mode — checkouts of other repos that agent sessions
+# can see for ADR-context purposes. Those repos own their own history; this
+# repo just hosts them as siblings. See README "Wrapping an existing setup".
+repos/
+
 # misc
 *.log
 *.tsbuildinfo

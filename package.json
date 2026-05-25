@@ -55,6 +55,8 @@
   },
   "version": "0.1.0",
   "private": true,
+  "license": "AGPL-3.0-or-later",
+  "author": "Alex McFadyen",
   "description": "Opinionated monorepo starter — pnpm + NX + TypeScript strict + Biome/Ultracite + NestJS + React/Vite + Vitest + Playwright + Drizzle + Lefthook + Trivy + OpenTofu. Decisions in docs/adr/.",
   "packageManager": "pnpm@9.15.0",
   "engines": {
