@@ -30,6 +30,7 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 - **[0013 — Vitest + Playwright](0013-vitest-playwright.md)** — Vitest for unit/integration; Playwright for E2E; no Jest.
 - **[0014 — Package by feature](0014-package-by-feature.md)** — vertical-slice layout; cross-domain primitives go in type-folders (`ui/`, `gql/`); extract to shared only on second consumer.
 - **[0039 — Test coverage policy](0039-test-coverage-policy.md)** — `@vitest/coverage-v8` on Vitest ≥4; single root `vitest.config.ts` with glob-keyed thresholds; `shared/*` 100/100/100 lines/functions/statements + hard-95 branches (paradox-honest, `/* v8 ignore next -- @preserve */` as escape valve); services 80/80; resolvers/controllers smoke-only via E2E; mutation testing (StrykerJS) documented as graduation.
+- **[0040 — E2E structure](0040-e2e-structure.md)** — per-app `apps/<p>/<s>-e2e/` workspace package + shared `shared/e2e-helpers/`; fixtures-injected POM (bare class POM rejected); selectors live in one place; `retries: CI?2:0`, `trace: 'retain-on-failure-and-retries'` (Playwright ≥1.59); projects `local` + `stage` (+ `setup-stage` dep); `@smoke` tag drives PR / prod-smoke cadence; `staging-with-prod-auth` deferred to graduation; Stagehand opt-in under `stagehand/` per ADR 0013.
 
 ### Configuration
 

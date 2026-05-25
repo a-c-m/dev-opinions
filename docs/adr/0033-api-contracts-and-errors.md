@@ -124,12 +124,33 @@ Same announce → monitor → sunset lifecycle on both surfaces; different on-th
 
 Sunset windows: **public APIs** (anonymous / partners without active contract) 6 months minimum; **internal-only** 2 months minimum. `shared/nest-versioning/` holds the decorator, interceptor, and `route_sunset` wiring.
 
+### Schema change detection — `graphql-inspector` in CI
+
+Every PR that touches `*.types.ts` / `*.input.ts` / resolver SDL
+runs `graphql-inspector diff` against `main`'s emitted SDL.
+Breaking changes (field removal, non-null tightening, enum
+value removal, argument type changes) fail the check; safe
+changes (additions, `@deprecated` annotations) pass with a
+markdown comment summarising the diff.
+
+This is the lightweight half of contract testing — catches the
+shape regressions that bite consumers, without standing up a
+Pact broker. Pact stays deferred (see below); the graduation
+trigger is **≥3 independent consumers of the same backend
+schema**.
+
+REST gets the equivalent at the deprecation-header layer: the
+`@Deprecated` decorator from `shared/nest-versioning/` writes
+`Deprecation` + `Sunset` headers (RFC 9745 / 8594), and stage
+access logs surface deprecated-path usage.
+
 ### Subscriptions — wire shape now, operations later
 
 `graphql-ws` protocol (Yoga + codegen ship it). Auth: token in `connectionParams` on `connection_init`. In-band errors send the same Problem Details body inside an `error` message frame; connection-terminating failures use close codes 4401 / 4403 / 4429. Pubsub backend, multiplexing, per-tenant quotas, long-lived-socket observability all deferred.
 
 ### What this defers (and re-evaluate when)
 
+- **Pact / consumer-driven contracts** — `graphql-inspector` covers breaking-change detection at the schema layer. Pact (`@pact-foundation/pact` 16.x) graduates when ≥3 independent consumers of the same backend schema exist, or when a non-GraphQL ingress earns its own contract.
 - **Lint rule for the domain-prefix code convention** — until drift shows up in review
 - **`drizzle-zod` at the resolver layer** — kept as a dep only if a non-GraphQL ingress (REST/webhook/queue) earns it
 - **`tools/gen-gql-from-drizzle` in-tree codegen** — graduation when the triple's per-field overhead becomes recurring PR noise
@@ -174,4 +195,5 @@ Sunset windows: **public APIs** (anonymous / partners without active contract) 6
 - [ADR 0031](0031-structured-logging-contract.md) + [ADR 0032](0032-runtime-observability.md) — `traceId` source
 - [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Problem Details; [RFC 9745](https://www.rfc-editor.org/rfc/rfc9745) Deprecation; [RFC 8594](https://www.rfc-editor.org/rfc/rfc8594) Sunset
 - [GraphQL Yoga](https://the-guild.dev/graphql/yoga-server); [graphql-ws protocol](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md)
+- [`graphql-inspector`](https://the-guild.dev/graphql/inspector) — schema diffing / breaking-change detection in CI; [`@pact-foundation/pact`](https://github.com/pact-foundation/pact-js) — consumer-driven contracts (graduation)
 - [`class-validator`](https://github.com/typestack/class-validator); [`drizzle-zod`](https://orm.drizzle.team/docs/zod); [GQLoom](https://github.com/modevol-com/gqloom)
