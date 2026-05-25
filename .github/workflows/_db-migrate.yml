@@ -1,0 +1,51 @@
+# Reusable workflow: run `db:migrate` for one shared/db-<domain> package
+# per ADR 0036. Called inline by deploy-prod.yml (Path A) and by
+# operator-dispatched db-migrate.yml (Path B). Both paths share this
+# workflow so SQL execution shape can't drift.
+#
+# The wrapper script enforces:
+#   - pg_try_advisory_lock(<hash-of-package-name>) — fails fast if held
+#   - SET lock_timeout = '3s'; SET statement_timeout = '15min';
+#   - drizzle's programmatic migrate() (not the CLI)
+# See docs/adr/0036-safe-database-migrations.md.
+
+name: _db-migrate
+
+on:
+  workflow_call:
+    inputs:
+      package:
+        description: 'shared/db-<domain> package name (e.g. shared/db-orders)'
+        required: true
+        type: string
+      environment:
+        description: 'GitHub Environment to deploy against (stage / production)'
+        required: true
+        type: string
+
+permissions:
+  id-token: write    # OIDC for cloud auth per ADR 0034
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup monorepo
+        uses: ./.github/actions/setup-monorepo
+
+      # Cloud OIDC + vault CLI auth happen here per the fork's choice.
+      # Example for AWS + Infisical:
+      # - uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+      #     aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Run migration
+        run: pnpm --filter @${{ inputs.package }} db:migrate
+        env:
+          APP_ENV: ${{ inputs.environment }}
+          # DATABASE_URL injected via the vault shim per ADR 0034

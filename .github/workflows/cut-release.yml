@@ -1,0 +1,48 @@
+# Cut a release: merge main → release-candidate per ADR 0024.
+# Triggers a deploy to stage by virtue of release-candidate updating.
+# Preconditions: release-candidate HEAD == last v* tag (no release in flight).
+# See docs/sops/release-pr-flow.md for the human-side procedure.
+
+name: cut-release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write     # needs to push release-candidate
+  pull-requests: write  # to open a PR on conflict
+
+concurrency:
+  group: release-in-flight
+  cancel-in-progress: false
+
+jobs:
+  cut:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: release-candidate
+
+      - name: Verify no release in flight
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 --match='v*' 2>/dev/null || echo "")
+          RC_HEAD=$(git rev-parse HEAD)
+          if [ -n "$LAST_TAG" ] && [ "$(git rev-parse $LAST_TAG)" != "$RC_HEAD" ]; then
+            echo "::error::release-candidate HEAD ($RC_HEAD) != last tag ($LAST_TAG). Release in flight; finish it first."
+            exit 1
+          fi
+
+      - name: Merge main → release-candidate
+        run: |
+          git config user.name "release-bot"
+          git config user.email "release-bot@noreply.invalid"
+          git fetch origin main:main
+          if ! git merge --no-ff -m "chore: cut release from main" main; then
+            echo "::warning::Merge conflict. Opening PR for manual resolution."
+            git merge --abort
+            # PR-creation step would go here; deferred until first real cut.
+            exit 1
+          fi
+          git push origin release-candidate

@@ -71,6 +71,18 @@
       }
     },
     {
+      // OTel + pino spec field names (trace_id, span_id, trace_flags, etc.) are
+      // snake_case by spec. shared/logger/ and any pino serialisers must keep them.
+      "includes": ["**/shared/logger/**", "**/*.logger.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": [
         "**/e2e/**",
         "**/*.spec.ts",

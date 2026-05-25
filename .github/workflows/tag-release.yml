@@ -1,0 +1,45 @@
+# Tag a release: bump version + create vX.Y.Z tag per ADR 0024.
+# Run AFTER QA on stage sign-off. Bump type auto-detected from
+# Conventional Commits since last tag per ADR 0019.
+# See docs/sops/release-pr-flow.md.
+
+name: tag-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'NX project to release (or "all" for the whole workspace)'
+        required: true
+        type: string
+        default: all
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-in-flight
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: release-candidate
+
+      - name: Setup monorepo
+        uses: ./.github/actions/setup-monorepo
+
+      - name: nx release (bump + commit + tag + push)
+        run: |
+          git config user.name "release-bot"
+          git config user.email "release-bot@noreply.invalid"
+          if [ "${{ inputs.project }}" = "all" ]; then
+            pnpm exec nx release --skip-publish
+          else
+            pnpm exec nx release --projects=${{ inputs.project }} --skip-publish
+          fi
