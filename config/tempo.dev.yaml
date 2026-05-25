@@ -1,4 +1,4 @@
-# Tempo — local dev config per ADR 0032.
+# Tempo — local dev config per ADR 0025.
 # Single-binary mode; in-memory storage (state resets on container restart).
 # Production deployments use object storage (S3/GCS/Azure) per fork.
 

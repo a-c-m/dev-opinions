@@ -1,4 +1,4 @@
-// Type surface for @shared/authz per ADR 0038.
+// Type surface for @shared/authz per ADR 0028.
 // Members alphabetised per ultracite useSortedInterfaceMembers.
 
 import type { MongoAbility } from "@casl/ability";

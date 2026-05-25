@@ -1,5 +1,5 @@
 // ManagedIdpAuthProvider — stub slot for a vendor-specific adapter
-// (Better Auth / WorkOS / Logto Cloud / etc.) per ADR 0037.
+// (Better Auth / WorkOS / Logto Cloud / etc.) per ADR 0027.
 //
 // Until a fork picks a vendor, this class delegates to the generic
 // OIDC verifier — every named vendor in the ladder is OIDC-compatible

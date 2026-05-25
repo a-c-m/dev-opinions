@@ -1,4 +1,4 @@
-// Stub per ADR 0016. Implementation lands when first service consumes.
+// Stub per ADR 0017. Implementation lands when first service consumes.
 // See docs/adr/0016-backend-config.md for the full contract.
 
 /**

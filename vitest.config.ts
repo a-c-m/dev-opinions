@@ -1,6 +1,6 @@
 import { defineConfig } from "vitest/config";
 
-// ADR 0039: single root config owns coverage policy. Per-package
+// ADR 0014: single root config owns coverage policy. Per-package
 // vitest configs handle project-specific concerns (environment,
 // setupFiles, include globs) but must NOT declare their own
 // `coverage.*` blocks — Vitest ignores them when the root runs.
@@ -22,7 +22,7 @@ export default defineConfig({
       reportOnFailure: true,
       include: ["apps/*/*/src/**/*.{ts,tsx}", "shared/*/src/**/*.ts", "tools/*/src/**/*.ts"],
       exclude: [
-        // ADR 0039 — types & DI wiring
+        // ADR 0014 — types & DI wiring
         "**/*.types.ts",
         "**/types.ts",
         "**/*.dto.ts",
@@ -33,10 +33,10 @@ export default defineConfig({
         // generated code
         "**/__generated__/**",
         "**/*.gen.ts",
-        // Drizzle declarative schema (ADR 0012)
+        // Drizzle declarative schema (ADR 0011)
         "**/db/schema/**",
         "**/drizzle/**",
-        // Smoke-only via E2E (ADR 0013 / ADR 0039)
+        // Smoke-only via E2E (ADR 0012 / ADR 0014)
         "**/*.controller.ts",
         "**/*.resolver.ts",
         // configs / boot / test infra
@@ -56,7 +56,7 @@ export default defineConfig({
         statements: 80,
         branches: 80,
         // shared/* infra — 100 on statements/lines/functions, hard 95
-        // on branches per ADR 0039 (branch-coverage paradox).
+        // on branches per ADR 0014 (branch-coverage paradox).
         // Escape valve is `/* v8 ignore next -- @preserve */`, NOT
         // a threshold drop.
         "shared/**/src/**/*.ts": {
@@ -66,7 +66,7 @@ export default defineConfig({
           branches: 95,
         },
         // App services — 80/80. Resolvers/controllers are excluded
-        // from rollup entirely (smoke-only via E2E per ADR 0013).
+        // from rollup entirely (smoke-only via E2E per ADR 0012).
         "apps/*/*/src/**/*.service.ts": {
           lines: 80,
           branches: 80,

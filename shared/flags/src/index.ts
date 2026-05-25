@@ -1,4 +1,4 @@
-// Stub per ADR 0029. Implementation lands when first service consumes.
+// Stub per ADR 0038. Implementation lands when first service consumes.
 // See docs/adr/0029-feature-flags.md for the full contract.
 
 export interface FlagDef {
@@ -10,7 +10,7 @@ export interface FlagDef {
 
 /**
  * Registry. Real registry adds per-flag entries here.
- * Kebab-case keys per ADR 0029 (matches the flag-tooling ecosystem).
+ * Kebab-case keys per ADR 0038 (matches the flag-tooling ecosystem).
  */
 export const flags = {} as const satisfies Record<string, FlagDef>;
 
@@ -28,7 +28,7 @@ export interface BooleanFeatureFlagOptions<K extends FlagKey> {
 
 /**
  * Frontend hook signature. Body delegates to `@openfeature/react-sdk`
- * (default) or `@posthog/react` (when fork adopts PostHog per ADR 0025).
+ * (default) or `@posthog/react` (when fork adopts PostHog per ADR 0036).
  * Real impl in `shared/flags/react.ts` once the React app consumes.
  */
 export interface UseFeatureFlagResult<T> {

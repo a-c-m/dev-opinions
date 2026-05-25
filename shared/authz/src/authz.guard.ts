@@ -1,4 +1,4 @@
-// AuthzGuard — route-boundary role check per ADR 0038's two-layer
+// AuthzGuard — route-boundary role check per ADR 0028's two-layer
 // enforcement. Reads `@CheckAbility(action, subject)` metadata,
 // builds an Ability via the factory, runs `ability.can()` against
 // the *subject class* (no DB fetch). Service layer does per-object
@@ -22,7 +22,7 @@ export const ABILITY_FACTORY = Symbol("shared.authz.AbilityFactory");
 /**
  * Pulls `TokenClaims` from the request. Forks wire this by setting
  * `request.user = claims` in their auth middleware/interceptor (per
- * ADR 0037). Returns null when no claims are attached.
+ * ADR 0027). Returns null when no claims are attached.
  */
 const claimsFromRequest = (req: { user?: TokenClaims }): TokenClaims | null => req.user ?? null;
 

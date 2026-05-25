@@ -1,4 +1,4 @@
-# OpenTelemetry Collector — local dev config per ADR 0032.
+# OpenTelemetry Collector — local dev config per ADR 0025.
 # Receives OTLP from services; fans out to Tempo (traces), Loki (logs),
 # Prometheus (metrics). Production Collector configs add cloud-backend
 # exporters and live in each fork's IaC.

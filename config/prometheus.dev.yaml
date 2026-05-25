@@ -1,4 +1,4 @@
-# Prometheus — local dev config per ADR 0032.
+# Prometheus — local dev config per ADR 0025.
 # OTLP receiver enabled so the Collector can remote-write metrics.
 # Scrapes the Collector's self-metrics endpoint too.
 

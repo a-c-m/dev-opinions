@@ -1,4 +1,4 @@
-// AuthzModule — NestJS DI wiring per ADR 0038. Forks override the
+// AuthzModule — NestJS DI wiring per ADR 0028. Forks override the
 // `AbilityFactory` provider with their own subclass; the no-op
 // `AuditService` is replaced when a concrete audit impl lands.
 

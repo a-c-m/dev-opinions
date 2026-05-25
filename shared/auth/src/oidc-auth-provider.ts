@@ -1,5 +1,5 @@
 // OidcAuthProvider — generic OIDC verification via `jose`.
-// Production canonical impl per ADR 0037.
+// Production canonical impl per ADR 0027.
 
 import type { JWTVerifyOptions } from "jose";
 import { createRemoteJWKSet, errors, jwtVerify } from "jose";

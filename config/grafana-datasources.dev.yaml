@@ -1,4 +1,4 @@
-# Grafana datasources — local dev config per ADR 0032.
+# Grafana datasources — local dev config per ADR 0025.
 # Provisioned at container start; Tempo + Loki + Prometheus all available.
 
 apiVersion: 1

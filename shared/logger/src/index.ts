@@ -1,8 +1,8 @@
-// Stub per ADR 0024. Implementation lands when first service consumes.
+// Stub per ADR 0035. Implementation lands when first service consumes.
 // See docs/adr/0024-structured-logging-contract.md for the full shape.
 
 /**
- * Required fields on every log line per ADR 0024's table.
+ * Required fields on every log line per ADR 0035's table.
  * `trace_id` / `span_id` / `trace_flags` are injected by
  * `@opentelemetry/instrumentation-pino` inside an active span.
  * biome.jsonc disables useNamingConvention for shared/logger/ so OTel

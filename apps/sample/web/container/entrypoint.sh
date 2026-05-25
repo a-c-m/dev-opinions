@@ -1,5 +1,5 @@
 #!/bin/sh
-# Runtime env injection for sample-web — implements ADR 0016.
+# Runtime env injection for sample-web — implements ADR 0017.
 #
 # The bundle was built with @import-meta-env/unplugin in runtime mode, so
 # index.html contains a single placeholder script that holds a sentinel

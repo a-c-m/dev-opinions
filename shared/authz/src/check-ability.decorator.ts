@@ -1,4 +1,4 @@
-// `@CheckAbility(action, subject)` — metadata decorator per ADR 0038.
+// `@CheckAbility(action, subject)` — metadata decorator per ADR 0028.
 // Reflector-based: `AuthzGuard` reads the metadata at request time and
 // runs `ability.can(action, subject)` against the factory output.
 

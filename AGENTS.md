@@ -1,6 +1,6 @@
 # Project context
 
-Canonical cross-agent brief per [ADR 0027](docs/adr/0037-multi-agent-rule-distribution.md). `CLAUDE.md` is a symlink to this file — edits to either path edit one file.
+Canonical cross-agent brief per [ADR 0037](docs/adr/0037-multi-agent-rule-distribution.md). `CLAUDE.md` is a symlink to this file — edits to either path edit one file.
 
 This repo is a monorepo starter (pnpm + NX). See [docs/adr/AGENTS.md](docs/adr/AGENTS.md) for the decisions behind every tool and framework here — read them before proposing a change to stack choices.
 
@@ -80,6 +80,9 @@ For ad-hoc searches, use the built-in `Grep` tool (ripgrep-backed). In shell scr
 
 ### Work from the repo root
 Don't pass absolute paths into commands where a relative path from the current directory would do. If you need to work inside a subdirectory repeatedly, `cd` to it first. Keeps commands readable and diffable.
+
+### Mini scripts: Node, written to `.ai-wip/`
+For one-shot verification / batch-transform / regex-sweep scripts, write a `.mjs` file under `.ai-wip/` and run it with `node`. Don't reach for Python — the team's primary language is TS/JS, Node is on every machine, and the script is easier to re-read and amend later. Reach for Python only if a Node equivalent would be materially harder. Never write the script to `/tmp/` (PreToolUse hook blocks it; `.ai-wip/` is the documented scratch location).
 
 ### Every commit names its ticket
 Every AI-authored commit must end its subject with a tracker reference: `#NNN` (GitHub) or `PROJ-NNN` (Jira/Linear). The PreToolUse hook blocks `git commit` without one — there is no AI-side escape hatch. If a commit genuinely has no ticket (scaffolding, dep bump, hotfix-without-issue), ask the human to run the commit themselves. Same goes for PRs: use `./.claude/commands/create-pr.sh` which appends the ticket to the title and writes `Closes #N` / `Refs PROJ-N` into the body. `bd` (beads) IDs are local-only and must NOT appear in commits or PRs.

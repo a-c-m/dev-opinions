@@ -1,6 +1,6 @@
 // DevAuthProvider — header-based shim for local dev.
 // Refused under NODE_ENV=production unless explicitly overridden.
-// Per ADR 0037.
+// Per ADR 0027.
 
 import type {
   AuthOutcome,

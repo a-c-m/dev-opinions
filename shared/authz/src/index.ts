@@ -1,4 +1,4 @@
-// @shared/authz — authorization seam per ADR 0028. Two-layer enforcement.
+// @shared/authz — authorization seam per ADR 0037. Two-layer enforcement.
 // See docs/adr/0028-authorization.md.
 
 import { DefaultAbilityFactory } from "./ability.factory.ts";

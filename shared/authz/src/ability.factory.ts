@@ -1,4 +1,4 @@
-// Default AbilityFactory per ADR 0038. ~40 LOC hand-rolled — no
+// Default AbilityFactory per ADR 0028. ~40 LOC hand-rolled — no
 // `nest-casl` wrapper (supply-chain minimisation). Forks extend by
 // subclassing `DefaultAbilityFactory` and overriding `defineRulesFor`
 // to add domain-specific RBAC + ABAC conditions.

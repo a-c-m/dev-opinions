@@ -24,7 +24,7 @@ export type {
 
 /**
  * Discriminated config for `createAuthProvider`. The `provider` field
- * selects the impl; selection is config-driven per ADR 0016.
+ * selects the impl; selection is config-driven per ADR 0017.
  */
 export type AuthProviderConfig =
   | ({ provider: "dev" } & DevAuthConfigWithLogger)
