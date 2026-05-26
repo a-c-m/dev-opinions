@@ -10,6 +10,10 @@ const schema = z.object({
 
 export type Env = z.infer<typeof schema>;
 
+// Pure: returns the parsed env, never reads it as a module-import side
+// effect. Call from main.ts at bootstrap, not at module scope — otherwise
+// every test that transitively imports this file pays the parse cost (and,
+// once a field without a default lands, throws on import).
 export const loadEnv = (source: NodeJS.ProcessEnv = process.env): Env => {
   const parsed = schema.safeParse(source);
   if (!parsed.success) {
@@ -17,5 +21,3 @@ export const loadEnv = (source: NodeJS.ProcessEnv = process.env): Env => {
   }
   return parsed.data;
 };
-
-export const env = loadEnv();

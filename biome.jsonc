@@ -42,19 +42,19 @@
           "level": "error",
           "options": {
             "paths": {
-              "pino-cloudwatch": "Logger transports in app code are banned. Write JSON to stdout; route at infra. See docs/adr/0031-structured-logging-contract.md.",
-              "pino-cloudwatch-transport": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "pino-loki": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "pino-datadog": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "pino-sentry": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "pino-elasticsearch": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "pino-mongodb": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "pino-logflare": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "winston-cloudwatch": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "winston-loki": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "winston-datadog": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "winston-sentry": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md.",
-              "winston-elasticsearch": "Logger transports in app code are banned. See docs/adr/0031-structured-logging-contract.md."
+              "pino-cloudwatch": "Logger transports in app code are banned. Write JSON to stdout; route at infra. See docs/adr/0024-structured-logging-contract.md.",
+              "pino-cloudwatch-transport": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "pino-loki": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "pino-datadog": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "pino-sentry": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "pino-elasticsearch": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "pino-mongodb": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "pino-logflare": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "winston-cloudwatch": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "winston-loki": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "winston-datadog": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "winston-sentry": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md.",
+              "winston-elasticsearch": "Logger transports in app code are banned. See docs/adr/0024-structured-logging-contract.md."
             }
           }
         }
@@ -98,6 +98,21 @@
         "rules": {
           "performance": {
             "noBarrelFile": "off"
+          }
+        }
+      }
+    },
+    {
+      // React hooks rules don't apply to backend services. NestJS controllers
+      // and modules can legitimately call methods like `app.useLogger(...)`
+      // that match React's hook-naming pattern; Biome's heuristic flags them
+      // as `useHookAtTopLevel` false positives.
+      "includes": ["**/apps/**/api/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "useHookAtTopLevel": "off",
+            "useExhaustiveDependencies": "off"
           }
         }
       }
