@@ -1,69 +1,84 @@
 # syntax=docker/dockerfile:1.7
 #
-# sample-web — React 19 + Vite 8, with ADR 0016 runtime env injection.
+# sample-web — React 19 + Vite 8, with ADR 0017 runtime env injection.
 #
 # Multi-stage:
-#   1. builder — install workspace deps and `vite build`. The
-#      `@import-meta-env/unplugin` rewrites every `import.meta.env.X` to a
-#      global accessor and injects a single placeholder script into
-#      index.html. The bundle JS contains no env values and no per-variable
-#      tokens; it is byte-identical across environments.
-#   2. runtime — unprivileged nginx-alpine + node + `@import-meta-env/cli`.
-#      The entrypoint substitutes the single placeholder in index.html with
-#      a JSON object built from the container's env, then hands off to nginx.
+#   1. builder — Chainguard Node dev (Wolfi). Installs workspace deps and
+#      `vite build`. `@import-meta-env/unplugin` rewrites every
+#      `import.meta.env.X` to a global accessor and injects a single
+#      placeholder script into index.html. The bundle JS contains no env
+#      values and no per-variable tokens; it is byte-identical across
+#      environments.
+#   2. runtime — Chainguard wolfi-base + apk-installed nginx + nodejs.
+#      Nightly Wolfi rebuilds against the latest packages; Chainguard image
+#      sign + SBOM stories apply (Priya F-11 / ADR 0008). The custom
+#      entrypoint runs `@import-meta-env/cli` to substitute the placeholder
+#      in index.html, then execs nginx.
 #
-# Example call from repo root:
-#   docker build -f apps/sample-web/Dockerfile -t sample-web:dev .
+# Build context is the repo root:
+#   docker build -f apps/sample/web/Dockerfile -t sample-web:dev .
 #   docker run -e API_URL=https://prod.api.example.com -p 8080:8080 sample-web:dev
+#
+# Dependabot auto-pins the `cgr.dev/chainguard/*` digests on every base update.
 
-ARG NODE_VERSION=22.19.0
 ARG PNPM_VERSION=9.15.0
 ARG IMV_CLI_VERSION=0.7.4
 
 # ============================================================================
-# 1. Builder
+# 1. Builder (Chainguard Node dev — Wolfi, has shell, corepack, apk)
 # ============================================================================
-FROM node:${NODE_VERSION}-alpine AS builder
+FROM cgr.dev/chainguard/node:latest-dev AS builder
 ENV PNPM_HOME="/pnpm" PATH="/pnpm:$PATH"
+USER root
 RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
 WORKDIR /workspace
 
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
-COPY apps/sample-web/package.json ./apps/sample-web/
+COPY apps/sample/web/package.json ./apps/sample/web/
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
-COPY tsconfig.base.json tsconfig.json nx.json ./
-COPY apps/sample-web ./apps/sample-web
+COPY tsconfig.base.json nx.json ./
+COPY apps/sample/web ./apps/sample/web
 
 RUN pnpm exec nx build sample-web --skip-nx-cache
 
 # ============================================================================
-# 2. Runtime
+# 2. Runtime (Chainguard wolfi-base + nginx + nodejs)
 # ============================================================================
-# nginx-unprivileged runs as the `nginx` user (uid 101) by default — no
-# root in the running container. Listens on 8080 out of the box.
-FROM nginxinc/nginx-unprivileged:alpine AS runtime
+FROM cgr.dev/chainguard/wolfi-base:latest AS runtime
 ARG IMV_CLI_VERSION
 USER root
 
-# nodejs to run the @import-meta-env/cli at container start; wget for the
-# healthcheck. Production deployments may prefer running the CLI in CD on a
-# node-capable runner instead of carrying node in the runtime image.
-RUN apk add --no-cache --no-progress nodejs npm wget \
- && npm install -g "@import-meta-env/cli@${IMV_CLI_VERSION}" \
- && npm cache clean --force \
- && apk del --no-progress npm
+# nginx + nodejs at runtime. npm is build-only (for the global CLI install)
+# and removed afterwards so it doesn't sit in the production image.
+RUN apk add --no-cache nginx nodejs && \
+    apk add --no-cache --virtual .build npm && \
+    npm install -g "@import-meta-env/cli@${IMV_CLI_VERSION}" && \
+    npm cache clean --force && \
+    apk del --no-cache .build
 
-COPY --from=builder --chown=nginx:nginx /workspace/apps/sample-web/dist /usr/share/nginx/html
-COPY --chown=nginx:nginx apps/sample-web/.env.example /etc/import-meta-env/.env.example
-COPY --chown=nginx:nginx apps/sample-web/container/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --chown=nginx:nginx apps/sample-web/container/entrypoint.sh /docker-entrypoint.d/40-replace-env.sh
-RUN chmod +x /docker-entrypoint.d/40-replace-env.sh
+# Run as a stable non-root uid (Chainguard convention: 65532).
+# nginx needs writable PID + log + temp dirs at this uid.
+RUN adduser -D -u 65532 -g app app && \
+    mkdir -p /var/lib/nginx/tmp /var/log/nginx /run/nginx && \
+    chown -R 65532:65532 /var/lib/nginx /var/log/nginx /run/nginx /usr/share/nginx
 
-USER nginx
+COPY --from=builder --chown=65532:65532 /workspace/apps/sample/web/dist /usr/share/nginx/html
+COPY --chown=65532:65532 apps/sample/web/.env.example /etc/import-meta-env/.env.example
+COPY --chown=65532:65532 apps/sample/web/container/nginx.conf /etc/nginx/http.d/default.conf
+COPY --chown=65532:65532 apps/sample/web/container/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+USER 65532
 EXPOSE 8080
+
+# Node-based healthcheck — runtime image has node from the apk install.
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:8080/ >/dev/null || exit 1
+  CMD ["node", "-e", "fetch('http://127.0.0.1:8080/').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+
+# Entrypoint runs env injection then execs CMD.
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
