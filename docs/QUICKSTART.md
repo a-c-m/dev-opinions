@@ -12,6 +12,7 @@ takes ~5 minutes if everything's missing, ~30 seconds if everything's present.
 | **ripgrep (`rg`)** | All search — Claude hooks, scripts, agent searches (enforced by `.claude/hooks/block-bash-rules.sh`) | macOS: `brew install ripgrep` &nbsp;·&nbsp; Linux: `apt install ripgrep` |
 | **jq** | JSON parser used by `.claude/hooks/*` to read tool input | macOS: `brew install jq` &nbsp;·&nbsp; Linux: `apt install jq` |
 | **Trivy** | Security gate (ADR 0008) — `pnpm check` fails without it | macOS: `brew install aquasecurity/trivy/trivy` &nbsp;·&nbsp; Linux: see <https://aquasecurity.github.io/trivy/> |
+| **Gitleaks** | Pre-commit secret scanning (ADR 0008) — Lefthook fires it on every commit | macOS: `brew install gitleaks` &nbsp;·&nbsp; Linux: see <https://github.com/gitleaks/gitleaks#installing> |
 | **OpenTofu** | Required only if you'll touch `apps/*/iac/` | macOS: `brew install opentofu` |
 | **beads (`bd`)** | Optional — local task tracking; `.claude/` SessionStart hook surfaces tasks if installed | macOS: `brew install beads` |
 | **Lefthook** | Installed automatically as a dev dep on `pnpm install` | nothing to do |
@@ -26,7 +27,7 @@ INCLUDE_OPTIONAL=1 ./scripts/setup-mac.sh # also install opentofu, beads
 ```
 
 You don't need every tool to start. The minimum to get the gate green is
-**Node 22 + pnpm + ripgrep + jq + Trivy**. Beads and OpenTofu are opt-in.
+**Node 22 + pnpm + ripgrep + jq + Trivy + Gitleaks**. Beads and OpenTofu are opt-in.
 
 ## 2. First clone
 
@@ -56,6 +57,16 @@ That sequences:
 All five exit 0 on a fresh clone. If `security` fails because Trivy isn't on
 PATH, install it (above) — don't skip the step.
 
+### Local `pnpm check` vs CI
+
+`pnpm check` runs everything you can run locally. CI runs three additional things on top, which you can't run from a clone:
+
+- **`pnpm lint:ci`** (workflow: `ci.yml` → `lint-baseline` job) — same Biome rules, but with `--suppression-fail-on-improvement`. It fails when the baseline could be tightened (i.e. a previously-suppressed diagnostic is no longer present). Catches drift in the ratchet direction `pnpm lint:check` doesn't.
+- **TruffleHog secret scan** (workflow: `secret-scan.yml`) — verified-only credential scan against the PR diff + a Monday full-history sweep.
+- **zizmor** (workflow: `actions-lint.yml`) — static analyzer for `.github/workflows/**` and `.github/actions/**` changes.
+
+If something fails in CI but `pnpm check` passes locally, it's almost always one of the above. Run `pnpm lint:ci` locally to verify the baseline-improvement axis before pushing.
+
 ## 4. Run the sample apps
 
 ```sh
@@ -74,8 +85,8 @@ pnpm --filter sample-web e2e              # playwright against the running web a
 ## 5. Build the sample app containers (optional)
 
 ```sh
-docker build -f apps/sample-api/Dockerfile -t sample-api:dev .
-docker build -f apps/sample-web/Dockerfile -t sample-web:dev .
+docker build -f apps/sample/api/Dockerfile -t sample-api:dev .
+docker build -f apps/sample/web/Dockerfile -t sample-web:dev .
 ```
 
 `sample-web`'s Dockerfile demonstrates ADR 0017: build with `BUILD_MODE=true`
@@ -91,7 +102,7 @@ docker run --rm -p 8080:8080 -e VITE_API_URL=https://prod.api.example.com sample
 When you're ready to start a real project from this scaffold:
 
 ```sh
-./scripts/reset-template.sh --yes        # removes apps/sample-* and prunes deps
+./scripts/reset-template.sh --yes        # removes apps/sample/ and prunes deps
 pnpm install                              # refresh the lockfile
 pnpm exec nx g @nx/nest:app <name>        # scaffold your first API
 # or
@@ -118,8 +129,10 @@ pnpm lint:check           # biome read-only
 pnpm typecheck            # tsgo across projects
 pnpm knip                 # dead-code / unused-deps scan
 pnpm security             # Trivy
-pnpm check                # full gate (all of the above)
+pnpm check                # full gate (all of the above + check:overrides)
 pnpm check:affected       # nx affected for lint/typecheck/test
+pnpm scripts:help         # discoverable list of repo scripts with one-line descriptions
+pnpm nx graph             # interactive project dependency graph in the browser
 pnpm commit               # interactive Conventional Commit (cz)
 pnpm reset                # delete sample apps when starting a new project
 ```

@@ -1,5 +1,7 @@
 # dev-opinions
 
+[![CI](https://github.com/a-c-m/dev-opinions/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/a-c-m/dev-opinions/actions/workflows/ci.yml)
+
 *I wrote this for you.*
 
 A collection of ADRs — what I currently think "good" looks like, mostly for projects in the JavaScript ecosystem.
@@ -20,9 +22,11 @@ It's built with the assumption that you're working primarily in the **JavaScript
 
 ### Licensing — AGPL, and why
 
-Published under **[AGPL-3.0-or-later](LICENSE)** because I want the loop to close: if you learn something building on top of this, I want to learn it too. That's the deal.
+Published under **[AGPL-3.0-or-later](LICENSE)**: if you learn something building on top of this, I want to learn it too. That's the deal.
 
-If AGPL doesn't work for what you're building and you'd rather not share back, **get in touch** — I hold the copyright, so I can grant you different terms. I'd be excited to have that conversation.
+> ⚠️ **If you fork this and ship a something based on it:** AGPL §13 (the "network use" clause) requires you to publish the source of your modified version to your end users. Internal tools and on-prem deployments aren't affected; only when end users interact with a modified version over a network. Many companies have policies that ban AGPL deps for exactly this reason — check yours before forking.
+
+If AGPL doesn't work for what you're building and you'd rather not share back, **get in touch** — I can grant you different terms. I'd be excited to have that conversation.
 
 ---
 
