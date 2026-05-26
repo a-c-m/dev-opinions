@@ -40,13 +40,13 @@ One concrete implementation of the opinions. Deviate as needed — the ADRs in [
 | --------------- | ----------------------------------------------------------------------------------------------- |
 | Package manager | pnpm 9                                                                                          |
 | Monorepo        | NX 22                                                                                           |
-| Language        | TypeScript 5.8 strict, tsgo for typecheck                                                       |
-| Lint/format     | Biome 2 + Ultracite 5                                                                           |
-| Dead code       | Knip 5                                                                                          |
+| Language        | TypeScript 6.0 strict (+ tsgo native preview), tsgo for typecheck                                |
+| Lint/format     | Biome 2 + Ultracite 7                                                                           |
+| Dead code       | Knip 6                                                                                          |
 | Backend         | NestJS 11 (Fastify adapter)                                                                     |
-| Frontend        | React 19 + Vite 7 primary, SvelteKit alternative                                                |
+| Frontend        | React 19 + Vite 8 primary, SvelteKit alternative                                                |
 | GraphQL         | Yoga via `@graphql-yoga/nestjs`, code-first                                                   |
-| Testing         | Vitest + Playwright (Stagehand optional)                                                        |
+| Testing         | Vitest 4 + Playwright 1.59 (Stagehand optional)                                                 |
 | ORM             | Drizzle (Postgres / SQLite)                                                                     |
 | Git hooks       | Lefthook                                                                                        |
 | Commits         | Conventional Commits + commitlint + commitizen                                                  |
@@ -70,7 +70,7 @@ pnpm check                # lint + typecheck + test + knip + security (Trivy)
 pnpm commit               # interactive conventional commit
 ```
 
-`pnpm check` requires Trivy (`brew install aquasecurity/trivy/trivy` on macOS); see also [`scripts/setup-mac.sh`](scripts/setup-mac.sh) to install all system prerequisites at once.
+System prereqs (required for the first commit to land cleanly, not just `pnpm check`): **Trivy** (`pnpm security`), **Gitleaks** (lefthook pre-commit secret scan), **jq** and **ripgrep** (Claude Code hooks under `.claude/hooks/`). On macOS, run [`./scripts/setup-mac.sh`](scripts/setup-mac.sh) to install all of them in one shot. See [docs/QUICKSTART.md](docs/QUICKSTART.md) for the full onboarding walk (Node, pnpm, optional tools).
 
 ## Layout
 
