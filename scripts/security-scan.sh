@@ -2,11 +2,12 @@
 # security-scan.sh — run Trivy across the repo.
 #
 # Fails on HIGH or CRITICAL findings. MEDIUM/LOW are reported but do not gate.
-# Full report is written to /tmp/base-app-trivy.log for later inspection.
+# Full report is written to .ai-wip/trivy.log for later inspection (per
+# CLAUDE.md "Capture output for review" — same scratch location AI hooks use).
 #
 # Usage:
 #   ./scripts/security-scan.sh             # fs scan (deps + secrets + config)
-#   ./scripts/security-scan.sh --json      # emit JSON at /tmp/base-app-trivy.json
+#   ./scripts/security-scan.sh --json      # emit JSON at .ai-wip/trivy.json
 #   ./scripts/security-scan.sh --ignore X  # pass --skip-files or similar to trivy
 
 set -euo pipefail
@@ -28,8 +29,9 @@ EOF
   exit 127
 fi
 
-OUTPUT="/tmp/base-app-trivy.log"
-JSON_OUT="/tmp/base-app-trivy.json"
+mkdir -p .ai-wip
+OUTPUT=".ai-wip/trivy.log"
+JSON_OUT=".ai-wip/trivy.json"
 
 echo "→ trivy fs scan (deps + secrets + config)"
 trivy fs \

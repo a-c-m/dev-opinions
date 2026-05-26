@@ -8,6 +8,7 @@
 #   ripgrep   — search tool; required by .claude/hooks/block-bash-rules.sh.
 #   jq        — JSON parser used by .claude/hooks/* to read tool input.
 #   trivy     — vulnerability scanner used by `pnpm security` (ADR 0008).
+#   gitleaks  — pre-commit secret scanning fired by lefthook (ADR 0008).
 #
 # Optional (re-run with INCLUDE_OPTIONAL=1):
 #   opentofu  — only if you'll touch apps/*/iac/ (ADR 0022).
@@ -35,9 +36,10 @@ install_if_missing() {
 }
 
 echo "Installing required system tools …"
-install_if_missing "ripgrep" rg ripgrep
-install_if_missing "jq"      jq jq
-install_if_missing "trivy"   trivy aquasecurity/trivy/trivy
+install_if_missing "ripgrep"  rg       ripgrep
+install_if_missing "jq"       jq       jq
+install_if_missing "trivy"    trivy    aquasecurity/trivy/trivy
+install_if_missing "gitleaks" gitleaks gitleaks
 
 if [ "${INCLUDE_OPTIONAL:-0}" = "1" ]; then
   echo
@@ -56,3 +58,4 @@ echo "Done. Verify with:"
 echo "  rg --version"
 echo "  jq --version"
 echo "  trivy --version"
+echo "  gitleaks version"

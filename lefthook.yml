@@ -5,42 +5,36 @@ pre-commit:
       glob: "*.{ts,tsx,js,jsx,json,jsonc}"
       run: pnpm exec biome check --write --no-errors-on-unmatched {staged_files}
       stage_fixed: true
-    typecheck-affected:
-      # Skip on the very first commit (no HEAD~1 to diff against).
-      run: |
-        if git rev-parse HEAD~1 >/dev/null 2>&1; then
-          pnpm exec nx affected --target=typecheck --base=HEAD~1
-        else
-          echo "initial commit — skipping nx affected typecheck"
-        fi
+    # Layer 1 of secret-scanning per ADR 0008. Catches staged secrets before
+    # they're committed. Pair with CI TruffleHog (.github/workflows/secret-scan.yml)
+    # and GitHub push protection at the org level. `gitleaks` is in QUICKSTART
+    # prereqs — fail-don't-skip, no silent bypass.
+    gitleaks:
+      run: gitleaks protect --staged --no-banner --redact
+    # Keep pnpm-overrides.md and package.json `pnpm.overrides` in sync.
+    # Only fires when either file is staged; cheap when it doesn't.
+    pnpm-overrides-sync:
+      glob: "{package.json,pnpm-overrides.md}"
+      run: node scripts/check-pnpm-overrides.mjs
+    # Typecheck: bypass NX entirely. See docs/conventions/nx-targets.md —
+    # `nx run-many` and `nx affected` both deadlock when spawned by lefthook
+    # against local long-running NX daemon states. `pnpm -r typecheck`
+    # invokes each leaf's `tsgo --noEmit` directly. No cache, but tsgo is
+    # fast enough that the cold cost is < 5s on this repo.
+    typecheck:
+      run: pnpm -r typecheck
 
 pre-push:
   parallel: true
   commands:
-    # On a normal push, run nx affected. On the initial push (no HEAD~1),
-    # fall back to run-many so the full repo is checked once before it
-    # reaches the remote — we never skip validation silently.
-    lint-affected:
-      run: |
-        if git rev-parse HEAD~1 >/dev/null 2>&1; then
-          pnpm exec nx affected --target=lint
-        else
-          pnpm exec nx run-many --target=lint --all
-        fi
-    test-affected:
-      run: |
-        if git rev-parse HEAD~1 >/dev/null 2>&1; then
-          pnpm exec nx affected --target=test
-        else
-          pnpm exec nx run-many --target=test --all
-        fi
-    typecheck-affected:
-      run: |
-        if git rev-parse HEAD~1 >/dev/null 2>&1; then
-          pnpm exec nx affected --target=typecheck
-        else
-          pnpm exec nx run-many --target=typecheck --all
-        fi
+    # Same NX-bypass rationale as pre-commit typecheck (above and in
+    # docs/conventions/nx-targets.md).
+    lint:
+      run: pnpm lint:check
+    typecheck:
+      run: pnpm -r typecheck
+    test:
+      run: pnpm -r test
 
 commit-msg:
   commands:

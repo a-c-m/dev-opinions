@@ -27,8 +27,12 @@ if [ ! -x "$REPO_ROOT/node_modules/.bin/biome" ]; then
   exit 0
 fi
 
-# Run biome on the single file. Capture output for review in /tmp.
-LOG="/tmp/base-app-post-edit-$$.log"
+# Run biome on the single file. Capture output for review under .ai-wip/
+# (CLAUDE.md "Capture output for review" — same scratch location the agent
+# uses, survives across sessions, never committed).
+LOG_DIR="$REPO_ROOT/.ai-wip"
+mkdir -p "$LOG_DIR"
+LOG="$LOG_DIR/post-edit-$$.log"
 if ! pnpm exec biome check "$FILE_PATH" > "$LOG" 2>&1; then
   echo "post-edit: biome diagnostics on $FILE_PATH — see $LOG" >&2
   tail -n 20 "$LOG" >&2
