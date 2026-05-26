@@ -120,7 +120,7 @@ Anything that mutates `index.html` between plugin output and the entrypoint CLI 
 
 ### Pinned versions
 
-Per CLAUDE.md ("Lock to exact versions"):
+Per AGENTS.md ("Lock to exact versions"):
 
 - `@import-meta-env/unplugin` is a dev dependency in the app's `package.json`, pinned exactly.
 - `@import-meta-env/cli` is **not** a JS dependency — it's a runtime tool installed into the container image only. It's pinned via an `IMV_CLI_VERSION` build ARG in the Dockerfile and consumed by `npm install -g "@import-meta-env/cli@${IMV_CLI_VERSION}"`. Keeping it out of `package.json` matches knip's view (no source file imports it) and keeps the dev-time install slim.

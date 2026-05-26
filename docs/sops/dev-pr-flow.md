@@ -14,9 +14,9 @@ through PR-merged. Synthesises [ADR 0031](../adr/0031-github-repo-conventions.md
 - Repo cloned; `pnpm install` run.
 - `gh` CLI authenticated (`gh auth status`).
 - `bd` installed if using local task capture
-  ([CLAUDE.md → Task tracking](../../CLAUDE.md#task-tracking--local-vs-team)).
+  ([AGENTS.md → Task tracking](../../AGENTS.md#task-tracking--local-vs-team)).
 - Working directory is the repo root (
-  [CLAUDE.md → Work from the repo root](../../CLAUDE.md#work-from-the-repo-root)).
+  [AGENTS.md → Work from the repo root](../../AGENTS.md#work-from-the-repo-root)).
 
 ## Steps
 
@@ -71,7 +71,7 @@ flowchart LR
    ```
 
    Both must pass green. Fix don't skip
-   ([CLAUDE.md → Fail, don't skip](../../CLAUDE.md#fail-dont-skip)).
+   ([AGENTS.md → Fail, don't skip](../../AGENTS.md#fail-dont-skip)).
 
 6. **Open the PR.** Use the wrapper — direct `gh pr create` is
    blocked by hook:
@@ -107,6 +107,6 @@ flowchart LR
   branching model and release flow this PR feeds into.
 - [release-pr-flow.md](release-pr-flow.md) — what happens after
   the PR lands on `main`.
-- [CLAUDE.md](../../CLAUDE.md) — operating rules, hooks, fail-don't-skip.
+- [AGENTS.md](../../AGENTS.md) — operating rules, hooks, fail-don't-skip.
 - [`./.claude/commands/create-pr.sh`](../../.claude/commands/create-pr.sh)
   — the PR creation wrapper.

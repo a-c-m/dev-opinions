@@ -8,7 +8,7 @@ tags: [ai-agents, claude-code, opencode, agents-md]
 
 ## Context and Problem Statement
 
-[ADR 0038](0038-claude-code-setup.md) configured this repo for
+[ADR 0038](0038-agent-harness-configuration.md) configured this repo for
 Claude Code only. We want to expand the set of agents the repo
 briefs — OpenCode now (model flexibility against the same project
 context), Codex CLI plausibly later. As a base-app template, forks
@@ -139,7 +139,7 @@ scripts around `pnpm`/`gh`.
 
 ### Skills layout migration
 
-[ADR 0038](0038-claude-code-setup.md) shipped flat
+[ADR 0038](0038-agent-harness-configuration.md) shipped flat
 `.claude/skills/*.md` files. Each skill is promoted to
 `.agents/skills/<name>/SKILL.md`; per-agent skill directories
 become per-entry symlinks. Safe because the Agent Skills open
@@ -188,7 +188,7 @@ as an agent named `README`.
 
 ## Relationship to ADR 0038
 
-[ADR 0038](0038-claude-code-setup.md) remains authoritative for
+[ADR 0038](0038-agent-harness-configuration.md) remains authoritative for
 `.claude/` itself (hook philosophy, agents/commands shape). This
 ADR supersedes 0029's single-agent assumptions: the single-agent
 context model, the flat `.claude/skills/*.md` layout, and
@@ -247,7 +247,7 @@ context model, the flat `.claude/skills/*.md` layout, and
    contributor edits. Rejected.
 ## Related
 
-- [ADR 0038](0038-claude-code-setup.md) — original Claude-only
+- [ADR 0038](0038-agent-harness-configuration.md) — original Claude-only
   configuration; superseded in part.
 - [agents.md spec &amp; adopter list](https://agents.md/)
 - [Ruler](https://github.com/intellectronica/ruler) — the

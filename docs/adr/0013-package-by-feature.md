@@ -101,7 +101,7 @@ When in doubt, start in the feature folder. Moving out is cheap; moving in is aw
 base-app ships no application code today, so no migration. Future apps follow the rule from creation:
 
 1. When `nx g` scaffolds a new app, the generator template starts with empty `ui/` (type-folder) rather than empty `components/` (layered). Tracked separately as a generator update.
-2. When an app from a downstream project arrives layered, the first non-trivial feature addition is the trigger to convert. Per-app `CLAUDE.md` should document its layout state.
+2. When an app from a downstream project arrives layered, the first non-trivial feature addition is the trigger to convert. Per-app `AGENTS.md` should document its layout state.
 
 ## Related
 

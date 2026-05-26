@@ -5,7 +5,7 @@
 #   2. Trailing GitHub issue reference (`#NNN`).
 #
 # Advisory-only: emits a warning on stderr, exits 0, so the session
-# continues. PreToolUse (`check-bash-git.sh`) is the hard gate for
+# continues. PreToolUse (`block-bash-git.sh`) is the hard gate for
 # AI-authored commits; this is the safety net for commits that came in
 # via $EDITOR (which PreToolUse can't inspect) and the conventional-
 # format check.

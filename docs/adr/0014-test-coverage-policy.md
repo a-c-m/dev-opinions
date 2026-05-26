@@ -93,7 +93,7 @@ The companion tool [`tools/coverage-baseline/`](../../tools/coverage-baseline/) 
 - `pnpm cov:check` (run after `pnpm test:cov`) fails when **any** file drops below its baseline (within a small `epsilon` tolerance).
 - **New files** (no baseline entry) are gated by glob rules in `.coverage-baseline.json`. The glob rules mirror the tiers above (`shared/**` → 100/95/100/100, `apps/**` and `tools/**` → 80/80/80/80).
 - `pnpm cov:promote` regenerates the baseline from the latest run. **Safe by default** — refuses to write a baseline that would lower any file's metric or accept a sub-threshold new file. AI agents may run safe-mode `promote` freely.
-- `pnpm cov:promote -- --allow-decrease` is the human-only override for deliberate regressions (e.g. a refactor that legitimately drops a tested file's coverage). A PreToolUse hook (`.claude/hooks/check-bash-rules.sh`) blocks AI from passing the flag — lowering the floor is always an audited human decision.
+- `pnpm cov:promote -- --allow-decrease` is the human-only override for deliberate regressions (e.g. a refactor that legitimately drops a tested file's coverage). A PreToolUse hook (`.claude/hooks/block-bash-rules.sh`) blocks AI from passing the flag — lowering the floor is always an audited human decision.
 
 Net effect: existing files keep shipping at today's coverage, new code is gated, accepted improvements are explicit, and only humans can accept regressions. The tool is library-shaped (~150 LOC core, pure comparison logic + thin CLI) and designed for extraction to npm later.
 
@@ -136,7 +136,7 @@ Both ship at 100/100/100/100 today. Under this policy:
 2. **One global 80/80 tier for everything** — loses the "infra is bulletproof" signal; the two existing `shared/*` packages would regress.
 3. **Per-project `coverage.thresholds` blocks** — Vitest 4 does support them, but they are ignored when the root runs coverage. Splitting policy across N configs invites drift.
 4. **Codecov / SonarCloud for PR enforcement** — both work; both add an external SaaS dependency for a feature the open-source action covers.
-5. **Adopt StrykerJS now** — wall-clock cost and LLM-corpus depth fail the gates set in [CLAUDE.md](../../CLAUDE.md). Documented as a graduation instead.
+5. **Adopt StrykerJS now** — wall-clock cost and LLM-corpus depth fail the gates set in [AGENTS.md](../../AGENTS.md). Documented as a graduation instead.
 
 ## Related
 

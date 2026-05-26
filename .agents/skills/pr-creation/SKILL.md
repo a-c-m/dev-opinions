@@ -3,7 +3,7 @@ name: pr-creation
 description: Auto-triggers when the user asks to open a PR. Drives the PR title, summary, and test plan to the repo's conventions.
 ---
 
-Use `./.claude/commands/create-pr.sh` — direct `gh pr create` is blocked by `check-bash-git.sh` because the wrapper guarantees the ticket suffix and `Closes` / `Refs` footer.
+Use `./.claude/commands/create-pr.sh` — direct `gh pr create` is blocked by `block-bash-git.sh` because the wrapper guarantees the ticket suffix and `Closes` / `Refs` footer.
 
 ```sh
 ./.claude/commands/create-pr.sh "<title>" "<summary>" <ticket>

@@ -39,7 +39,8 @@
     "deny": [
       "Bash(rm -rf:*)",
       "Bash(git push --force:*)",
-      "Bash(git reset --hard:*)"
+      "Bash(git reset --hard:*)",
+      "Grep"
     ]
   },
   "hooks": {
@@ -49,11 +50,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/biome-check.sh"
+            "command": "./.claude/hooks/validate-edit-biome.sh"
           },
           {
             "type": "command",
-            "command": "./.claude/hooks/prevent-wait-for-timeout.sh"
+            "command": "./.claude/hooks/validate-edit-no-wait.sh"
           }
         ]
       },
@@ -62,15 +63,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/check-bash-git.sh"
+            "command": "./.claude/hooks/block-bash-git.sh"
           },
           {
             "type": "command",
-            "command": "./.claude/hooks/check-bash-biome.sh"
+            "command": "./.claude/hooks/block-bash-biome.sh"
           },
           {
             "type": "command",
-            "command": "./.claude/hooks/check-bash-rules.sh"
+            "command": "./.claude/hooks/block-bash-rules.sh"
           }
         ]
       }
@@ -81,7 +82,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/post-edit-checks.sh"
+            "command": "./.claude/hooks/notify-edit-biome.sh"
           }
         ]
       },
@@ -90,7 +91,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/commit-format.sh"
+            "command": "./.claude/hooks/notify-bash-commit.sh"
           }
         ]
       }
@@ -100,7 +101,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/beads-session-start.sh"
+            "command": "./.claude/hooks/bootstrap-session-beads.sh"
           }
         ]
       }

@@ -17,9 +17,9 @@ This tree carries the decisions, conventions, and operational procedures for the
 - Adding a load-bearing decision → new ADR under `adr/`, then index it in [`adr/AGENTS.md`](adr/AGENTS.md).
 - Adding a long reference table or naming alphabet → `conventions/<topic>.md`, linked from the ADR that ratified it.
 - Adding an "I do this every time X happens" doc → runbook (incident-shaped) or SOP (process-shaped). Copy the matching `TEMPLATE.md`.
-- Adding a one-off how-to that doesn't fit any of the above → it probably belongs in CLAUDE.md or the relevant app's `AGENTS.md`/`CLAUDE.md`, not here.
+- Adding a one-off how-to that doesn't fit any of the above → it probably belongs in `AGENTS.md` (root or per-app), not here.
 
 ## Related
 
-- [`/CLAUDE.md`](../CLAUDE.md) (= `/AGENTS.md`) — operating rules and conventions for any agent or contributor working in this repo.
+- [`/AGENTS.md`](../AGENTS.md) (with `/CLAUDE.md` as a committed symlink) — operating rules and conventions for any agent or contributor working in this repo.
 - [`/docs/adr/AGENTS.md`](adr/AGENTS.md) — ADR index with one-line hooks per decision.

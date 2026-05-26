@@ -13,7 +13,7 @@ gh pr list --limit 5 2>/dev/null || true
 
 Then:
 
-1. Read root `CLAUDE.md` and any `CLAUDE.md` in the current working subdirectory.
+1. Read root `AGENTS.md` and any `AGENTS.md` in the current working subdirectory (`CLAUDE.md` is a symlink — either path works).
 2. Read `docs/adr/README.md` to recall the active decisions.
 3. Ask the user what they want to work on unless they have already said.
 

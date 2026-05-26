@@ -9,7 +9,7 @@ takes ~5 minutes if everything's missing, ~30 seconds if everything's present.
 |---|---|---|
 | **Node 22** | Runtime; pinned exact in `.nvmrc` | `fnm install 22.19.0` or `nvm install` (in repo dir) |
 | **pnpm 9+** | Package manager (ADR 0001) | `corepack enable` then `corepack prepare pnpm@9.15.0 --activate` |
-| **ripgrep (`rg`)** | All search — Claude hooks, scripts, agent searches (enforced by `.claude/hooks/check-bash-rules.sh`) | macOS: `brew install ripgrep` &nbsp;·&nbsp; Linux: `apt install ripgrep` |
+| **ripgrep (`rg`)** | All search — Claude hooks, scripts, agent searches (enforced by `.claude/hooks/block-bash-rules.sh`) | macOS: `brew install ripgrep` &nbsp;·&nbsp; Linux: `apt install ripgrep` |
 | **jq** | JSON parser used by `.claude/hooks/*` to read tool input | macOS: `brew install jq` &nbsp;·&nbsp; Linux: `apt install jq` |
 | **Trivy** | Security gate (ADR 0008) — `pnpm check` fails without it | macOS: `brew install aquasecurity/trivy/trivy` &nbsp;·&nbsp; Linux: see <https://aquasecurity.github.io/trivy/> |
 | **OpenTofu** | Required only if you'll touch `apps/*/iac/` | macOS: `brew install opentofu` |
@@ -100,7 +100,7 @@ pnpm exec nx g @nx/react:app <name>       # scaffold your first frontend
 
 Then update:
 
-- Root `README.md` and `CLAUDE.md` with project-specific context.
+- Root `README.md` and `AGENTS.md` with project-specific context.
 - `package.json` `name` and `description`.
 - `.github/CODEOWNERS` (currently `@a-c-m`).
 - `.github/SECURITY.md` contact (currently `security@acmconsulting.eu`).

@@ -3,7 +3,7 @@ name: to-prd
 description: Auto-triggers when the user wants to turn the current conversation into a PRD (Product Requirements Document) — usually after a grill-me session or a long discovery thread. Synthesises what's already been discussed, then files it as a GitHub issue. Does NOT interview — use grill-me first if the discussion is incomplete.
 ---
 
-Adapted from [mattpocock/skills](https://github.com/mattpocock/skills/blob/main/skills/engineering/to-prd/SKILL.md). Audited for this repo: wired the issue-filing step to our `./.claude/commands/create-issue.sh`; replaced upstream `CONTEXT.md` references with the relevant `CLAUDE.md` and ADRs; kept the PRD template verbatim because it's a known-good shape.
+Adapted from [mattpocock/skills](https://github.com/mattpocock/skills/blob/main/skills/engineering/to-prd/SKILL.md). Audited for this repo: wired the issue-filing step to our `./.claude/commands/create-issue.sh`; replaced upstream `CONTEXT.md` references with the relevant `AGENTS.md` and ADRs; kept the PRD template verbatim because it's a known-good shape.
 
 ## When to use
 
@@ -23,11 +23,11 @@ Adapted from [mattpocock/skills](https://github.com/mattpocock/skills/blob/main/
 
 Use only what's already in the conversation context plus the codebase. Do **not** ask the user follow-up questions during this skill — that's `grill-me`'s job.
 
-### 2. Verify against the relevant CLAUDE.md + ADRs
+### 2. Verify against the relevant AGENTS.md + ADRs
 
 Before writing, read:
-- The nearest `CLAUDE.md` (root, product, or service) for vocabulary and conventions.
-- Any ADR under [docs/adr/](../../docs/adr/) the change touches — particularly if it modifies a stack choice (a new ADR is required per CLAUDE.md, not just a PRD).
+- The nearest `AGENTS.md` (root, product, or service) for vocabulary and conventions.
+- Any ADR under [docs/adr/](../../docs/adr/) the change touches — particularly if it modifies a stack choice (a new ADR is required per AGENTS.md, not just a PRD).
 
 Use the project's actual vocabulary in the PRD.
 

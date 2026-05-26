@@ -27,7 +27,7 @@ This repo is a monorepo starter (pnpm + NX). See [docs/adr/AGENTS.md](docs/adr/A
 
 ## Preferred workflow
 
-1. Read any `CLAUDE.md` in the app you are working on before editing.
+1. Read any `AGENTS.md` in the app you are working on before editing (`CLAUDE.md` symlinks to it).
 2. Use NX generators for new apps/libs — do not hand-roll project structure.
 3. Run `pnpm check:affected` before committing.
 4. Run `pnpm knip` to confirm no dead code was added.
@@ -45,6 +45,15 @@ Two tiers, deliberately separate:
 - **Team, long-running, externally visible** — GitHub Issues via `./.claude/commands/create-issue.sh`. Anything tied to a release, any bug a teammate might need to see, any discovery that produces a decision.
 
 If a local bead outgrows its scope, copy it into a GitHub issue and close the bead.
+
+## Memory — project vs personal
+
+Two sinks, deliberately separate — same two-tier shape as task tracking.
+
+- **Project-shared** — facts every contributor benefits from (a convention, a rule, a recurring gotcha, a non-obvious constraint): add a bullet to the nearest `AGENTS.md` (root or per-folder). Committed; shared via git; subject to the ~150-line cap and inline-rationale rule per [ADR 0037](docs/adr/0037-multi-agent-rule-distribution.md).
+- **Personal** — facts about *this developer* (role, expertise level, response-style preferences): write to the harness's auto-memory under `~/.claude/`. Per-developer; not committed. Cannot be redirected from project settings — Claude Code ignores `autoMemoryDirectory` in committed `.claude/settings.json` for security.
+
+Before writing to auto-memory, ask: "would another contributor want this?" If yes, it's project-shared — write to `AGENTS.md`, not auto-memory. If a memory turns out to be project-shared after the fact, promote it: delete the personal entry, add the AGENTS.md bullet.
 
 ## MCP tools available
 
@@ -76,7 +85,7 @@ Don't chain unrelated Bash commands with `&&` or `;`. Each step should be runnab
 Prefer `cmd > .ai-wip/<name>.log 2>&1` over `cmd | rg …` or `cmd | jq …` inline. The user can re-read the file later. Inline pipes discard the raw output. If the file is small, `cat` it after. If large, `tail` or `rg` it — but the full output stays on disk. `.ai-wip/` is gitignored — one known location, survives across sessions, never committed. Don't use `/tmp/` (PreToolUse hook blocks it).
 
 ### Search with ripgrep, never grep
-For ad-hoc searches, use the built-in `Grep` tool (ripgrep-backed). In shell scripts and Bash tool calls, use `rg`, not POSIX `grep`. Ripgrep is faster and respects `.gitignore`, which matters in this monorepo. `git grep` is fine when you specifically need git's index or history. The PreToolUse hook **blocks** Bash calls that invoke `grep`/`egrep`/`fgrep` (exit 2). Carve-outs for `git grep`, `man grep`, `which grep`, `type grep`, `command -v grep`, `apropos grep`, `whatis grep`, `info grep` — these are *about* grep, not invocations of it.
+Use `rg` via Bash for **all** searches — not POSIX `grep`, and not the built-in `Grep` tool. Bash calls are reviewable and capturable to `.ai-wip/<name>.log`; the built-in tool's output isn't. Ripgrep is faster and respects `.gitignore`, which matters in this monorepo. `git grep` is fine when you specifically need git's index or history. Enforcement: the built-in `Grep` tool is in `permissions.deny` (`.claude/settings.json`); the PreToolUse hook **blocks** Bash calls that invoke `grep`/`egrep`/`fgrep` (exit 2). Carve-outs for `git grep`, `man grep`, `which grep`, `type grep`, `command -v grep`, `apropos grep`, `whatis grep`, `info grep` — these are *about* grep, not invocations of it.
 
 ### Work from the repo root
 Don't pass absolute paths into commands where a relative path from the current directory would do. If you need to work inside a subdirectory repeatedly, `cd` to it first. Keeps commands readable and diffable.
@@ -101,6 +110,14 @@ All dependency versions in every `package.json` are pinned exactly (e.g. `"2.2.6
 - Prefer editing existing files over creating new ones.
 - Prefer generators over ad-hoc project creation.
 - Prefer an ADR over a silent stack change.
+
+## Reasoning & Pushback
+
+- Be direct. If something is wrong or flawed, say so.
+- Challenge weak reasoning before helping execute it.
+- Form strongest-case counter arguments before conceding a point.
+- Hold positions under pressure unless given new evidence — not just pushback.
+- Flag uncertainty with a confidence level when relevant.
 
 
 # Ultracite Code Standards

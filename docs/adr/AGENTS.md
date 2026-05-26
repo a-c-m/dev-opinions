@@ -73,4 +73,4 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 ### AI agents (meta)
 
 - **[0037 — AGENTS.md as cross-agent standard](0037-multi-agent-rule-distribution.md)** — `AGENTS.md` canonical; `CLAUDE.md` symlinked; skills in `.agents/skills/<name>/SKILL.md` with per-agent symlinks; OpenCode hook parity via plugin (best-effort).
-- **[0038 — Claude Code config layout](0038-claude-code-setup.md)** — `.claude/` layout (agents, hooks, commands, skills, settings); `.mcp.json` (context7, playwright, chrome-devtools); hooks split into content validators and command guards. Claude-specific impl; cross-agent parts superseded by 0037.
+- **[0038 — Agent harness configuration](0038-agent-harness-configuration.md)** — per-harness runtime layer (Claude Code today). Directory layout; three-tier hook philosophy (content validators, command guards, session bootstrappers); permission model (pattern over enumeration; deny as enforcement edge); shell-script commands; memory split (project-shared → AGENTS.md, personal → harness auto-memory); session lifecycle. Complementary to 0037 (cross-agent context).

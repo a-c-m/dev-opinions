@@ -41,7 +41,7 @@ Five templates cover the common intake shapes, with `config.yml` disabling the b
 - `@commitlint/cli` + `@commitlint/config-conventional` validate format via the Lefthook `commit-msg` hook ([ADR 0030](0030-lefthook.md)).
 - `commitizen` + `cz-conventional-changelog` drive an interactive `pnpm commit` (`cz`) prompt.
 - **Scope = NX project name** (`api`, `web`, `logger`, `env-config`, …) so commits filter cleanly by project and `nx release` can compute per-project semver bumps from the history.
-- **Trailing ticket suffix is mandatory for AI-authored commits**: `#<n>` (GitHub) or `PROJ-<n>` (Jira/Linear), e.g. `feat(api): add search endpoint #142`. The PreToolUse hook blocks AI `git commit` without one — no AI-side escape hatch. Humans MAY commit without one when there is genuinely no ticket (scaffolding, dep bump, hotfix-without-issue). See [CLAUDE.md "Every commit names its ticket"](../../CLAUDE.md).
+- **Trailing ticket suffix is mandatory for AI-authored commits**: `#<n>` (GitHub) or `PROJ-<n>` (Jira/Linear), e.g. `feat(api): add search endpoint #142`. The PreToolUse hook blocks AI `git commit` without one — no AI-side escape hatch. Humans MAY commit without one when there is genuinely no ticket (scaffolding, dep bump, hotfix-without-issue). See [AGENTS.md "Every commit names its ticket"](../../AGENTS.md).
 
 The ticket suffix is the load-bearing piece: it underpins the commit ↔ ticket ↔ release traceability that PR review, release notes, and audit all depend on.
 

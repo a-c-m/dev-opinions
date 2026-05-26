@@ -5,7 +5,7 @@
 # (https://brew.sh).
 #
 # Required (the gate and Claude hooks depend on these):
-#   ripgrep   — search tool; required by .claude/hooks/check-bash-rules.sh.
+#   ripgrep   — search tool; required by .claude/hooks/block-bash-rules.sh.
 #   jq        — JSON parser used by .claude/hooks/* to read tool input.
 #   trivy     — vulnerability scanner used by `pnpm security` (ADR 0008).
 #

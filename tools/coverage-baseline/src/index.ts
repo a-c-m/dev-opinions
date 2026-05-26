@@ -19,7 +19,7 @@ export interface PromoteOptions {
   /**
    * If false (default), refuse to write a baseline that would lower any
    * file's metric or record a sub-threshold value for a new file.
-   * Set true to override (human-only — see CLAUDE.md). The CLI surfaces
+   * Set true to override (human-only — see AGENTS.md). The CLI surfaces
    * this as `--allow-decrease` and a PreToolUse hook blocks AI from
    * passing it.
    */

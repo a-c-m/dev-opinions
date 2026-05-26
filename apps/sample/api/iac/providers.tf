@@ -1,4 +1,4 @@
-# Provider declarations — pin every version exactly (see CLAUDE.md rule).
+# Provider declarations — pin every version exactly (see AGENTS.md rule).
 # Uncomment the provider block that matches your target and remove the rest.
 
 terraform {

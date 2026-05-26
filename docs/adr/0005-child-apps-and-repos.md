@@ -7,7 +7,7 @@ tags: [ai-agents, multi-repo, layout]
 
 ## Context and Problem Statement
 
-[ADRs 0012](0038-claude-code-setup.md) and [0037](0037-multi-agent-rule-distribution.md)
+[ADRs 0012](0038-agent-harness-configuration.md) and [0037](0037-multi-agent-rule-distribution.md)
 set up agent context for *one* repo. A new use case has surfaced:
 **cross-repo context**. Working on a web client, the agent should
 also be able to read its server; organizational ADRs that live in
@@ -80,7 +80,7 @@ as children are added.
 - **ADR enforcement when editing a child**: agentic. The parent's
   `AGENTS.md` instructs the agent to surface and seek clarification
   when proposed work counters a parent ADR. Hooks that ride on the
-  parent's `.claude/` (e.g. `check-bash-rules.sh` enforcing the
+  parent's `.claude/` (e.g. `block-bash-rules.sh` enforcing the
   ripgrep rule) keep firing — they're project-level.
 
 ### Use case coverage
@@ -146,6 +146,6 @@ No upstream sync from base-app. Forks diverge from day one.
   sibling capabilities.
 - **[ADR 0037](0037-multi-agent-rule-distribution.md)** — extends
   cross-agent context to span multiple repos. No supersedence.
-- **[ADR 0038](0038-claude-code-setup.md)** — Claude Code's
+- **[ADR 0038](0038-agent-harness-configuration.md)** — Claude Code's
   project-root model is the load-bearing primitive.
 - [agents.md spec](https://agents.md/) — `AGENTS.md` format.

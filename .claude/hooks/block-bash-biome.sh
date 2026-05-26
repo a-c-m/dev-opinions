@@ -21,7 +21,7 @@ fi
 
 # Strip heredoc bodies and quoted strings before pattern-matching, so
 # commit messages or doc text mentioning `bs update` / `--unsafe` don't
-# false-positive. Mirrors check-bash-rules.sh.
+# false-positive. Mirrors block-bash-rules.sh.
 SCRUBBED="$(CMD="$COMMAND" python3 - <<'PY'
 import os, re
 cmd = os.environ.get("CMD", "")

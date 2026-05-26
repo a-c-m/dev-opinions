@@ -108,7 +108,7 @@ fi
 # Only checks commits whose message is supplied on the command line via
 # `-m "..."` or `-F <file>`. If the message comes from $EDITOR (`git commit`
 # with no -m / -F), we can't inspect it pre-execution; the PostToolUse hook
-# (commit-format.sh) catches it after the fact.
+# (notify-bash-commit.sh) catches it after the fact.
 #
 # Extracts the *first line* of the message (subject) using python — single
 # parser handles -m repetition (`-m "subject" -m "body"`), -F <file>, and
@@ -191,7 +191,7 @@ PY
 
 # If the "subject" looks like shell metacharacters (heredoc opener, command
 # substitution, backticks) rather than a real commit subject, shlex saw
-# inside a construct it couldn't parse. Fall through to commit-format.sh
+# inside a construct it couldn't parse. Fall through to notify-bash-commit.sh
 # (PostToolUse), which inspects HEAD after the commit lands.
 case "$SUBJECT" in
   '$('*|'`'*|*'<<'*) exit 0 ;;
