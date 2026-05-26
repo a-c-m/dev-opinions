@@ -1,5 +1,5 @@
 ---
-date: 2026-05-25
+date: 2026-05-26
 tags: [backend, async, jobs, workers, webhooks, inngest, postgres]
 ---
 
@@ -96,10 +96,38 @@ The worker is what fails and retries — that's load on us, not load on the prov
 
 The state change and the intent-to-deliver are written in the same database transaction. A worker drains the outbox.
 
+#### Consumer registry — config day-one, DB as graduation
+
+Consumers are declared in config day-one — a `webhookConsumers` array loaded by `@shared/config` per [ADR 0016](0016-backend-config.md). Each entry:
+
+```ts
+{ id: string; endpoint: string; secret: string; timeoutMs?: number }
+```
+
+- `id` — stable kebab-case string. Used in outbox rows, delivery logs, and alerts.
+- `endpoint` — absolute URL the signed payload is POSTed to.
+- `secret` — per-consumer HMAC-SHA256 signing key. Lives in the secret store (or env var locally), never in committed YAML.
+- `timeoutMs` — per-consumer HTTP timeout. Defaults to `10000`; must be a positive integer when set.
+
+Validated at boot via the `@shared/config` zod schema. A bad endpoint, missing secret, duplicate id, or unparseable list aborts startup. **Onboarding a new consumer is a config change, not a code change.**
+
+Empty list = silent no-op (intentional for local development). In deployed environments, set `webhookConsumersRequired: true` — startup refuses when the list is empty, surfacing a misconfigured secret before the first dropped event rather than at runtime.
+
+**Graduate to a `webhook_consumers` table** when *any* of:
+
+1. Consumers need onboarding **without a redeploy** (admin UI / runtime registration).
+2. You need an **audit trail** of credential rotations and endpoint changes.
+3. **Per-consumer event subscriptions** (filtering) need to be edited dynamically.
+4. Consumer count outgrows reasonable config — tens, not hundreds.
+
+The outbox schema stays the same on graduation; only `consumer_id` semantics change (it becomes a foreign key to the new table).
+
+#### Outbox schema
+
 ```sql
 CREATE TABLE webhook_outbox (
   id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  consumer_id     UUID        NOT NULL REFERENCES webhook_consumers(id),
+  consumer_id     TEXT        NOT NULL,  -- config id; FK only after graduation
   event_type      TEXT        NOT NULL,
   payload         JSONB       NOT NULL,
   status          delivery_status NOT NULL DEFAULT 'pending',  -- pending|delivered|abandoned
@@ -110,12 +138,15 @@ CREATE TABLE webhook_outbox (
 );
 ```
 
+**One outbox row per consumer per event** — independent retry per consumer. A consumer that's down only retries its own rows and never blocks delivery to the others.
+
 The drain worker:
 
 1. Claims rows with `FOR UPDATE SKIP LOCKED` (same trick).
-2. Builds the payload, signs it (HMAC SHA-256 over body with the per-consumer secret), POSTs.
-3. **Retry policy**: exponential backoff on 5xx, timeouts, network errors. **Do-not-retry on 4xx** (except 429, which honours `Retry-After`). After `max_attempts`, status flips to `abandoned` and an alert fires.
-4. Successful delivery marks `status = 'delivered'`; the row stays for audit (TTL'd by the cache-cleanup pattern from [ADR 0020](0020-request-cycle-resilience.md)).
+2. Resolves `consumer_id` against an in-memory `Map<id, consumer>` built once at construction from the config array. Unknown id (consumer removed since the row was written) → logged and skipped; row marked processed.
+3. Builds the payload, signs it (HMAC-SHA256 over body with the consumer's `secret`), POSTs with the consumer's `timeoutMs`.
+4. **Retry policy**: exponential backoff on 5xx, timeouts, network errors. **Do-not-retry on 4xx** (except 429, which honours `Retry-After`). After `max_attempts`, status flips to `abandoned` and an alert fires.
+5. Successful delivery marks `status = 'delivered'`; the row stays for audit (TTL'd by the cache-cleanup pattern from [ADR 0020](0020-request-cycle-resilience.md)).
 
 **Why outbox not "POST in the request handler"**: a POST after a DB commit can fail to reach the consumer; the database is the only thing that knows the truth. Writing both in one transaction is the only at-least-once contract that doesn't require distributed transactions.
 
@@ -135,6 +166,7 @@ The drain worker:
 - **The `jobs` table grows.** Periodic prune of completed rows (status='done' AND updated_at < now() - interval '7 days') is a required scheduled job.
 - **DIY semantics have edges.** Lost lock during long-running jobs, clock skew on `run_at`, worker crash mid-job. Mitigations in the implementation; pathological cases are exactly what triggers graduation.
 - **Outbox throughput is bounded by DB write throughput.** For >100 events/sec sustained, this becomes a hotspot — graduate.
+- **Outbox volume scales with consumer count.** A webhook with N configured consumers writes N outbox rows — the cost of independent per-consumer retry. Graduate to a `webhook_consumers` table (and FK) once sustained throughput hits ~100 events/sec or consumer count exceeds ~tens.
 
 ### Neutral
 
@@ -149,6 +181,7 @@ The drain worker:
 4. **Temporal** — industrial-grade workflow engine. Right answer for genuinely complex long-running orchestrations; massive operational footprint. Rejected for now; revisit if Inngest itself becomes the bottleneck.
 5. **Sync webhook processing** (no inbox) — simplest possible, but at the cost of duplicate deliveries every time processing is slower than the provider's retry timeout. Rejected.
 6. **Direct POST for webhooks-out** (no outbox) — simplest until the first lost delivery after a crash between commit and POST. The outbox is the only at-least-once contract without distributed transactions. Rejected.
+7. **`webhook_consumers` table day-one** — adds a CRUD surface and a migration before a single consumer has been validated in production. Naming the table as graduation keeps day-one onboarding to a config edit, mirroring the jobs (DIY → Inngest) and feature-flags (TS registry → Unleash) graduation shapes used elsewhere in this ADR. Rejected for now; named as graduation.
 
 ## Related
 
