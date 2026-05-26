@@ -72,7 +72,10 @@ export async function promoteBaseline(
 
   const files: Record<string, FileCoverage> = {};
   for (const key of Object.keys(current).sort()) {
-    files[key] = current[key];
+    const fileCoverage = current[key];
+    if (fileCoverage !== undefined) {
+      files[key] = fileCoverage;
+    }
   }
   const baseline: Baseline = {
     files,

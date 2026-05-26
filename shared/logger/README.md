@@ -65,3 +65,9 @@ tail -f .ai-wip/logs/*.log | pino-pretty
 ## Transport rule
 
 Pino writes JSON to stdout. **No transport packages are imported.** Routing to a backend (CloudWatch, Loki, New Relic, …) is the infrastructure's job — see [ADR 0025](../../docs/adr/0025-runtime-observability.md).
+
+## Shutdown / flush
+
+No explicit flush helper is exported, deliberately. Pino's `stdout` writes are synchronous in this setup, so there's no buffered tail to lose on `SIGTERM`. Adding an `OnApplicationShutdown` helper would invent a problem this contract has already designed away.
+
+If a fork adopts an async pino transport — against [ADR 0024](../../docs/adr/0024-structured-logging-contract.md)'s "no transports in app code" rule — they own the flush story. The right shape there is a constructor-injected pino instance + an `OnApplicationShutdown` handler that awaits `logger.flush()`; we'll add it here if and when ADR 0024 changes.
