@@ -8,11 +8,12 @@ takes ~5 minutes if everything's missing, ~30 seconds if everything's present.
 | Tool | Why | Install |
 |---|---|---|
 | **Node 22** | Runtime; pinned exact in `.nvmrc` | `fnm install 22.19.0` or `nvm install` (in repo dir) |
-| **pnpm 9+** | Package manager (ADR 0001) | `corepack enable` then `corepack prepare pnpm@9.15.0 --activate` |
+| **pnpm 9+** | Package manager (ADR 0001) | `corepack enable` then `corepack prepare pnpm@9.15.9 --activate` |
 | **ripgrep (`rg`)** | All search — Claude hooks, scripts, agent searches (enforced by `.claude/hooks/block-bash-rules.sh`) | macOS: `brew install ripgrep` &nbsp;·&nbsp; Linux: `apt install ripgrep` |
 | **jq** | JSON parser used by `.claude/hooks/*` to read tool input | macOS: `brew install jq` &nbsp;·&nbsp; Linux: `apt install jq` |
 | **Trivy** | Security gate (ADR 0008) — `pnpm check` fails without it | macOS: `brew install aquasecurity/trivy/trivy` &nbsp;·&nbsp; Linux: see <https://aquasecurity.github.io/trivy/> |
 | **Gitleaks** | Pre-commit secret scanning (ADR 0008) — Lefthook fires it on every commit | macOS: `brew install gitleaks` &nbsp;·&nbsp; Linux: see <https://github.com/gitleaks/gitleaks#installing> |
+| **direnv** | Loads `.envrc` per-repo so `CI=true` / `NX_NO_CLOUD=true` don't have to be prefixed inline (enforced by `.claude/hooks/block-bash-rules.sh`) | macOS: `brew install direnv` &nbsp;·&nbsp; Linux: `apt install direnv` — then see [Direnv setup](#direnv-setup) |
 | **OpenTofu** | Required only if you'll touch `apps/*/iac/` | macOS: `brew install opentofu` |
 | **beads (`bd`)** | Optional — local task tracking; `.claude/` SessionStart hook surfaces tasks if installed | macOS: `brew install beads` |
 | **Lefthook** | Installed automatically as a dev dep on `pnpm install` | nothing to do |
@@ -28,6 +29,27 @@ INCLUDE_OPTIONAL=1 ./scripts/setup-mac.sh # also install opentofu, beads
 
 You don't need every tool to start. The minimum to get the gate green is
 **Node 22 + pnpm + ripgrep + jq + Trivy + Gitleaks**. Beads and OpenTofu are opt-in.
+
+### Direnv setup
+
+The repo's Claude hook (`.claude/hooks/block-bash-rules.sh`) blocks inline
+`CI=true` / `NX_NO_CLOUD=true` prefixes on Bash tool calls — that env belongs
+in the shell, not on every command. Direnv loads it from a per-repo `.envrc`
+file automatically on `cd`.
+
+One-time setup:
+
+```sh
+brew install direnv                                # macOS
+echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc      # wire into zsh; restart shell
+cp .envrc.example .envrc                          # template → real file (gitignored)
+direnv allow                                       # trust this .envrc once
+```
+
+After that, every shell that `cd`s into the repo gets the right env. Edit
+`.envrc` to add machine-specific values; `.envrc.example` stays as the
+committed template. `direnv allow` needs to be re-run any time `.envrc`
+changes (direnv prints a reminder when it does).
 
 ## 2. First clone
 
@@ -79,7 +101,7 @@ pnpm --filter sample-web dev              # vite on http://localhost:5173
 E2E:
 
 ```sh
-pnpm --filter sample-web e2e              # playwright against the running web app
+pnpm --filter sample-web-e2e e2e          # playwright against the running web app
 ```
 
 ## 5. Build the sample app containers (optional)

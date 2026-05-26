@@ -9,6 +9,8 @@
 #   jq        — JSON parser used by .claude/hooks/* to read tool input.
 #   trivy     — vulnerability scanner used by `pnpm security` (ADR 0008).
 #   gitleaks  — pre-commit secret scanning fired by lefthook (ADR 0008).
+#   direnv    — loads .envrc per-repo so CI=true / NX_NO_CLOUD=true don't have
+#               to be prefixed inline (block-bash-rules.sh enforces this).
 #
 # Optional (re-run with INCLUDE_OPTIONAL=1):
 #   opentofu  — only if you'll touch apps/*/iac/ (ADR 0022).
@@ -40,6 +42,21 @@ install_if_missing "ripgrep"  rg       ripgrep
 install_if_missing "jq"       jq       jq
 install_if_missing "trivy"    trivy    aquasecurity/trivy/trivy
 install_if_missing "gitleaks" gitleaks gitleaks
+install_if_missing "direnv"   direnv   direnv
+
+# direnv needs a shell hook to actually load .envrc on `cd`. The install above
+# only puts the binary on PATH — it doesn't wire it into your shell.
+if command -v direnv >/dev/null 2>&1; then
+  if ! rg -q 'direnv hook' "${ZDOTDIR:-$HOME}/.zshrc" 2>/dev/null; then
+    echo
+    echo "⚠ direnv installed but no shell hook found in ~/.zshrc."
+    echo "  Add this line, then restart your shell:"
+    echo
+    echo '    eval "$(direnv hook zsh)"'
+    echo
+    echo "  Then in the repo:  cp .envrc.example .envrc && direnv allow"
+  fi
+fi
 
 if [ "${INCLUDE_OPTIONAL:-0}" = "1" ]; then
   echo
@@ -59,3 +76,4 @@ echo "  rg --version"
 echo "  jq --version"
 echo "  trivy --version"
 echo "  gitleaks version"
+echo "  direnv --version"

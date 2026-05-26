@@ -16,7 +16,7 @@
 # Dependabot (ecosystem: docker) auto-pins the `cgr.dev/chainguard/node`
 # digest on every base update — see `.github/dependabot.yml`.
 
-ARG PNPM_VERSION=9.15.0
+ARG PNPM_VERSION=9.15.9
 
 # ============================================================================
 # 1. Builder (Chainguard Node dev — has shell, corepack, apk)

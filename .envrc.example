@@ -1,0 +1,21 @@
+# .envrc.example — template for direnv-loaded shell env.
+#
+# Copy to `.envrc` (gitignored) and run `direnv allow` once. Direnv will then
+# auto-export these whenever you `cd` into the repo.
+#
+# This file exists because `.claude/hooks/block-bash-rules.sh` blocks inline
+# `CI=true` / `NX_NO_CLOUD=true` prefixes on Bash tool calls — the right place
+# for repo-wide env is the shell, not per-command. See docs/QUICKSTART.md
+# "Direnv setup" for the one-time install steps.
+#
+# Add machine-specific secrets to `.envrc` directly (still gitignored). Do not
+# put secrets in this example file — it's committed.
+
+# Treat local runs the same as CI: skip interactive prompts, disable spinners,
+# fail loud on warnings. Matches what `pnpm check` does in GitHub Actions.
+export CI=true
+
+# Disable NX Cloud connection attempts. This repo doesn't ship an NX Cloud
+# token; without this, `nx` prints a noisy "connecting to cloud" warning on
+# every invocation. Pure local cache only.
+export NX_NO_CLOUD=true

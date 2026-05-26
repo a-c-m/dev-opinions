@@ -21,9 +21,13 @@ case "$FILE_PATH" in
   *) exit 0 ;;
 esac
 
-# If biome is not installed yet, the advisory cannot run. Silent — the pre-edit
-# hook is the one that enforces; this is just a nudge.
+# If biome is not installed, the advisory cannot run. Per ADR 0038 "fail-don't-skip"
+# — notify-* is non-blocking by design (no hard fail), but it must not be silent.
+# Surface the missing tool to stderr so the gap shows up in the harness log, then
+# exit 0 to preserve notify-* semantics. The paired validate-edit-biome.sh is the
+# hard gate; this advisory just refuses to disappear quietly.
 if [ ! -x "$REPO_ROOT/node_modules/.bin/biome" ]; then
+  echo "notify-edit-biome: biome missing at node_modules/.bin/biome — run 'pnpm install' to restore post-edit advisories." >&2
   exit 0
 fi
 

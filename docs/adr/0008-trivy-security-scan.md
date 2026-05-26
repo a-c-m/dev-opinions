@@ -28,6 +28,32 @@ A quality gate that covers lint, types, tests, and dead code still lets vulnerab
 
 The script fails with a clear message if Trivy is missing, so a fresh clone cannot silently skip security scanning.
 
+## Lifecycle script policy
+
+Supply-chain attacks against npm packages have repeatedly used install lifecycle scripts (`preinstall`, `install`, `postinstall`) as the execution vector — the package gets pulled in by `pnpm install` and its postinstall runs with full developer credentials. Recent incidents that motivated this hardening:
+
+- **Nx s1ngularity** (Aug 2025) — compromised `nx` releases shipped a postinstall that exfiltrated tokens.
+- **Shai-Hulud** (Sept 2025) — self-replicating worm propagated via lifecycle scripts across npm.
+- **Shai-Hulud 2.0** (Nov 2025) — second wave; same vector, different payload.
+
+### Decision
+
+Install lifecycle scripts are **denied by default**. The repo opts specific packages into running their scripts via `pnpm.onlyBuiltDependencies` in the root `package.json`. Anything not on the list has its postinstall silently skipped by pnpm.
+
+### Current allow-list
+
+- **esbuild** — downloads the platform-native binary (no binary, no bundler).
+- **lefthook** — installs the local git hook shims that wire `lefthook.yml` into `.git/hooks/`.
+- **nx** — registers the NX daemon and CLI shims for local cache.
+- **unrs-resolver** — Rust napi-rs resolver; the postinstall picks the correct prebuilt binary for the host platform.
+- **@import-meta-env/unplugin** — wires up the ADR 0017 build-time env-injection hook.
+
+`@nestjs/core`'s postinstall is intentionally **not** allow-listed — it is `opencollective || exit 0`, a funding-attribution probe that is safe to skip.
+
+### Migration path
+
+pnpm 11 renames this field to `allowBuilds` with an object syntax (`{name: "reason"}`). When we move to pnpm 11 (currently blocked on a `pnpm.overrides` regression and NX ≥22.7.3 for pnpm 11 compatibility), translate the array above to the new shape and inline the justifications.
+
 ## Consequences
 
 ### Positive

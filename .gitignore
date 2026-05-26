@@ -13,6 +13,11 @@ coverage/
 .env.*.local
 !.env.example
 
+# direnv — local shell env loaded on `cd` into the repo. `.envrc.example` is
+# committed as the template; the real `.envrc` is per-developer.
+.envrc
+!.envrc.example
+
 # editor / OS
 .DS_Store
 *.swp
