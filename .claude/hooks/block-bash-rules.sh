@@ -5,7 +5,7 @@
 # tool calls in this repo.
 #
 # Rules enforced (all parse the same COMMAND once, top of file):
-#   1. No command chaining (&& or ||).         CLAUDE.md "One command at a time".
+#   1. No command chaining (&&, ||, or ;).     CLAUDE.md "One command at a time".
 #   2. No inline `CI=true` / `NX_NO_CLOUD=true` prefix. The shell exports them
 #      via `.envrc` + direnv; prepending them per-call papers over a broken
 #      env-loading setup.
@@ -39,7 +39,8 @@ fi
 
 # ---- 1. command chaining ----------------------------------------------------
 # Strip heredoc bodies and quoted strings before scanning, so legitimate uses
-# of && / || inside commit messages or echoed text don't false-positive.
+# of && / || / ; inside commit messages or echoed text don't false-positive.
+# `;` is part of the same rule per CLAUDE.md "One command at a time".
 CHAIN_VIOLATION="$(CMD="$COMMAND" python3 - <<'PY'
 import os, re
 
@@ -54,22 +55,26 @@ cmd = re.sub(
 cmd = re.sub(r"'(?:[^'\\]|\\.)*'", "", cmd)
 cmd = re.sub(r'"(?:[^"\\]|\\.)*"', "", cmd)
 
-if re.search(r"&&|\|\|", cmd):
+if re.search(r"&&|\|\||;", cmd):
     print("violation")
 PY
 )"
 
 if [ "$CHAIN_VIOLATION" = "violation" ]; then
   cat >&2 <<'EOF'
-Bash command chaining (&& or ||) is blocked by project hook.
+Bash command chaining (&&, ||, or ;) is blocked by project hook.
 
 CLAUDE.md "One command at a time" — each command must be its own Bash
 call so the user can review/approve it individually. Split this into
 separate Bash tool calls.
 
 Sanctioned compound forms (not blocked):
-  - HEREDOC inside $(cat <<'EOF' ... EOF) for commit messages
+  - HEREDOC inside cat <<EOF ... EOF for commit messages
   - cmd > .ai-wip/<name>.log 2>&1   (redirect, not a chain)
+
+If you need a for-loop or if-block that uses `;` as syntax (e.g.
+`for x in a b; do echo $x; done`), write the script to .ai-wip/ as a
+.mjs/.sh and run it with one Bash call instead.
 
 If you need to act on the result of one command, capture output:
   cmd > .ai-wip/<name>.log 2>&1
@@ -221,7 +226,43 @@ EOF
   exit 2
 fi
 
-# ---- 7. echo / cat / sed / awk file-mutation nudges (advisory) -------------
+# ---- 7. nx affected --target=typecheck|lint -------------------------------
+# tsgo (and biome under NX) have been observed deadlocking when invoked via
+# `nx affected` against local long-running NX daemon states. Force run-many
+# for these two targets. `nx affected --target=test` is fine.
+# Matches both long and short flag forms and comma-separated target lists.
+# Strip heredoc bodies and quoted strings before matching so the pattern
+# inside a commit message / doc string doesn't false-positive.
+# See docs/conventions/nx-targets.md for the full story.
+NX_STRIPPED="$(CMD="$COMMAND" python3 - <<'PY'
+import os, re
+cmd = os.environ.get("CMD", "")
+cmd = re.sub(
+    r"<<-?\s*['\"]?(\w+)['\"]?[^\n]*\n.*?^\s*\1\s*$",
+    "",
+    cmd,
+    flags=re.DOTALL | re.MULTILINE,
+)
+cmd = re.sub(r"'(?:[^'\\]|\\.)*'", "", cmd)
+cmd = re.sub(r'"(?:[^"\\]|\\.)*"', "", cmd)
+print(cmd)
+PY
+)"
+if printf '%s' "$NX_STRIPPED" | rg -q 'nx\s+affected\s+(--target=|-t\s+)[^[:space:]]*\b(typecheck|lint)\b'; then
+  cat >&2 <<'EOF'
+🚫 BLOCKED: `nx affected --target=typecheck` / `nx affected --target=lint`.
+
+Use `nx run-many --target=<target> --all` for typecheck and lint. NX cache
+makes warm runs cheap; the affected-shape deadlocks under tsgo/biome when
+other NX daemons are alive on this machine. `nx affected --target=test`
+is still fine.
+
+See docs/conventions/nx-targets.md.
+EOF
+  exit 2
+fi
+
+# ---- 8. echo / cat / sed / awk file-mutation nudges (advisory) -------------
 WARN=""
 case "$COMMAND" in
   *"echo"*">"*)           WARN="Writing a file with 'echo >' — use the Write tool for clarity and permission-prompt consistency." ;;

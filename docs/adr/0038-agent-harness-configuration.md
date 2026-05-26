@@ -48,6 +48,8 @@ Hooks split by *what they protect*, not by which tool triggers them. Filename pr
 
 Hooks fail by exiting non-zero with a clear stderr message. None carry an escape hatch (no "skip if missing", no `|| true`). If a hook can't run because a tool is missing, that's a setup problem to fix, not a condition to swallow.
 
+**Carve-out for `bootstrap-session-*`:** session bootstrappers are *context primers*, not guards. When their input isn't present (e.g. `bootstrap-session-beads.sh` and no `.beads/` directory because beads isn't used in this repo), they exit 0 silently — there is nothing to prime, so nothing to surface. This is not an escape hatch on a guard; the guard tiers (`validate-edit-*`, `block-bash-*`) still fail-don't-skip.
+
 New hook? Pick the tier matching its lifecycle moment; name `<tier>-<surface>-<concern>.sh`. If no existing tier fits, that's an ADR amendment, not a naming exception.
 
 ### Permission model
