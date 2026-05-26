@@ -10,6 +10,9 @@
 # Variables not present in the container env are left undefined in the
 # emitted object; the in-browser zod schema in src/env.ts decides whether
 # that is an error (required) or a default (optional).
+#
+# This script is the ENTRYPOINT for the container. After the substitution
+# completes, it execs whatever CMD passes — normally nginx.
 
 set -eu
 
@@ -20,3 +23,6 @@ echo "info: replacing import-meta-env placeholder in $TARGET"
 # --disposable: skip writing a .bak alongside the swapped index.html, which
 # nginx would otherwise serve from the same directory.
 import-meta-env --disposable -x "$EXAMPLE" -p "$TARGET"
+
+# Hand off to the next process (nginx via CMD).
+exec "$@"
