@@ -1,7 +1,7 @@
 // Unit tests for the createAuthProvider factory — verifies the
 // discriminated-config selection picks the correct impl per provider.
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   type AuthProviderConfig,
   createAuthProvider,
@@ -20,12 +20,6 @@ vi.mock("jose", async (importOriginal) => {
   };
 });
 
-const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
-
-afterEach(() => {
-  process.env.NODE_ENV = ORIGINAL_NODE_ENV;
-});
-
 const oidcConfig = {
   audience: "test-svc",
   issuer: "https://issuer.test",
@@ -34,8 +28,11 @@ const oidcConfig = {
 
 describe("createAuthProvider", () => {
   it("returns DevAuthProvider when config.provider === 'dev'", () => {
-    process.env.NODE_ENV = "development";
-    const config: AuthProviderConfig = { provider: "dev", warn: vi.fn() };
+    const config: AuthProviderConfig = {
+      nodeEnv: "development",
+      provider: "dev",
+      warn: vi.fn(),
+    };
     const provider = createAuthProvider(config);
     expect(provider).toBeInstanceOf(DevAuthProvider);
   });

@@ -5,14 +5,17 @@
   "type": "module",
   "exports": {
     "./types": {
+      "source": "./src/types.ts",
       "types": "./dist/types.d.ts",
       "default": "./dist/types.js"
     },
     "./base-options": {
+      "source": "./src/base-options.ts",
       "types": "./dist/base-options.d.ts",
       "default": "./dist/base-options.js"
     },
     "./nest": {
+      "source": "./src/nest.module.ts",
       "types": "./dist/nest.module.d.ts",
       "default": "./dist/nest.module.js"
     }
@@ -33,9 +36,10 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "lint": "bs check --write .",
     "test": "vitest run",
-    "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
+    "test:watch": "vitest",
     "typecheck": "tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {

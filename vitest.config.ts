@@ -9,6 +9,12 @@ import { defineConfig } from "vitest/config";
 // glob threshold must satisfy BOTH the glob tier AND the global
 // floor (Vitest's behaviour, differs from Jest).
 export default defineConfig({
+  // ADR 0039 — source-mode dev. Tests resolve `@shared/*` to raw `.ts`
+  // via the `source` export-condition key rather than the built `dist/`.
+  // No `pnpm build` required before `pnpm test`.
+  resolve: {
+    conditions: ["source"],
+  },
   test: {
     projects: [
       "apps/*/*/vite.config.ts",

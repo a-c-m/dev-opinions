@@ -1,0 +1,25 @@
+{
+  "name": "sample-web-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "nx": {
+    "projectType": "application",
+    "implicitDependencies": [
+      "sample-web"
+    ],
+    "tags": [
+      "scope:sample",
+      "type:e2e"
+    ]
+  },
+  "scripts": {
+    "e2e": "playwright test",
+    "test:e2e": "playwright test",
+    "typecheck": "tsgo --noEmit -p tsconfig.json",
+    "lint": "bs check --write ."
+  },
+  "devDependencies": {
+    "@playwright/test": "1.59.1"
+  }
+}

@@ -144,7 +144,7 @@ Stagehand v3 lives at `apps/<p>/<s>-e2e/stagehand/`, ignored by the default `tes
 
 - **Two workspaces to add per new service** (`<service>` + `<service>-e2e`). Mitigated when NX generators ship for this.
 - **`shared/e2e-helpers/` is a coupling point** — a breaking locator change ripples to every `-e2e` consumer. Trade for the single-edit-point benefit.
-- **Sample app deviates** — `apps/sample/web/e2e/` is colocated; sample is a throwaway scaffold (deleted by `pnpm reset`) and not a worked example for this ADR.
+- **Two workspaces to add per new service** is the cost; `apps/sample/web-e2e/` shows the canonical shape (sibling package, implicit-deps the web app, owns its own `playwright.config.ts`).
 
 ### Neutral
 

@@ -9,7 +9,7 @@ Delete this app with `pnpm reset` once your own frontends are in place.
 ```sh
 pnpm --filter sample-web dev         # vite dev server
 pnpm --filter sample-web test        # vitest component tests
-pnpm --filter sample-web e2e         # playwright smoke
+pnpm --filter sample-web-e2e e2e     # playwright smoke (sibling package per ADR 0015)
 pnpm --filter sample-web typecheck   # tsgo
 pnpm --filter sample-web lint        # biome
 ```

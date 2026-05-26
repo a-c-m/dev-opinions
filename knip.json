@@ -9,8 +9,11 @@
       "project": ["src/**/*.ts"]
     },
     "apps/sample/web": {
-      "entry": ["e2e/**/*.spec.ts"],
       "project": ["src/**/*.{ts,tsx}"]
+    },
+    "apps/sample/web-e2e": {
+      "entry": ["e2e/**/*.spec.ts", "playwright.config.ts"],
+      "project": ["e2e/**/*.ts", "playwright.config.ts"]
     },
     "shared/logger": {
       "entry": ["src/types.ts", "src/base-options.ts", "src/nest.module.ts"],

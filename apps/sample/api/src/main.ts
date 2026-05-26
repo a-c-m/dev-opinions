@@ -11,9 +11,11 @@ const SERVICE_META = { name: "sample-api", version: "0.0.0" } as const;
 
 async function bootstrap(): Promise<void> {
   const env = loadEnv();
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
-    bufferLogs: true,
-  });
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule.forRoot(env),
+    new FastifyAdapter(),
+    { bufferLogs: true }
+  );
   app.useLogger(app.get(Logger));
   app.flushLogs();
   app.enableShutdownHooks();
