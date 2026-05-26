@@ -1,53 +1,47 @@
 // Unit tests for DevAuthProvider — verifies header extraction, prod
 // refusal, and the warn-on-construction signal.
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { DevAuthProvider } from "./dev-auth-provider.ts";
 import type { AuthRequest } from "./types.ts";
 
-const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
 const DEV_AUTH_PROVIDER_LOG_RE = /DevAuthProvider/;
 const REFUSED_MSG_RE = /refused/;
 
 describe("DevAuthProvider", () => {
-  afterEach(() => {
-    process.env.NODE_ENV = ORIGINAL_NODE_ENV;
-  });
-
   describe("constructor", () => {
     it("warns on construction outside production", () => {
-      process.env.NODE_ENV = "development";
       const warn = vi.fn();
-      new DevAuthProvider({ warn });
+      new DevAuthProvider({ nodeEnv: "development", warn });
       expect(warn).toHaveBeenCalledOnce();
       expect(warn.mock.calls[0]?.[0]).toMatch(DEV_AUTH_PROVIDER_LOG_RE);
     });
 
     it("uses a no-op warn when none provided", () => {
-      process.env.NODE_ENV = "development";
       // Doesn't throw — that's the assertion.
-      expect(() => new DevAuthProvider()).not.toThrow();
+      expect(() => new DevAuthProvider({ nodeEnv: "development" })).not.toThrow();
     });
 
-    it("refuses to construct under NODE_ENV=production", () => {
-      process.env.NODE_ENV = "production";
-      expect(() => new DevAuthProvider()).toThrow(REFUSED_MSG_RE);
+    it("refuses to construct under nodeEnv=production", () => {
+      expect(() => new DevAuthProvider({ nodeEnv: "production" })).toThrow(REFUSED_MSG_RE);
     });
 
     it("allows construction under production with explicit override", () => {
-      process.env.NODE_ENV = "production";
       const warn = vi.fn();
-      expect(() => new DevAuthProvider({ allowDevInProduction: true, warn })).not.toThrow();
+      expect(
+        () =>
+          new DevAuthProvider({
+            allowDevInProduction: true,
+            nodeEnv: "production",
+            warn,
+          })
+      ).not.toThrow();
       expect(warn).toHaveBeenCalledOnce();
     });
   });
 
   describe("authenticate", () => {
-    beforeEach(() => {
-      process.env.NODE_ENV = "development";
-    });
-
-    const makeProvider = () => new DevAuthProvider({ warn: vi.fn() });
+    const makeProvider = () => new DevAuthProvider({ nodeEnv: "development", warn: vi.fn() });
 
     it("returns unauthenticated when x-dev-user-id is missing", async () => {
       const req: AuthRequest = { headers: {} };

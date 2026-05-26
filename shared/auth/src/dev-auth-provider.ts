@@ -48,13 +48,20 @@ const buildClaims = (req: AuthRequest): TokenClaims | null => {
   return { userId, roles: parseRoles(readHeader(req, "x-dev-roles")) };
 };
 
-const isProduction = (): boolean => process.env.NODE_ENV === "production";
-
-export type DevAuthConfigWithLogger = DevAuthConfig & { warn?: WarnFn };
+export type DevAuthConfigWithLogger = DevAuthConfig & {
+  /**
+   * Host's `NODE_ENV`. Required — shared libs do not read `process.env`
+   * directly (ADR 0016/0017). The host validates via its env schema and
+   * threads the value in.
+   */
+  nodeEnv: string;
+  warn?: WarnFn;
+};
 
 export class DevAuthProvider implements AuthProvider {
-  constructor(config: DevAuthConfigWithLogger = {}) {
-    if (isProduction() && !config.allowDevInProduction) {
+  constructor(config: DevAuthConfigWithLogger) {
+    const isProduction = config.nodeEnv === "production";
+    if (isProduction && !config.allowDevInProduction) {
       throw new Error(PROD_REFUSAL);
     }
     (config.warn ?? noopWarn)(ACTIVE_WARNING);

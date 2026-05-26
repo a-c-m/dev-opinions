@@ -44,21 +44,13 @@ describe("baseLoggerOptions", () => {
     expect(serialised?.stack).toBeTypeOf("string");
   });
 
-  it("honours LOG_LEVEL env var; defaults to 'info'", () => {
-    const original = process.env.LOG_LEVEL;
-    try {
-      process.env.LOG_LEVEL = undefined;
-      delete process.env.LOG_LEVEL;
-      expect(baseLoggerOptions(meta).level).toBe("info");
+  it("defaults level to 'info' when config omitted", () => {
+    expect(baseLoggerOptions(meta).level).toBe("info");
+    expect(baseLoggerOptions(meta, {}).level).toBe("info");
+  });
 
-      process.env.LOG_LEVEL = "debug";
-      expect(baseLoggerOptions(meta).level).toBe("debug");
-    } finally {
-      if (original === undefined) {
-        delete process.env.LOG_LEVEL;
-      } else {
-        process.env.LOG_LEVEL = original;
-      }
-    }
+  it("honours the caller-supplied level", () => {
+    expect(baseLoggerOptions(meta, { level: "debug" }).level).toBe("debug");
+    expect(baseLoggerOptions(meta, { level: "warn" }).level).toBe("warn");
   });
 });
