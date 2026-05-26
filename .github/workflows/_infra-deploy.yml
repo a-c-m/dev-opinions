@@ -68,17 +68,19 @@ jobs:
       TF_ENCRYPTION: ${{ secrets.encryption-passphrase }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Configure AWS credentials via OIDC
         if: ${{ secrets.aws-role != '' }}
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
         with:
           role-to-assume: ${{ secrets.aws-role }}
           aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
 
       - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@9d84900f3238fab8cd84ce47d658d25dd008be2f # v1
         with:
           tofu_version: ${{ inputs.tofu-version }}
 
@@ -104,7 +106,7 @@ jobs:
 
       - name: Upload plan artefact
         if: ${{ !inputs.auto-apply }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: tfplan-${{ inputs.environment }}-${{ github.sha }}
           path: ${{ inputs.working-directory }}/tfplan.bin

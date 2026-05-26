@@ -19,9 +19,12 @@ on:
         type: string
 
 permissions:
-  contents: write    # for merge-back to main
+  contents: read
   id-token: write
   packages: write
+# `contents: write` is scoped per-job — only `merge-back` needs it. Keeping
+# it at the workflow level would grant the migrate / validate-tag / build
+# jobs unnecessary write to the repo (least-privilege per Priya F-6).
 
 concurrency:
   group: release-in-flight
@@ -31,9 +34,10 @@ jobs:
   validate-tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Verify tag exists
         run: git rev-parse "refs/tags/${{ inputs.tag }}" || exit 1
 
@@ -44,16 +48,19 @@ jobs:
       # Forks override `package` per their shared/db-* layout.
       package: shared/db-app
       environment: production
-    secrets: inherit
+    # _db-migrate.yml declares no `workflow_call.secrets:` inputs — it uses
+    # OIDC + vault-shim per ADR 0026. Don't widen the secret blast radius
+    # with `inherit` (Priya F-5).
 
   build-and-deploy:
     needs: migrate
     runs-on: ubuntu-latest
     environment: production    # human approval gate per ADR 0035
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ inputs.tag }}
+          persist-credentials: false
 
       - name: Setup monorepo
         uses: ./.github/actions/setup-monorepo
@@ -64,10 +71,13 @@ jobs:
   merge-back:
     needs: build-and-deploy
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # only this job pushes to main (per Priya F-6)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+          persist-credentials: true   # job pushes to main; intent explicit
       - name: Merge tag → main
         run: |
           git config user.name "release-bot"

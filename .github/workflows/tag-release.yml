@@ -25,11 +25,15 @@ concurrency:
 jobs:
   tag:
     runs-on: ubuntu-latest
+    # Human-approved environment gate per Priya F-9. Same reasoning as
+    # cut-release.yml — tag creation is the deploy-prod input.
+    environment: release-engineering
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           ref: release-candidate
+          persist-credentials: true   # job creates + pushes version tag
 
       - name: Setup monorepo
         uses: ./.github/actions/setup-monorepo

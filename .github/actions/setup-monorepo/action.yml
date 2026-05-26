@@ -15,9 +15,14 @@ runs:
   using: composite
   steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       with:
         fetch-depth: ${{ inputs.fetch-depth }}
+        # Don't persist the GH token to .git/config — stops any later step
+        # in the same job (third-party action, malicious dep) reading it.
+        # Jobs that need to push (cut-release, tag-release, deploy-prod
+        # merge-back) call actions/checkout directly, not via this action.
+        persist-credentials: false
 
     - name: Read Node version from .nvmrc
       id: node-version
@@ -25,7 +30,7 @@ runs:
       run: echo "version=$(cat .nvmrc | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
 
     - name: Setup Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
       with:
         node-version: ${{ steps.node-version.outputs.version }}
 
@@ -39,7 +44,7 @@ runs:
       run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
 
     - name: Cache pnpm store
-      uses: actions/cache@v4
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
       with:
         path: ${{ steps.pnpm-store.outputs.path }}
         key: pnpm-store-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -47,7 +52,7 @@ runs:
           pnpm-store-${{ runner.os }}-
 
     - name: Cache NX
-      uses: actions/cache@v4
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
       with:
         path: .nx/cache
         key: nx-${{ runner.os }}-${{ github.sha }}

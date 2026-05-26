@@ -19,11 +19,18 @@ concurrency:
 jobs:
   cut:
     runs-on: ubuntu-latest
+    # Human-approved environment gate per Priya F-9. Production tags + the
+    # release-candidate branch are the input to deploy-prod; the deploy
+    # itself is environment-gated but the *creation* of these refs wasn't.
+    # Configure required-reviewer protection on this environment in the
+    # GitHub UI: Settings → Environments → release-engineering.
+    environment: release-engineering
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           ref: release-candidate
+          persist-credentials: true   # job pushes release-candidate; explicit
 
       - name: Verify no release in flight
         run: |

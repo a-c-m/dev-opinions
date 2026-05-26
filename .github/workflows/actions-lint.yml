@@ -1,0 +1,46 @@
+name: Actions lint (zizmor)
+
+# Static analysis for GitHub Actions workflows per Priya F-7.
+# zizmor (Trail of Bits, hardened May 2026) catches:
+#   - template-injection vulnerabilities (untrusted input → shell)
+#   - missing / excessive permissions blocks
+#   - tag-pinning regressions (we SHA-pin per ADR 0008 — this prevents drift)
+#   - `pull_request_target` misuse
+#   - missing `persist-credentials: false`
+#
+# Without this, the SHA-pinning and least-privilege controls we just put
+# in place will rot the moment someone adds a workflow with a tag pin or
+# missing `permissions:` block and no one notices in review.
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+      - ".github/workflows/actions-lint.yml"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+
+permissions:
+  contents: read
+  security-events: write   # for SARIF upload
+
+jobs:
+  zizmor:
+    name: zizmor (workflow static analysis)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+        with:
+          # `auditor` is the strictest persona; surfaces every finding zizmor
+          # has rules for. The action uploads SARIF to GitHub Security tab.
+          persona: auditor
