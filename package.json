@@ -27,6 +27,7 @@
   },
   "name": "dev-opinions",
   "scripts": {
+    "scripts:help": "node scripts/help.mjs",
     "prepare": "lefthook install",
     "dev": "nx run-many --target=dev --all --parallel",
     "dev:obs": "podman compose -f docker-compose.observability.yml up -d",
@@ -48,8 +49,9 @@
     "typecheck": "nx run-many --target=typecheck --all",
     "knip": "knip",
     "security": "./scripts/security-scan.sh",
-    "check": "pnpm lint:check && pnpm typecheck && pnpm test && pnpm knip && pnpm security",
-    "check:affected": "nx affected --target=lint,typecheck,test",
+    "check:overrides": "node scripts/check-pnpm-overrides.mjs",
+    "check": "pnpm lint:check && pnpm typecheck && pnpm test && pnpm knip && pnpm security && pnpm check:overrides",
+    "check:affected": "nx run-many --target=lint --all && nx run-many --target=typecheck --all && nx affected --target=test",
     "commit": "cz",
     "release": "nx release",
     "reset": "./scripts/reset-template.sh",
@@ -62,8 +64,8 @@
   "description": "Opinionated monorepo starter — pnpm + NX + TypeScript strict + Biome/Ultracite + NestJS + React/Vite + Vitest + Playwright + Drizzle + Lefthook + Trivy + OpenTofu. Decisions in docs/adr/.",
   "packageManager": "pnpm@9.15.0",
   "engines": {
-    "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "node": "22.19.0",
+    "pnpm": "9.15.0"
   },
   "config": {
     "commitizen": {
@@ -72,7 +74,9 @@
   },
   "pnpm": {
     "overrides": {
-      "fastify": "5.8.5"
+      "fastify": "5.8.5",
+      "fast-uri": "3.1.2",
+      "picomatch": "4.0.4"
     }
   }
 }
