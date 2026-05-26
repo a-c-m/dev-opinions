@@ -32,4 +32,7 @@ jobs:
     with:
       package: ${{ inputs.package }}
       environment: ${{ inputs.environment }}
-    secrets: inherit
+    # _db-migrate.yml uses OIDC for cloud auth and vault-shim env injection
+    # for DATABASE_URL (ADR 0026). It declares no `workflow_call.secrets:`
+    # inputs, so no secrets need to be passed. Previously `secrets: inherit`
+    # passed every org/repo secret unnecessarily (Priya F-5).
