@@ -21,7 +21,7 @@
 #
 # Dependabot auto-pins the `cgr.dev/chainguard/*` digests on every base update.
 
-ARG PNPM_VERSION=9.15.0
+ARG PNPM_VERSION=9.15.9
 ARG IMV_CLI_VERSION=0.7.4
 
 # ============================================================================

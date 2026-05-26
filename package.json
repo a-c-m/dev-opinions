@@ -50,7 +50,8 @@
     "knip": "knip",
     "security": "./scripts/security-scan.sh",
     "check:overrides": "node scripts/check-pnpm-overrides.mjs",
-    "check": "pnpm lint:check && pnpm typecheck && pnpm test && pnpm knip && pnpm security && pnpm check:overrides",
+    "check:shared": "node scripts/check-shared-conventions.mjs",
+    "check": "pnpm lint:check && pnpm typecheck && pnpm test && pnpm knip && pnpm security && pnpm check:overrides && pnpm check:shared",
     "check:affected": "nx run-many --target=lint --all && nx run-many --target=typecheck --all && nx affected --target=test",
     "commit": "cz",
     "release": "nx release",
@@ -62,10 +63,10 @@
   "license": "AGPL-3.0-or-later",
   "author": "Alex McFadyen",
   "description": "Opinionated monorepo starter — pnpm + NX + TypeScript strict + Biome/Ultracite + NestJS + React/Vite + Vitest + Playwright + Drizzle + Lefthook + Trivy + OpenTofu. Decisions in docs/adr/.",
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@9.15.9",
   "engines": {
     "node": "22.19.0",
-    "pnpm": "9.15.0"
+    "pnpm": "9.15.9"
   },
   "config": {
     "commitizen": {
@@ -73,6 +74,13 @@
     }
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "lefthook",
+      "nx",
+      "unrs-resolver",
+      "@import-meta-env/unplugin"
+    ],
     "overrides": {
       "fastify": "5.8.5",
       "fast-uri": "3.1.2",
