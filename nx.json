@@ -41,7 +41,6 @@
       "inputs": ["default", "^production"]
     }
   },
-  "parallel": 4,
   "defaultBase": "main",
   "release": {
     "projectsRelationship": "independent",
