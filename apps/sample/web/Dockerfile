@@ -27,7 +27,7 @@ ARG IMV_CLI_VERSION=0.7.4
 # ============================================================================
 # 1. Builder (Chainguard Node dev — Wolfi, has shell, corepack, apk)
 # ============================================================================
-FROM cgr.dev/chainguard/node:latest-dev AS builder
+FROM cgr.dev/chainguard/node:latest-dev@sha256:faccba56d910f16378d9dceda517a3df2aa1196731769255def28265f50336d0 AS builder
 ENV PNPM_HOME="/pnpm" PATH="/pnpm:$PATH"
 USER root
 RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
@@ -48,7 +48,7 @@ RUN pnpm exec nx build sample-web --skip-nx-cache
 # ============================================================================
 # 2. Runtime (Chainguard wolfi-base + nginx + nodejs)
 # ============================================================================
-FROM cgr.dev/chainguard/wolfi-base:latest AS runtime
+FROM cgr.dev/chainguard/wolfi-base:latest@sha256:5743937d521cbeb9e8c73bf1bd7ba2589c178940eb03d7b148efecc962be8587 AS runtime
 ARG IMV_CLI_VERSION
 USER root
 

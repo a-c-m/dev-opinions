@@ -21,7 +21,7 @@ ARG PNPM_VERSION=9.15.9
 # ============================================================================
 # 1. Builder (Chainguard Node dev — has shell, corepack, apk)
 # ============================================================================
-FROM cgr.dev/chainguard/node:latest-dev AS builder
+FROM cgr.dev/chainguard/node:latest-dev@sha256:faccba56d910f16378d9dceda517a3df2aa1196731769255def28265f50336d0 AS builder
 ENV PNPM_HOME="/pnpm" PATH="/pnpm:$PATH"
 USER root
 RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
@@ -54,7 +54,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 # ============================================================================
 # Runs as `node` user (uid 65532) by default. Read-only filesystem-friendly.
 # CMD must use exec form (no shell available).
-FROM cgr.dev/chainguard/node:latest AS runtime
+FROM cgr.dev/chainguard/node:latest@sha256:2887b8175fe6b1f242c4e7ee9d0ea8280b4dfba0d7171dfddf987f305ef0dc09 AS runtime
 ENV NODE_ENV=production
 
 WORKDIR /app
