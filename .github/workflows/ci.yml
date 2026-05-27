@@ -35,8 +35,11 @@ jobs:
       - name: Typecheck (run-many)
         run: pnpm exec nx run-many --target=typecheck --all
 
-      - name: Test (affected)
-        run: pnpm exec nx affected --target=test
+      - name: Test with coverage (root vitest, generates coverage-summary.json)
+        run: pnpm test:cov
+
+      - name: Coverage ratchet (ADR 0014)
+        run: pnpm cov:check
 
       - name: Dead code (full repo)
         run: pnpm knip

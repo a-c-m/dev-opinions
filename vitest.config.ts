@@ -24,6 +24,9 @@ export default defineConfig({
     ],
     coverage: {
       provider: "v8",
+      // `json-summary` is the input format `pnpm cov:check` (the
+      // per-file ratchet) reads. Don't remove it without updating
+      // `.coverage-baseline.json#coverageFile`.
       reporter: ["text", "lcov", "json-summary", "json"],
       reportOnFailure: true,
       include: ["apps/*/*/src/**/*.{ts,tsx}", "shared/*/src/**/*.ts", "tools/*/src/**/*.ts"],
@@ -54,30 +57,22 @@ export default defineConfig({
         "**/main.{ts,tsx}",
         "**/instrumentation.{mts,mjs,ts}",
       ],
-      thresholds: {
-        // Global floor — applies to every counted file, including
-        // files matched by glob tiers below.
-        lines: 80,
-        functions: 80,
-        statements: 80,
-        branches: 80,
-        // shared/* infra — 100 on statements/lines/functions, hard 95
-        // on branches per ADR 0014 (branch-coverage paradox).
-        // Escape valve is `/* v8 ignore next -- @preserve */`, NOT
-        // a threshold drop.
-        "shared/**/src/**/*.ts": {
-          lines: 100,
-          functions: 100,
-          statements: 100,
-          branches: 95,
-        },
-        // App services — 80/80. Resolvers/controllers are excluded
-        // from rollup entirely (smoke-only via E2E per ADR 0012).
-        "apps/*/*/src/**/*.service.ts": {
-          lines: 80,
-          branches: 80,
-        },
-      },
+      // Vitest's own `thresholds:` is intentionally absent.
+      //
+      // Per ADR 0014, coverage is gated by the per-file ratchet in
+      // `tools/coverage-baseline/` — run via `pnpm cov:check`, fed by
+      // the `json-summary` reporter above, configured in
+      // `.coverage-baseline.json` (glob → per-file threshold map) and
+      // pinned by `coverage-baseline.json` (committed per-file
+      // snapshot). The ratchet catches "file X regressed" and "new
+      // file Y is below its glob's bar"; vitest's `thresholds` only
+      // catches "the *average* across globbed files dropped", which
+      // hides per-file regressions and fails on the wrong shape (one
+      // 0% file drags the mean below a global floor even when every
+      // other file is at 100%).
+      //
+      // Don't add `thresholds:` back here. Edit `.coverage-baseline.json`
+      // glob tiers, then run `pnpm cov:promote` to refresh the snapshot.
     },
   },
 });

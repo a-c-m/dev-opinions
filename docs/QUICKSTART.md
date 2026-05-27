@@ -72,11 +72,14 @@ That sequences:
 |---|---|---|
 | Lint | `pnpm lint:check` (`bs check`) | ADR 0006 — biome 2 + ultracite + baseline |
 | Typecheck | `pnpm typecheck` (`tsgo`) | ADR 0003 |
-| Tests | `pnpm test` (vitest 4) | ADR 0012 |
+| Tests + coverage | `pnpm test:cov` (vitest 4 with `--coverage`) | ADR 0012 |
+| Coverage ratchet | `pnpm cov:check` (per-file baseline) | ADR 0014 |
 | Dead code | `pnpm knip` | ADR 0007 |
 | Security | `pnpm security` (Trivy fs scan) | ADR 0008 |
+| Overrides sync | `pnpm check:overrides` (`pnpm-overrides.md` ↔ `package.json#pnpm.overrides`) | ADR 0008 |
+| Shared conventions | `pnpm check:shared` (ADR 0039 package shape) | ADR 0039 |
 
-All five exit 0 on a fresh clone. If `security` fails because Trivy isn't on
+All steps exit 0 on a fresh clone. If `security` fails because Trivy isn't on
 PATH, install it (above) — don't skip the step.
 
 ### Local `pnpm check` vs CI

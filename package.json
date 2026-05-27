@@ -51,7 +51,7 @@
     "security": "./scripts/security-scan.sh",
     "check:overrides": "node scripts/check-pnpm-overrides.mjs",
     "check:shared": "node scripts/check-shared-conventions.mjs",
-    "check": "pnpm lint:check && pnpm typecheck && pnpm test && pnpm knip && pnpm security && pnpm check:overrides && pnpm check:shared",
+    "check": "pnpm lint:check && pnpm typecheck && pnpm test:cov && pnpm cov:check && pnpm knip && pnpm security && pnpm check:overrides && pnpm check:shared",
     "check:fast": "nx run-many --target=lint --all && nx run-many --target=typecheck --all && nx affected --target=test",
     "commit": "cz",
     "release": "nx release",
