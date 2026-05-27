@@ -85,10 +85,19 @@ jobs:
           scan-ref: .
           scanners: vuln,secret,misconfig
           severity: HIGH,CRITICAL
+          # trivy-action's entrypoint.sh unsets TRIVY_SEVERITY when format=sarif
+          # unless this is "true" — without it, exit-code fires on ANY finding
+          # (including MEDIUM/LOW), which contradicts ADR 0008's HIGH/CRITICAL
+          # gate.
+          limit-severities-for-sarif: "true"
           ignore-unfixed: false
           format: sarif
           output: trivy-results.sarif
           exit-code: "1"
+          # Same ignorefile the local `pnpm security` script uses, so CI and
+          # local stay in lock-step. Empty by default; entries land here with
+          # a reason + review date per ADR 0008.
+          trivyignores: .trivyignore
 
       - name: Upload SARIF to GitHub Security tab
         if: always()
