@@ -53,6 +53,31 @@ EOF
     ;;
 esac
 
+# Force-push variants. settings.json `permissions.deny` catches the literal
+# `git push --force` / `--force-with-lease` / `--force-if-includes` / `-f` /
+# `-u --force` shapes. This hook is the backstop for composed forms the
+# pattern matcher can't catch: `git push --force-with-lease=refs/heads/main`,
+# `git -c push.useForceWithLease=true push`, multi-flag combinations, etc.
+# Rationale: force-push of any kind is a human-only operation. --force-with-
+# lease protects against overwriting *others*' commits, not your own previous
+# work on a shared branch — the lease semantics aren't a substitute for
+# "ask the human first".
+if printf '%s' "$SCRUBBED" | rg -q '(^|\s)git(\s+-[cC]\s+\S+)*\s+push\b' \
+   && printf '%s' "$SCRUBBED" | rg -q '(--force(-with-lease|-if-includes)?(=\S*)?(\s|$)|(^|\s)-f(\s|$)|push\.useForceWithLease)'; then
+  cat >&2 <<'EOF'
+🚫 BLOCKED: force-push variant detected.
+
+`git push --force`, `--force-with-lease`, `--force-if-includes`, `-f`, and
+the `-c push.useForceWithLease=true` shape are all blocked for AI agents.
+Force-pushing of any kind is a human-only operation — --force-with-lease's
+lease semantics protect against overwriting other people's commits, not
+your own previous work on a shared branch.
+
+If the user genuinely needs a force-push, they can run it themselves.
+EOF
+  exit 2
+fi
+
 case "$SCRUBBED" in
   *"gh issue create"*)
     cat >&2 <<'EOF'
