@@ -4,6 +4,8 @@ Decisions for base-app and downstream apps scaffolded from it. Each entry is a o
 
 ADRs are Accepted by default. A `status:` field appears only when `proposed`, `superseded by ADR-NNNN`, or `deprecated`.
 
+> This index covers **technical decisions**. People-and-process norms (development flow, spikes, meetings, chat, career) live in [../handbook/](../handbook/).
+
 ## Format (MADR-lite)
 
 Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Context** → **Decision Outcome** → **Consequences** (Positive / Negative / Neutral) → **Alternatives considered** → **Related**. Soft ~150-line cap per ADR 0037.
@@ -69,6 +71,7 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 ### Operations & security
 
 - **[0036 — Production data flow](0036-production-data-flow.md)** — companion to 0035; three hard rules (raw prod data never leaves prod; sanitisation inside prod boundary; prod creds never reach CI / dev); decoupled snapshot/restore pipeline; SQL-level sanitisation.
+- **[0040 — Incident management](0040-incident-management.md)** — SEV1–SEV4 vocabulary; blameless RCAs mandatory for SEV1/2 + recurring SEV3; declaration is channel-first (no GitHub Issue template); CODEOWNERS team-metadata = service ownership; OOH defined per fork. Ratifies [handbook/incidents.md](../handbook/incidents.md) + [runbooks/incident-response.md](../runbooks/incident-response.md) + [incidents/TEMPLATE.md](../incidents/TEMPLATE.md).
 
 ### AI agents (meta)
 

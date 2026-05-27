@@ -135,7 +135,9 @@ escalating responses:
 3. **Catastrophic** (data corrupted, prior shape gone):
    PITR restore to a timestamp before the migration ran.
    **You lose everything written after that timestamp.**
-   Bridge with on-call; document as an incident.
+   Bridge with on-call; follow [`incident-response.md`](incident-response.md)
+   and file the RCA under [`../incidents/`](../incidents/) per
+   [ADR 0040](../adr/0040-incident-management.md).
 
 ## Escalation
 
