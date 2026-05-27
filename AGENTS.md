@@ -15,7 +15,7 @@ Note: ADRs refer to this template as **base-app**; the published GitHub artifact
 - **Dead code**: `pnpm knip` — CI blocks on new issues.
 - **Security**: `pnpm security` — Trivy scans deps, secrets, and IaC. Fails on HIGH/CRITICAL (ADR 0008).
 - **Full gate**: `pnpm check` = lint + typecheck + test + knip + security.
-- **Commits**: Conventional Commits + **trailing ticket reference**. Use `pnpm commit` for the interactive prompt, or write messages like `feat(api): add search endpoint #123` / `feat(api): add search endpoint PROJ-456`. Use `#000` as a placeholder when there genuinely is no ticket (scaffolding, dep bump). See [Every commit names its ticket](#every-commit-names-its-ticket).
+- **Commits**: Conventional Commits + **trailing ticket reference**. Use `pnpm commit` for the interactive prompt, or write messages like `feat(api): add search endpoint #123` / `feat(api): add search endpoint PROJ-456`. The trailer is required — open an issue first via `./.claude/commands/create-issue.sh` if there isn't one. See [Every commit names its ticket](#every-commit-names-its-ticket).
 - **PRs**: Use `./.claude/commands/create-pr.sh "<title>" "<summary>" <ticket>`. Title gets the ticket suffix; body opens with `Closes #N` (GitHub) or `Refs PROJ-N` (Jira/Linear). Direct `gh pr create` is blocked.
 
 ## Repo layout
@@ -98,10 +98,13 @@ The `pnpm cov:check` gate compares per-file coverage against a committed `covera
 ### Mini scripts: Node, written to `.ai-wip/`
 For one-shot verification / batch-transform / regex-sweep scripts, write a `.mjs` file under `.ai-wip/` and run it with `node`. Don't reach for Python — the team's primary language is TS/JS, Node is on every machine, and the script is easier to re-read and amend later. Reach for Python only if a Node equivalent would be materially harder. Never write the script to `/tmp/` (PreToolUse hook blocks it; `.ai-wip/` is the documented scratch location).
 
-### Every commit names its ticket (AI-only enforcement)
-Every AI-authored commit must end its subject with a tracker reference: `#NNN` (GitHub), `PROJ-NNN` (Jira/Linear), or `#000` (no-ticket placeholder for scaffolding / dep bumps). The PreToolUse hook (`.claude/hooks/block-bash-git.sh`) blocks `git commit` without one — there is no AI-side escape hatch. If a commit genuinely has no ticket and `#000` isn't appropriate, ask the human to run the commit themselves. Same goes for PRs: use `./.claude/commands/create-pr.sh` which appends the ticket to the title and writes `Closes #N` / `Refs PROJ-N` into the body. `bd` (beads) IDs are local-only and must NOT appear in commits or PRs.
+### Every commit names its ticket
+Every commit must end its subject with a tracker reference: `#NNN` (GitHub) or `PROJ-NNN` (Jira/Linear). Two layers enforce this:
 
-**Asymmetry — humans are NOT subject to this hook.** Lefthook's `commit-msg` runs commitlint, which enforces Conventional Commits format only — it does *not* require a ticket trailer. Humans are still strongly encouraged to follow the same convention, but nothing blocks them. **Why:** humans can be held accountable for misuse via PR review, CODEOWNERS, and `git blame`; AI agents cannot, so the gate runs at the harness layer where the agent acts. Do not "fix" this asymmetry by adding a ticket-trailer check to commitlint — it is deliberate.
+- **commit-msg lefthook** runs commitlint's `subject-ticket-suffix` rule for everyone (humans + AI). Bypass with `git commit --no-verify` if you genuinely need to — it's a one-off, not a habit.
+- **PreToolUse hook** (`.claude/hooks/block-bash-git.sh`) blocks `git commit` without a trailer *and* blocks `--no-verify` for AI agents. So agents have no bypass at all.
+
+Open a ticket first via `./.claude/commands/create-issue.sh "<title>"` if one doesn't exist. PRs use `./.claude/commands/create-pr.sh` which appends the ticket to the title and writes `Closes #N` / `Refs PROJ-N` into the body. `bd` (beads) IDs are local-only and must NOT appear in commits or PRs.
 
 ### Lock to exact versions
 All dependency versions in every `package.json` are pinned exactly (e.g. `"2.2.6"`, not `"^2.2.6"` or `"~2.2.6"`). Ranges let silent upgrades break the build between `pnpm install` runs on different machines. Upgrades happen intentionally, via a PR that bumps the pin and re-runs the full quality gate.
