@@ -19,6 +19,12 @@ jobs:
     name: Lint / Typecheck / Test / Knip
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0   # nx affected base needs full history
+          persist-credentials: false
+
       - name: Setup
         uses: ./.github/actions/setup-monorepo
 
@@ -48,6 +54,12 @@ jobs:
     name: Lint baseline (bs check)
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
       - name: Setup
         uses: ./.github/actions/setup-monorepo
 
@@ -67,7 +79,7 @@ jobs:
           persist-credentials: false
 
       - name: Trivy vulnerability + secret + misconfig scan
-        uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # 0.36.0
         with:
           scan-type: fs
           scan-ref: .

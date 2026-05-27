@@ -38,6 +38,12 @@ jobs:
     name: pnpm reset → install → lint
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
       - name: Setup
         uses: ./.github/actions/setup-monorepo
         with:

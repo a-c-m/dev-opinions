@@ -1,29 +1,30 @@
 name: Setup monorepo
-description: Checkout, Node via .nvmrc, pnpm via Corepack, cached install.
+description: Node via .nvmrc, pnpm via Corepack, cached install. **Caller must run `actions/checkout` first** — local composite actions can't be loaded before the repo is on disk.
+
+# Caller responsibilities:
+#
+#   1. Run `actions/checkout` BEFORE invoking this composite. Local actions
+#      live at `./.github/actions/...` and the runner can't read the
+#      action.yml until the repo has been checked out.
+#
+#   2. Pass `fetch-depth: 0` on actions/checkout when the job needs git
+#      history (nx affected base, biome baseline diff, nx release).
+#
+#   3. Pass `persist-credentials: false` UNLESS the job pushes to a
+#      protected branch. Default-deny: stops any later step in the same
+#      job (third-party action, malicious dep) reading the GH token from
+#      .git/config. Jobs that need to push (cut-release, tag-release,
+#      deploy-prod merge-back) opt in with `persist-credentials: true`.
 
 inputs:
-  fetch-depth:
-    description: git clone depth. `0` for full history (needed for nx affected base).
-    required: false
-    default: "0"
   install:
-    description: Run `pnpm install --frozen-lockfile`. Set to `false` to skip for actions that only need the checkout and caches.
+    description: Run `pnpm install --frozen-lockfile`. Set to `false` to skip for actions that only need the caches.
     required: false
     default: "true"
 
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      with:
-        fetch-depth: ${{ inputs.fetch-depth }}
-        # Don't persist the GH token to .git/config — stops any later step
-        # in the same job (third-party action, malicious dep) reading it.
-        # Jobs that need to push (cut-release, tag-release, deploy-prod
-        # merge-back) call actions/checkout directly, not via this action.
-        persist-credentials: false
-
     - name: Read Node version from .nvmrc
       id: node-version
       shell: bash
