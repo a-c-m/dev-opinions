@@ -31,8 +31,10 @@ const groups = [
   [
     "Quality gates",
     {
-      check: "lint:check + typecheck + test:cov + cov:check + knip + security + check:overrides + check:shared",
-      "check:fast": "lint+typecheck via run-many (NX deadlock workaround); test via nx affected — see docs/conventions/nx-targets.md",
+      check:
+        "lint:check + typecheck + test:cov + cov:check + knip + security + check:overrides + check:shared",
+      "check:fast":
+        "lint+typecheck via run-many (NX deadlock workaround); test via nx affected — see docs/conventions/nx-targets.md",
       "check:overrides": "Verify pnpm-overrides.md is in sync with package.json pnpm.overrides",
       lint: "Biome 2 + Ultracite (--write, auto-fix)",
       "lint:check": "Biome read-only — fails on NEW errors vs the baseline",
