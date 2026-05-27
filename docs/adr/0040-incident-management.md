@@ -88,12 +88,12 @@ Declaration is a post in the incident channel per the runbook's message template
 
 ## Alternatives considered
 
-1. **One ADR carrying severity + declaration + comms + roles + RCA**. Violates the [~150-line MADR-lite cap](0037-multi-agent-rule-distribution.md) and conflates norms (handbook-shaped) with procedure (runbook-shaped). Rejected — split per artifact type.
+1. **One ADR carrying severity + declaration + comms + roles + RCA.** Violates the [~150-line MADR-lite cap](0037-multi-agent-rule-distribution.md) and conflates norms (handbook-shaped) with procedure (runbook-shaped). Rejected — split per artifact type.
 2. **Mandate incident.io / PagerDuty as the day-one declaration mechanism.** Couples the template to a vendor; defaults a paid product on small forks. Rejected — Slack + GitHub Issue is enough; vendor named as graduation.
-3. **`EMERGENCY.md` at repo root for service ownership**. Duplicates CODEOWNERS team-metadata; second sync surface. Rejected.
+3. **`EMERGENCY.md` at repo root for service ownership.** Duplicates CODEOWNERS team-metadata; second sync surface. Rejected.
 4. **No formal protocol — Slack improvisation.** Already implicitly promised by career.md; not delivering is the failure mode this ADR fixes. Rejected.
 5. **`docs/post-mortems/` as the artifact directory.** Reads less naturally than `incidents/` (the post-mortem is *of an incident*); "postmortem" is the report not the dir. Rejected.
-6. **`.github/ISSUE_TEMPLATE/incident.md` as the declaration mechanism.** Couples declaration to GitHub Issues; the five existing templates in [ADR 0031](0031-github-repo-conventions.md) are backlog-shaped (story / bug / discovery / release / default) and an incident's live-coordination lifecycle doesn't fit alongside them. Rejected — declaration is channel-first per the runbook's message template.
+6. **`.github/ISSUE_TEMPLATE/incident.md` as the declaration mechanism.** Couples declaration to GitHub Issues; the five existing templates in [ADR 0031](0031-github-repo-conventions.md) are backlog-shaped (output / task / bug / spike / release) and an incident's live-coordination lifecycle doesn't fit alongside them. Rejected — declaration is channel-first per the runbook's message template.
 
 ## Related
 

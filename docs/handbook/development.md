@@ -199,6 +199,22 @@ See the blog for the details, but TL:DR; Having a human review the plan improves
 
 > Reality check: This only works if your pair planners actually engage. Rubber-stamp reviews are worse than no reviews. Fix your culture first.
 
+#### Pair-plan the child Work *before* creating the tickets
+
+The cheapest place to pair-plan an **[Output](#2-output-aka-stories-epics)** is at the **breakdown** — before any of its child Work becomes a real ticket. This is an **Output-scoped practice** because Outputs are big enough to earn it; single Tasks and spike follow-ups don't need the full three-stage ceremony (though the underlying idea — sketch the list before fleshing out tickets — still applies in lighter form).
+
+Three stages, kept deliberately separate:
+
+1. **Open the Output** with its parent context — goal, parent Outcome, success metric, impact, acceptance criteria. Most of the child Work is deliberately *not* there yet. Exceptions could be if we know its going to need a UAT pass or its own release, then they would be pre sketched (not ticket created).
+
+2. When estimating, we **sketch the breakdown** inside the Output ticket's *Child Work* section. One bullet per item: **title + estimate + short description** — not fully-detailed tickets. Then sit with a peer and pair-plan *that list*: are the edges covered, is anything missing, are you solving the problem the right way? Make sure QA, UAT, and release tickets are considered if they apply. The **sum of the estimates is your sizing signal** — if it's bigger than this Output should be, slice the Output here, before any tickets exist. The [`output.md`](../../.github/ISSUE_TEMPLATE/output.md) issue template's *Child Work* section is shaped for exactly this list.
+
+3. **Create the real tickets** only when the Output (or a slice of it) moves into *in progress*. Expect to **replan** at this point — the act of starting work surfaces detail the breakdown didn't. Each ticket then meets the [Definition of Ready](#definition-of-ready) on its own terms.
+
+Writing a detailed ticket is slow; *deleting* ten half-written tickets when the breakdown turns out wrong is worse — and there's a temptation to keep tickets that no longer fit just because they exist. A list inside the Output is cheap to revise; a dozen written-but-wrong child tickets aren't.
+
+This is Pair Point 1 (review of the plan) applied at the breakdown level — same loop, earlier in the process, where the unit of work is still a sentence.
+
 ### Small code
 
 Small tickets lead to small code:

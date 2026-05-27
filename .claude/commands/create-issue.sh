@@ -7,15 +7,19 @@
 #
 # Usage:
 #   create-issue.sh [--template <name>] "<title>"
-#   create-issue.sh "<title>"                      # defaults to story
+#   create-issue.sh "<title>"                      # defaults to task
 #   create-issue.sh --template bug "<title>"
-#   create-issue.sh --template discovery "<title>"
+#   create-issue.sh --template spike "<title>"
+#   create-issue.sh --template output "<title>"    # parent — sprint-level bundle
 #
-# Available templates: story, bug, discovery, release, default.
+# Available templates: output, task, bug, spike, release.
+# Names track handbook/development.md (Work types + the Output parent concept)
+# and handbook/spikes.md. Task is the catch-all — "if it needs doing, it's
+# probably a task" — so no separate "Other" template.
 
 set -euo pipefail
 
-TEMPLATE="story"
+TEMPLATE="task"
 TITLE=""
 
 while [ $# -gt 0 ]; do

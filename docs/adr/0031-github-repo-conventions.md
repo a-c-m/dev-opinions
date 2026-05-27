@@ -29,11 +29,11 @@ Every PR opens with the same structure so reviewers can orient in seconds:
 
 Five templates cover the common intake shapes, with `config.yml` disabling the blank template so every issue picks a category.
 
-- `story.md` — feature work: goal, success metric, impact, acceptance criteria.
+- `output.md` — **parent** concept: a bundle of Work delivering one coherent thing (AKA story / epic / bet) per [handbook/development.md → Output](../handbook/development.md#2-output-aka-stories-epics). Carries goal, parent Outcome, success metric, child Work items, acceptance criteria. Most Work that moves into "in progress" belongs to one of these.
+- `task.md` — Work-level ticket: feature, automation, docs, design, manual QA, anything that needs doing per [handbook/development.md → Work](../handbook/development.md#1-work). Carries what, why, acceptance criteria, prod signal, estimate. **Task is the catch-all** — "if it needs doing, it's probably a task" — so there's no separate "Other" template.
 - `bug.md` — description, reproduction steps, expected vs actual, environment.
-- `discovery.md` — research spikes with explicit deliverable (a decision, a doc, a spike branch).
+- `spike.md` — timeboxed research per [handbook/spikes.md](../handbook/spikes.md): one question, deliverable, timebox, out-of-scope.
 - `release.md` — release planning or release notes.
-- `default.md` — catch-all for issues that do not fit a category.
 
 ### Commit conventions
 
