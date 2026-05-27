@@ -1,9 +1,9 @@
 {
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
-    "@commitlint/cli": "20.5.2",
-    "@commitlint/config-conventional": "20.5.0",
-    "@commitlint/types": "20.5.0",
+    "@commitlint/cli": "21.0.1",
+    "@commitlint/config-conventional": "21.0.1",
+    "@commitlint/types": "21.0.1",
     "@nx/eslint": "22.7.4",
     "@nx/js": "22.7.4",
     "@nx/nest": "22.7.4",
