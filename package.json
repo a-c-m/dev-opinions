@@ -26,6 +26,7 @@
     "vitest": "4.1.7"
   },
   "name": "dev-opinions",
+  "type": "module",
   "scripts": {
     "scripts:help": "node scripts/help.mjs",
     "prepare": "lefthook install",
