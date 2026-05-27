@@ -33,7 +33,7 @@
     "typecheck": "tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@casl/ability": "6.7.5",
+    "@casl/ability": "7.0.0",
     "@shared/auth": "workspace:*"
   },
   "peerDependencies": {
