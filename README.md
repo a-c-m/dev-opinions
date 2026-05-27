@@ -4,13 +4,13 @@
 
 *I wrote this for you.*
 
-A collection of ADRs — what I currently think "good" looks like, mostly for projects in the JavaScript ecosystem.
+A collection of opinions, committed to code as ADRs, SOPs, handbook entries, runbooks, and incident post-mortems. This is what I currently think "good" looks like, mostly for projects in the JavaScript ecosystem.
 
-Packaged as a runnable monorepo template, but the real payload is [`docs/adr/`](docs/adr/). Three ways to use it:
+Packaged as a runnable monorepo template, but the real payload is [`docs/`](docs/) — opinions live there, version-controlled next to the code they describe. Three ways to use it:
 
 - **Start a new project from it.** Clone, run `./scripts/reset-template.sh`, generate your first app. The opinions come with you.
-- **Wrap an existing setup with it.** One monorepo, or a group of related repos that want a shared source of truth for conventions. Vendor [`docs/adr/`](docs/adr/), the agent files, and the hooks; leave the sample apps behind.
-- **Just read it — or have your AI read it.** Point Claude / Cursor / Copilot at [`docs/adr/`](docs/adr/) and [`AGENTS.md`](AGENTS.md) and they stop guessing about your conventions. Equally useful for humans venturing into territory outside their usual skill set, where the *why* in each ADR matters more than the *what*.
+- **Wrap an existing setup with it.** One monorepo, or a group of related repos that want a shared source of truth for conventions. Vendor [`docs/`](docs/), the agent files, and the hooks; leave the sample apps behind.
+- **Just read it — or have your AI read it.** Point Claude / Cursor / Copilot at [`docs/`](docs/) and [`AGENTS.md`](AGENTS.md) and they stop guessing about your conventions. Equally useful for humans venturing into territory outside their usual skill set, where the *why* in each decision matters more than the *what*.
 
 ## A note before you clone
 
@@ -40,7 +40,7 @@ One concrete implementation of the opinions. Deviate as needed — the ADRs in [
 | --------------- | ----------------------------------------------------------------------------------------------- |
 | Package manager | pnpm 9                                                                                          |
 | Monorepo        | NX 22                                                                                           |
-| Language        | TypeScript 6.0 strict (+ tsgo native preview), tsgo for typecheck                                |
+| Language        | TypeScript 6.0 strict (+ tsgo native preview), tsgo for typecheck                               |
 | Lint/format     | Biome 2 + Ultracite 7                                                                           |
 | Dead code       | Knip 6                                                                                          |
 | Backend         | NestJS 11 (Fastify adapter)                                                                     |
@@ -79,8 +79,12 @@ apps/<product>/<service>/  # deployable units, two-tier
 shared/                    # reusable libraries (@shared/*)
 tools/                     # workspace-internal tooling
 docs/adr/                  # architecture decision records (AGENTS.md = index)
-docs/runbooks/             # ops runbooks (3am-ready)
-docs/sops/                 # standard operating procedures
+docs/handbook/             # engineering handbook (dev flow, spikes, incidents, career, …)
+docs/runbooks/             # under-pressure operational procedures (3am-ready)
+docs/sops/                 # normal-work standard operating procedures
+docs/incidents/            # filed RCAs (TEMPLATE.md + blameless by policy)
+docs/conventions/          # long-form refs ratified by ADRs
+docs/QUICKSTART.md         # first-clone walkthrough
 scripts/                   # repo scripts (reset, codegen, security-scan)
 AGENTS.md                  # canonical cross-agent brief; CLAUDE.md is a symlink
 .agents/skills/            # canonical skill sources, symlinked per agent
