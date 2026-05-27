@@ -59,8 +59,8 @@ The root `package.json` keeps a thin orchestration layer over `nx run-many`. Onl
     "lint:ci":     "bs check --suppression-fail-on-improvement",
     "knip":        "knip",
     "security":    "./scripts/security-scan.sh",
-    "check":       "pnpm lint:check && pnpm typecheck && pnpm test && pnpm knip && pnpm security",
-    "check:affected": "nx affected --target=lint,typecheck,test"
+    "check":       "pnpm lint:check && pnpm typecheck && pnpm test:cov && pnpm cov:check && pnpm knip && pnpm security",
+    "check:fast":  "nx run-many --target=lint,typecheck --all && nx affected --target=test"
   }
 }
 ```

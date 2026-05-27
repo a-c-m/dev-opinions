@@ -52,7 +52,7 @@
     "check:overrides": "node scripts/check-pnpm-overrides.mjs",
     "check:shared": "node scripts/check-shared-conventions.mjs",
     "check": "pnpm lint:check && pnpm typecheck && pnpm test && pnpm knip && pnpm security && pnpm check:overrides && pnpm check:shared",
-    "check:affected": "nx run-many --target=lint --all && nx run-many --target=typecheck --all && nx affected --target=test",
+    "check:fast": "nx run-many --target=lint --all && nx run-many --target=typecheck --all && nx affected --target=test",
     "commit": "cz",
     "release": "nx release",
     "reset": "./scripts/reset-template.sh",

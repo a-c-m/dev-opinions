@@ -25,7 +25,7 @@ flowchart LR
     A([Pick up work]) --> B[Branch from main]
     B --> C[Develop + tests]
     C --> D[Conventional commit]
-    D --> E[pnpm check:affected<br/>pnpm knip]
+    D --> E[pnpm check:fast<br/>pnpm knip]
     E --> F[Open PR via wrapper]
     F --> G[CODEOWNERS review]
     G --> H[Merge to main]
@@ -66,7 +66,7 @@ flowchart LR
 5. **Before claiming done.** Run the Definition of Done:
 
    ```bash
-   pnpm check:affected   # lint + typecheck + test on changed projects
+   pnpm check:fast       # lint+typecheck via run-many; test via nx affected
    pnpm knip             # no new dead code
    ```
 

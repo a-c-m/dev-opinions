@@ -31,7 +31,7 @@ Note: ADRs refer to this template as **base-app**; the published GitHub artifact
 
 1. Read any `AGENTS.md` in the app you are working on before editing (`CLAUDE.md` symlinks to it).
 2. Use NX generators for new apps/libs — do not hand-roll project structure.
-3. Run `pnpm check:affected` before committing.
+3. Run `pnpm check:fast` before committing.
 4. Run `pnpm knip` to confirm no dead code was added.
 5. For any decision that changes the stack, add or supersede an ADR under `docs/adr/`.
 

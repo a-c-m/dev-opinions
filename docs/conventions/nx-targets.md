@@ -48,7 +48,7 @@ Even outside lefthook, `nx affected` with `tsgo` or Biome has been observed dead
 
 - **`lefthook.yml`** — pre-commit + pre-push use `pnpm -r` / `pnpm lint:check`, never NX.
 - **`.github/workflows/ci.yml`** — uses `nx run-many` for lint + typecheck (CI never showed the deadlock; the NX cache is worth keeping in CI), `nx affected` for test.
-- **`package.json` scripts** — `pnpm typecheck` and `pnpm lint:check` are the root entry points dev tooling should call. `pnpm check:affected` uses `nx run-many` for tc+lint, `nx affected --target=test`.
+- **`package.json` scripts** — `pnpm typecheck` and `pnpm lint:check` are the root entry points dev tooling should call. `pnpm check:fast` uses `nx run-many` for tc+lint (NX-deadlock workaround), `nx affected --target=test` for tests. Renamed from `check:affected` to stop the name implying incremental across the whole gate.
 - **`.claude/hooks/block-bash-rules.sh` rule 7** — blocks the agent from running `nx affected --target=typecheck` or `nx affected --target=lint` with a stderr message pointing at this doc. (Run-many is allowed; the block targets the documented-bad shape.)
 
 ## When to revisit

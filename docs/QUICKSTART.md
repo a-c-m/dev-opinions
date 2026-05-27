@@ -152,7 +152,7 @@ pnpm typecheck            # tsgo across projects
 pnpm knip                 # dead-code / unused-deps scan
 pnpm security             # Trivy
 pnpm check                # full gate (all of the above + check:overrides)
-pnpm check:affected       # nx affected for lint/typecheck/test
+pnpm check:fast           # lint+typecheck via run-many; tests via nx affected (see docs/conventions/nx-targets.md)
 pnpm scripts:help         # discoverable list of repo scripts with one-line descriptions
 pnpm nx graph             # interactive project dependency graph in the browser
 pnpm commit               # interactive Conventional Commit (cz)
@@ -169,7 +169,7 @@ dependency may have an unpatched CVE. Bump the offending package, or add
 the CVE to `.trivyignore` with a reason and review date. Don't disable the
 step.
 
-**"`pnpm check:affected` finds nothing"** — `nx affected` compares against
+**"`pnpm check:fast` finds nothing"** — `nx affected` (used for the test step) compares against
 `origin/main` by default. On a fresh clone with no remote tracking branch,
 either push first or use `--base=HEAD~1`.
 
