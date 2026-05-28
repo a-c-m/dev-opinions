@@ -36,6 +36,8 @@ The pattern that avoids both is a small library of **reusable workflows** (prefi
 - **Concurrency**: each workflow cancels in-progress runs for the same branch so a forced push does not queue stale CI.
 - **OIDC**: cloud authentication is OIDC-only. Long-lived `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / equivalents must not be added as repo or environment secrets. The control is the cloud-side IAM posture (no long-lived-key users provisioned) plus Trivy secret scanning on every PR; PR review catches the shape mistake. See [ADR 0026](0026-secrets-runtime-injection.md) for the full secrets-injection model.
 
+Practitioner-level rules for writing workflows (sharp edges in the platform itself, do/don't pairs) live in [docs/conventions/github-actions.md](../conventions/github-actions.md). This ADR is the design rationale; that file is the rulebook.
+
 ## Consequences
 
 ### Positive
