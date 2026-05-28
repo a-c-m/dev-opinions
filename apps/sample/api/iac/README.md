@@ -31,7 +31,7 @@ tofu plan -var-file=.conf.dev.tfvars
 tofu apply -var-file=.conf.dev.tfvars
 ```
 
-`tofu apply` should be rare locally — the normal path is the `_infra-deploy`
+`tofu apply` should be rare locally — the normal path is the `_tofu-deploy`
 reusable workflow driven by a PR or a merge to `main`.
 
 ## Adopting this skeleton
@@ -46,7 +46,7 @@ reusable workflow driven by a PR or a merge to `main`.
    etc. Commit only non-secret tfvars; secret values flow through `TF_VAR_*`
    in CI.
 5. Add your first resource in `main.tf` and run `tofu plan` locally.
-6. Wire a deploy workflow that calls `.github/workflows/_infra-deploy.yml`
+6. Wire a deploy workflow that calls `.github/workflows/_tofu-deploy.yml`
    with the paths and environment for this app.
 
 ## State encryption — do not disable

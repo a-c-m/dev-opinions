@@ -2,7 +2,7 @@
   "name": "sample-api-iac",
   "version": "0.0.0",
   "private": true,
-  "description": "OpenTofu infrastructure for sample-api. Deployed via .github/workflows/_infra-deploy.yml.",
+  "description": "OpenTofu infrastructure for sample-api. Deployed via .github/workflows/_tofu-deploy.yml.",
   "pipeline": {
     "tool": "opentofu",
     "tf_remote_state": "sample-api/terraform.tfstate",

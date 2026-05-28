@@ -9,7 +9,7 @@
 #       permissions:
 #         id-token: write
 #         contents: read
-#       uses: ./.github/workflows/_infra-deploy.yml
+#       uses: ./.github/workflows/_tofu-deploy.yml
 #       with:
 #         working-directory: apps/my-api/iac
 #         var-file: .conf.prod.tfvars
@@ -18,7 +18,7 @@
 #         encryption-passphrase: ${{ secrets.TF_ENCRYPTION }}
 #         aws-role: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
 
-name: _infra-deploy (reusable)
+name: _tofu-deploy (reusable)
 
 on:
   workflow_call:

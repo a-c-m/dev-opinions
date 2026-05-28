@@ -33,7 +33,7 @@ Terraform has been the industry default for a decade, but since its 2023 licence
 - **Environments**: one tfvars file per environment (`dev`, `staging`, `prod`). Environment is selected at apply time via `-var-file`, not via workspaces (workspaces hide environment in a terminal command and are easy to get wrong).
 - **Secrets**: application secrets live in the target cloud's secret manager (AWS Secrets Manager, GCP Secret Manager, Azure Key Vault), *referenced* by name in tfvars. Secret *values* are injected at apply time via `TF_VAR_*` env vars from CI secrets. Nothing secret is ever committed.
 - **Provider versions are pinned exactly** in `providers.tf` and `.terraform.lock.hcl` is committed — the same "exact versions" rule as application dependencies.
-- **Deploys via CI only**: `.github/workflows/_infra-deploy.yml` is the reusable workflow that runs `tofu init / validate / plan / apply`. Local apply is for emergencies, not the default loop. The state lock + the CI concurrency group prevent races.
+- **Deploys via CI only**: `.github/workflows/_tofu-deploy.yml` is the reusable workflow that runs `tofu init / validate / plan / apply`. Local apply is for emergencies, not the default loop. The state lock + the CI concurrency group prevent races.
 
 ### Open decisions (captured here, not blocking)
 

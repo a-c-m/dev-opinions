@@ -64,7 +64,7 @@ Frontmatter (`date`, optional `decision-makers` / `tags` / `status`) → **Conte
 - **[0030 — Lefthook for git hooks](0030-lefthook.md)** — YAML runner; pre-commit (biome, knip, commitlint), pre-push (`nx affected`), commit-msg gates.
 - **[0031 — GitHub repo conventions](0031-github-repo-conventions.md)** — PR template + 5 issue templates + path-based CODEOWNERS (with team-metadata comment blocks) + Conventional Commits + mandatory `#N` / `PROJ-N` ticket suffix for AI commits + staggered weekly Dependabot + SECURITY.md.
 - **[0032 — GitHub Actions](0032-github-actions-ci.md)** — reusable workflows (`_` prefix) + `setup-monorepo` composite; PR CI runs `nx affected` + Trivy; OIDC-only cloud auth.
-- **[0033 — OpenTofu IaC](0033-opentofu-iac.md)** — per-app `apps/<name>/iac/`; remote encrypted state; environments via `-var-file`; deploys via `_infra-deploy.yml`.
+- **[0033 — OpenTofu IaC](0033-opentofu-iac.md)** — per-app `apps/<name>/iac/`; remote encrypted state; environments via `-var-file`; deploys via `_tofu-deploy.yml`.
 - **[0034 — Container conventions](0034-container-conventions.md)** — single `Dockerfile` per service, four targets, `node:22-bookworm-slim`; `USER node`; `HEALTHCHECK` on `/healthz` (liveness, no DB) + `/readyz` (readiness, DB + downstreams) via `@nestjs/terminus`; `ENTRYPOINT` stacks vault → OTel → app.
 - **[0035 — Branches, releases, environments](0035-branching-releases-environments.md)** — two branches (`main` + `release-candidate`); tag-driven prod with merge-back on success; hotfix from prod tag → PR into `release-candidate`; GitLab Flow + SemVer.
 

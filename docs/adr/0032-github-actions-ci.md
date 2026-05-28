@@ -26,7 +26,7 @@ The pattern that avoids both is a small library of **reusable workflows** (prefi
       ├── ci.yml                      # PR entry point: calls nx affected + knip + trivy
       ├── trivy.yml                   # scheduled full vulnerability scan
       ├── _container-build.yml        # reusable: build, tag, scan, push an image
-      └── _infra-deploy.yml           # reusable: tofu init/validate/plan/apply
+      └── _tofu-deploy.yml            # reusable: tofu init/validate/plan/apply
   ```
 - **Naming**: reusable workflows are prefixed `_`. App-specific workflows call them with inputs; they do not duplicate the steps.
 - **Composite action `setup-monorepo`**: encapsulates Node via `.nvmrc`, pnpm via Corepack, pnpm store cache keyed on `pnpm-lock.yaml`, and `pnpm install --frozen-lockfile`. Every workflow that touches Node code uses this action — there is no place where the setup steps are re-inlined.
