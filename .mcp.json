@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "atlassian": {
+      "type": "sse",
+      "url": "https://mcp.atlassian.com/v1/sse"
+    },
     "context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@2.1.8"],
@@ -9,7 +13,12 @@
     },
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@0.0.70", "--output-dir", ".playwright-mcp"]
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.70",
+        "--output-dir",
+        ".playwright-mcp"
+      ]
     },
     "chrome-devtools": {
       "command": "npx",
