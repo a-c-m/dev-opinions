@@ -28,3 +28,12 @@ Authoritative ADRs:
 - **Permission rule** → `settings.json`. Prefer patterns over enumeration; use `deny` to enforce "use X, not Y" project rules.
 
 When in doubt, the decision rule from [`.agents/README.md`](../.agents/README.md) applies: *is there a shared open standard for this asset's format that multiple harnesses agree on?* If yes, it goes in `.agents/`. If no, it stays per-harness here.
+
+## Output verbosity — quiet by default
+
+Tool output is a major token sink, so the harness defaults to quiet and surfaces failures. Opt back in per source:
+
+- **lefthook** — `output: false` ([`lefthook.yml`](../lefthook.yml)); more via `LEFTHOOK_OUTPUT=…`.
+- **pnpm / NX noise** — `env` vars in [`settings.json`](settings.json): `NPM_CONFIG_GLOBALCONFIG=/dev/null` (skips the `~/.npmrc` read the sandbox blocks anyway) and `NX_TUI=false` (no escape-sequence TUI). Agent-scoped (your shell keeps full output); override per-call, e.g. `NX_TUI=true pnpm test`.
+
+Not muted on purpose: pnpm's `Unsupported engine` warning is real drift ([`.nvmrc`](../.nvmrc) pins node 22.19.0) — `nvm use`, don't silence.
