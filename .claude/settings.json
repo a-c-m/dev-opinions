@@ -151,5 +151,58 @@
         ]
       }
     ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false,
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "codeload.github.com",
+        "objects.githubusercontent.com",
+        "registry.npmjs.org"
+      ]
+    },
+    "filesystem": {
+      "denyRead": [
+        "~/.config",
+        "~/.aws",
+        "~/.azure",
+        "~/.oci",
+        "~/.docker",
+        "~/.kube",
+        "~/.vault-token",
+        "~/.password-store",
+        "~/.netrc",
+        "~/.git-credentials",
+        "~/.authinfo",
+        "~/.gnupg",
+        "~/.npmrc",
+        "~/.yarnrc.yml",
+        "~/.pypirc",
+        "~/.cargo/credentials.toml",
+        "~/.gem/credentials",
+        "~/.m2/settings.xml",
+        "~/.composer/auth.json",
+        "~/.terraform.d",
+        "~/.terraformrc",
+        "~/.pulumi",
+        "~/.zsh_history",
+        "~/.bash_history",
+        "~/.zshrc",
+        "~/.zshenv",
+        "~/.zprofile",
+        "~/.bashrc",
+        "~/.bash_profile",
+        "~/.profile",
+        "~/.envrc",
+        "~/Library/Keychains"
+      ],
+      "allowRead": [
+        "~/.config/git"
+      ]
+    },
+    "excludedCommands": ["gh", "gh *"]
   }
 }
