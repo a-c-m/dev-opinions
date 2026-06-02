@@ -15,17 +15,23 @@ Note: ADRs refer to this template as **base-app**; the published GitHub artifact
 - **Dead code**: `pnpm knip` — CI blocks on new issues.
 - **Security**: `pnpm security` — Trivy scans deps, secrets, and IaC. Fails on HIGH/CRITICAL (ADR 0008).
 - **Full gate**: `pnpm check` = lint + typecheck + test + knip + security.
-- **Commits**: Conventional Commits + **trailing ticket reference**. Use `pnpm commit` for the interactive prompt, or write messages like `feat(api): add search endpoint #123` / `feat(api): add search endpoint PROJ-456`. The trailer is required — open an issue first via `./.claude/commands/create-issue.sh` if there isn't one. See [Every commit names its ticket](#every-commit-names-its-ticket).
+- **Commits**: Conventional Commits + **trailing ticket reference**. Use `pnpm commit` for the interactive prompt, or write messages like `feat(api): add search endpoint #123` / `feat(api): add search endpoint PROJ-456`. The trailer is required — open an issue first via `./.claude/commands/create-issue.sh` if there isn't one (see **Every commit names its ticket** under Operating rules).
 - **PRs**: Use `./.claude/commands/create-pr.sh "<title>" "<summary>" <ticket>`. Title gets the ticket suffix; body opens with `Closes #N` (GitHub) or `Refs PROJ-N` (Jira/Linear). Direct `gh pr create` is blocked.
 
 ## Repo layout
 
 - `apps/<product>/<service>/` — deployable units, two-tier. Second tier is the product (e.g. `tool1`, `funnels`, `marketing`); third tier is the service within it (e.g. `web`, `api`, `worker`). Each leaf has `src/main.ts(x)` and a scoped `package.json` (no `project.json` — NX metadata goes in `package.json` `"nx"`, see [ADR 0004](docs/adr/0004-nx-monorepo.md)).
+- `repos/*` — independent child repos (often symlinks to external checkouts) for wrapping existing setups. See [repos/README.md](repos/README.md).
 - `shared/*` — reusable libraries, imported as `@shared/<name>`.
 - `tools/*` — workspace-internal tooling (custom reporters, generators).
 - `docs/adr/` — architecture decision records. New significant decisions get a new ADR.
 - `scripts/` — repo scripts. `reset-template.sh` deletes sample apps when starting a new project.
 - `.claude/` — Claude Code configuration (agents, hooks, commands, skills, settings).
+
+## Apps and Repos
+<!-- One line per app/repo (name + description). If empty, offer to populate; if stale, offer to update. -->
+
+- 
 
 ## Preferred workflow
 
@@ -37,25 +43,29 @@ Note: ADRs refer to this template as **base-app**; the published GitHub artifact
 
 ## Env variables
 
-Backend services follow ADR 0016: typed schema + layered YAML files in `config/`, with secrets-only living in env vars and injected via `@shared/config`. Web apps follow ADR 0017: a zod schema in `src/env.ts` validating values injected at deploy time via `@import-meta-env/unplugin`. Do not read `process.env` directly in application code in either tier.
+- **Backend** (ADR 0016): typed schema + layered YAML in `config/`; secrets-only in env vars, injected via `@shared/config`.
+- **Web** (ADR 0017): a zod schema in `src/env.ts` over values injected at deploy time via `@import-meta-env/unplugin`.
+- **Never** read `process.env` directly in app code — either tier.
+
+Bash **sandbox** is enabled, credential stores (cloud/registry/CLI tokens, keychain, shell rc) are blocked from reads and writes are confined to the workspace — see [docs/conventions/sandbox.md](docs/conventions/sandbox.md).
 
 ## Task tracking — local vs team
 
 Two tiers, deliberately separate:
 
 - **Local, ephemeral, personal** — `bd` (beads) CLI. Scratch lists, in-flight per-branch notes, quick captures. State lives in `.beads/` and is **gitignored**. Use `bd q "<task>"` to capture, `bd list --ready` to pick up next. Never install `bd`'s own git hooks in this repo.
-- **Team, long-running, externally visible** — GitHub Issues via `./.claude/commands/create-issue.sh`. Anything tied to a release, any bug a teammate might need to see, any discovery that produces a decision.
+- **Team, long-running, externally visible** — Issues in centralized tracker e.g. `./.claude/commands/create-issue.sh`. Anything tied to a release, any bug a teammate might need to see, any discovery that produces a decision.
 
 If a local bead outgrows its scope, copy it into a GitHub issue and close the bead.
 
 ## Memory — project vs personal
 
-Two sinks, deliberately separate — same two-tier shape as task tracking.
+Two sinks — same split as task tracking. Test: *would another contributor want this?*
 
-- **Project-shared** — facts every contributor benefits from (a convention, a rule, a recurring gotcha, a non-obvious constraint): add a bullet to the nearest `AGENTS.md` (root or per-folder). Committed; shared via git; subject to the ~150-line cap and inline-rationale rule per [ADR 0037](docs/adr/0037-multi-agent-rule-distribution.md).
-- **Personal** — facts about *this developer* (role, expertise level, response-style preferences): write to the harness's auto-memory under `~/.claude/`. Per-developer; not committed. Cannot be redirected from project settings — Claude Code ignores `autoMemoryDirectory` in committed `.claude/settings.json` for security.
+- **Project-shared** (yes) — conventions, rules, gotchas, non-obvious constraints: a bullet in the nearest `AGENTS.md`. Committed; subject to the ~150-line cap + inline-rationale rule per [ADR 0037](docs/adr/0037-multi-agent-rule-distribution.md).
+- **Personal** (no) — facts about *this developer* (role, expertise, response-style): the harness auto-memory under `~/.claude/`. Not committed.
 
-Before writing to auto-memory, ask: "would another contributor want this?" If yes, it's project-shared — write to `AGENTS.md`, not auto-memory. If a memory turns out to be project-shared after the fact, promote it: delete the personal entry, add the AGENTS.md bullet.
+Mis-filed a personal note that's actually shared? Move it to `AGENTS.md`/`docs/`.
 
 ## MCP tools available
 
@@ -75,43 +85,22 @@ Surface these proactively when the situation matches — don't wait to be asked.
 
 ## Operating rules
 
-These are non-negotiable. They exist because each has cost us time before.
+Non-negotiable — each has cost us time before.
 
-### Fail, don't skip
-When a hook, check, or lint fails, fix the underlying cause. Never add an escape hatch to the hook (skip-if-missing, `--no-verify`, muting the rule globally, early-return on edge cases). A hook that can be silently skipped is not a hook. If the failure is a bootstrap problem, solve it by installing what the hook needs, not by making the hook optional.
-
-### One command at a time
-Don't chain unrelated Bash commands with `&&` or `;`. Each step should be runnable and reviewable on its own. Chain only when two commands are genuinely one logical operation (e.g. `mkdir -p x && cd x`).
-
-### Capture output for review
-Prefer `cmd > .ai-wip/<name>.log 2>&1` over `cmd | rg …` or `cmd | jq …` inline. The user can re-read the file later. Inline pipes discard the raw output. If the file is small, `cat` it after. If large, `tail` or `rg` it — but the full output stays on disk. `.ai-wip/` is gitignored — one known location, survives across sessions, never committed. Don't use `/tmp/` (PreToolUse hook blocks it).
-
-### Search with ripgrep, never grep
-Use `rg` via Bash for **all** searches — not POSIX `grep`, and not the built-in `Grep` tool. Bash calls are reviewable and capturable to `.ai-wip/<name>.log`; the built-in tool's output isn't. Ripgrep is faster and respects `.gitignore`, which matters in this monorepo. `git grep` is fine when you specifically need git's index or history. Enforcement: the built-in `Grep` tool is in `permissions.deny` (`.claude/settings.json`); the PreToolUse hook **blocks** Bash calls that invoke `grep`/`egrep`/`fgrep` (exit 2). Carve-outs for `git grep`, `man grep`, `which grep`, `type grep`, `command -v grep`, `apropos grep`, `whatis grep`, `info grep` — these are *about* grep, not invocations of it.
-
-### Work from the repo root
-Don't pass absolute paths into commands where a relative path from the current directory would do. If you need to work inside a subdirectory repeatedly, `cd` to it first. Keeps commands readable and diffable.
-
-### Coverage baseline — ratchet up only
-The `pnpm cov:check` gate compares per-file coverage against a committed `coverage-baseline.json` (ratchet — see ADR 0014). `pnpm cov:promote` (safe mode) is fine to run when nothing regresses. `pnpm cov:promote -- --allow-decrease` writes a baseline that *lowers* a file's coverage; that's a deliberate human call. The PreToolUse hook blocks AI from passing `--allow-decrease`. If a refactor genuinely needs to drop coverage, hand the command to the human.
-
-### Mini scripts: Node, written to `.ai-wip/`
-For one-shot verification / batch-transform / regex-sweep scripts, write a `.mjs` file under `.ai-wip/` and run it with `node`. Don't reach for Python — the team's primary language is TS/JS, Node is on every machine, and the script is easier to re-read and amend later. Reach for Python only if a Node equivalent would be materially harder. Never write the script to `/tmp/` (PreToolUse hook blocks it; `.ai-wip/` is the documented scratch location).
-
-### Every commit names its ticket
-Every commit must end its subject with a tracker reference: `#NNN` (GitHub) or `PROJ-NNN` (Jira/Linear). Two layers enforce this:
-
-- **commit-msg lefthook** runs commitlint's `subject-ticket-suffix` rule for everyone (humans + AI). Bypass with `git commit --no-verify` if you genuinely need to — it's a one-off, not a habit.
-- **PreToolUse hook** (`.claude/hooks/block-bash-git.sh`) blocks `git commit` without a trailer *and* blocks `--no-verify` for AI agents. So agents have no bypass at all.
-
-Open a ticket first via `./.claude/commands/create-issue.sh "<title>"` if one doesn't exist. PRs use `./.claude/commands/create-pr.sh` which appends the ticket to the title and writes `Closes #N` / `Refs PROJ-N` into the body. `bd` (beads) IDs are local-only and must NOT appear in commits or PRs.
-
-### Lock to exact versions
-All dependency versions in every `package.json` are pinned exactly (e.g. `"2.2.6"`, not `"^2.2.6"` or `"~2.2.6"`). Ranges let silent upgrades break the build between `pnpm install` runs on different machines. Upgrades happen intentionally, via a PR that bumps the pin and re-runs the full quality gate.
+- **Fail, don't skip** — when a hook/check/lint fails, fix the cause; never add an escape hatch (skip-if-missing, `--no-verify`, muting the rule, early-return). A hook you can silently skip isn't a hook.
+- **One command at a time** — don't chain Bash with `&&` or `;`; each step must be runnable and reviewable alone.
+- **Capture output for review** — prefer `cmd > .ai-wip/<name>.log 2>&1` over inline `| rg`/`| jq`, which discard the raw output. `.ai-wip/` is gitignored and survives sessions; `cat`/`tail`/`rg` the file after. Never `/tmp/` or `$TMPDIR` — the harness's own Bash-tool guidance pushes `$TMPDIR`, but this repo overrides it; the `block-bash-rules.sh` hook blocks `>` redirects to both.
+- **Search with ripgrep, never grep** — use `rg` via Bash for all searches, not POSIX `grep` or the built-in `Grep` tool. Faster, respects `.gitignore`.
+- **Work from the repo root** — don't pass absolute paths where a relative one works.
+- **Sub-repos under `repos/*`** — run `cd repos/<name> && <cmd>` as **one** Bash call. This single chained form is the sanctioned exception to "one command at a time" (a `cd` is just navigation, so it's still one real command) and the only form that works in **agent threads** — they reset cwd between Bash calls, so a bare `cd` in a prior call is lost. Keep it to one `cd` + one command: a *second* `&&`/`;`, `git -C`, and `gh --repo`/`-R` all stay blocked. Capture works inside too: `cd repos/<name> && <cmd> > .ai-wip/<name>.log 2>&1` is prompt-free. Don't capture back to root via `../../.ai-wip/…` (`repos/*` can be symlinks). See [repos/README.md](repos/README.md).
+- **Coverage baseline — ratchet up only** — `pnpm cov:check` compares per-file coverage to committed `coverage-baseline.json` (ADR 0014). `cov:promote` is fine when nothing regresses; `--allow-decrease` *lowers* a baseline and is human-only — the PreToolUse hook blocks AI from passing it.
+- **Mini scripts: Node in `.ai-wip/`** — write one-shot scripts as `.mjs` and run with `node`; don't reach for Python unless a Node equivalent is materially harder. Never `/tmp/` or `$TMPDIR`.
+- **Lock to exact versions** — pin every `package.json` dep exactly (`"2.2.6"`, not `^`/`~`). Ranges drift between installs; upgrade intentionally via a PR that bumps the pin and re-runs the gate.
+- **Every commit names its ticket** — subject must end with `#NNN` (GitHub) or `PROJ-NNN` (Jira/Linear). Enforced twice: the commit-msg lefthook (commitlint `subject-ticket-suffix`, all authors) and the `block-bash-git.sh` PreToolUse hook (blocks a missing trailer *and* `--no-verify` for AI — no bypass). Open a ticket first if none exists. `bd` IDs are local-only — never in commits or PRs.
 
 ## When in doubt
 
-- **Ask before you start.** Confirm scope and surface your assumptions before touching code on anything beyond a fully-specified one-liner. If the request leaves any real decision unspecified, ask one or two sharp questions first. Don't paper over ambiguity with a default and a comment.
+- **Ask before you start.** Confirm scope and surface your assumptions before touching code on anything beyond a fully-specified one-liner. If the request leaves any real decision unspecified, ask one or two sharp questions first.
 - **If multiple decisions are unsettled, don't drip-feed questions** — lead with `/grill-me` instead.
 - **If you're unsure mid-task, stop and check** rather than guessing. A pause to confirm is cheaper than a wrong implementation.
 - Prefer editing existing files over creating new ones.
@@ -128,4 +117,10 @@ All dependency versions in every `package.json` are pinned exactly (e.g. `"2.2.6
 
 ## Code standards
 
-Biome 2 (Ultracite preset) enforces formatting and most lint rules at edit time via the `validate-edit-biome` hook (`.claude/hooks/validate-edit-biome.sh`) — so agents do not need to re-read the full standards each session. See [docs/conventions/code-standards.md](docs/conventions/code-standards.md) for the long-form human reference (naming, architecture, edge cases Biome can't catch). Run `pnpm dlx ultracite fix` to apply, `pnpm dlx ultracite check` to verify.
+Biome 2 (Ultracite preset) enforces formatting / lint rules at edit time via the `validate-edit-biome` hook (`.claude/hooks/validate-edit-biome.sh`) — so agents do not need to re-read the full standards each session. See [docs/conventions/code-standards.md](docs/conventions/code-standards.md) for the long-form human reference (naming, architecture, edge cases Biome can't catch). Run `pnpm dlx ultracite fix` to apply, `pnpm dlx ultracite check` to verify.
+
+## Before you are done
+
+- Could it have been shorter? 50% or more less verbose and keep its value?
+- Try another pass, make it shorter/simpler/more concise
+- No, really - remove verbosity when you see it.
