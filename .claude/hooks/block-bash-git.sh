@@ -7,15 +7,30 @@
 #      issue template, labels, and body shape stay consistent.
 #   3. Direct `gh pr create` — use ./.claude/commands/create-pr.sh so the
 #      title suffix (#N) and `Closes #N` footer are guaranteed.
-#   4. `git -C <path>` — same spirit as CLAUDE.md "Work from the repo root":
-#      cd to the dir in a separate Bash call, then run plain git.
-#   5. `git commit` without a trailing ticket reference in the subject line.
+#   4. `git -C <path>` / `gh --repo` — same spirit as CLAUDE.md "Work from the
+#      repo root": cd to the dir in a separate Bash call, then run plain git.
+#   5. `git branch -d`/`-D`/`--delete` — deleting a branch is a human-only
+#      operation; the force form discards unmerged work without a prompt.
+#   6. `git commit` without a trailing ticket reference in the subject line.
 #      Accepts GitHub-style (`#123`) or Jira/Linear-style (`PROJ-123`).
 #      CLAUDE.md "Every commit names its ticket" — for AI commits, no
 #      escape hatch: if there's truly no ticket, ask the human to run the
 #      commit themselves (like --no-verify).
 
 set -euo pipefail
+
+# Hooks get a minimal PATH without Homebrew's bin; add it so rg-based checks fire.
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+# Fail closed, not open (CLAUDE.md "Fail, don't skip"): if a tool these checks
+# depend on is missing from the hook PATH, BLOCK rather than silently passing
+# commands through with the checks dead.
+for _t in rg python3 jq; do
+  command -v "$_t" >/dev/null 2>&1 || {
+    echo "🚫 block-bash-git: required tool '$_t' not on hook PATH — safety checks can't run. Install it or fix the hook PATH." >&2
+    exit 2
+  }
+done
 
 INPUT="$(cat)"
 COMMAND="$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty')"
@@ -24,20 +39,7 @@ COMMAND="$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty')"
 # commit messages mentioning blocked tokens (--no-verify, gh pr create,
 # git -C) don't false-positive. The trailing-ticket subject check below
 # uses COMMAND directly because it deliberately parses inside -m "…".
-SCRUBBED="$(CMD="$COMMAND" python3 - <<'PY'
-import os, re
-cmd = os.environ.get("CMD", "")
-cmd = re.sub(
-    r"<<-?\s*['\"]?(\w+)['\"]?[^\n]*\n.*?^\s*\1\s*$",
-    "",
-    cmd,
-    flags=re.DOTALL | re.MULTILINE,
-)
-cmd = re.sub(r"'(?:[^'\\]|\\.)*'", "", cmd)
-cmd = re.sub(r'"(?:[^"\\]|\\.)*"', "", cmd)
-print(cmd)
-PY
-)"
+SCRUBBED="$(printf '%s' "$COMMAND" | bash "$(dirname "$0")/lib/scrub-command.sh")"
 
 case "$SCRUBBED" in
   *"--no-verify"*)
@@ -110,9 +112,11 @@ esac
 
 # Match `git -C <path>` only at the start of a command (after optional
 # whitespace). Substring matching would false-positive on commit messages
-# or docs that mention "git -C". Command chaining is blocked elsewhere,
-# so any real invocation has to appear at the start.
-if printf '%s' "$SCRUBBED" | rg -q '^\s*git -C '; then
+# or docs that mention "git -C". Anchored to the start of a command segment —
+# string start OR just after a chaining operator — so the one sanctioned chain
+# (`cd repos/<x> && git -C …`, exempted by block-bash-rules) can't smuggle a
+# `git -C` past this guard. (Quoted text is already gone via SCRUBBED.)
+if [[ "$SCRUBBED" =~ (^|[&\;\|])[[:space:]]*git[[:space:]]+-C[[:space:]] ]]; then
   cat >&2 <<'EOF'
 🚫 BLOCKED: `git -C <path>` detected.
 
@@ -123,6 +127,54 @@ the implied working directory and bypasses the cwd-discipline rule.
 Two-call replacement:
   cd <path>          (one Bash call)
   git <subcommand>   (subsequent calls reuse the cwd)
+EOF
+  exit 2
+fi
+
+# `gh --repo <owner/repo>` / `gh -R <owner/repo>` — same spirit as `git -C`:
+# for a repo checked out under repos/*, cd into the local checkout and let gh
+# infer the repo from its git remote, rather than targeting it by owner/name.
+# Anchored to a `gh` at the start of a command segment (string start OR just
+# after a chaining operator, so the sanctioned `cd repos/<x> && gh …` chain
+# can't slip a `-R` past this) — docs/commit messages mentioning --repo don't
+# false-positive (and SCRUBBED has already had quoted strings stripped).
+GH_CMD_RE='(^|[&\;\|])[[:space:]]*gh([[:space:]]|$)'
+GH_FLAG_RE='(^|[[:space:]])(--repo([[:space:]]|=)|-R([[:space:]]|[A-Za-z0-9]))'
+if [[ "$SCRUBBED" =~ $GH_CMD_RE ]] && [[ "$SCRUBBED" =~ $GH_FLAG_RE ]]; then
+  cat >&2 <<'EOF'
+🚫 BLOCKED: `gh --repo` / `gh -R <owner/repo>` detected.
+
+CLAUDE.md "Work from the repo root" — cd to the directory in a separate
+Bash call, then run plain git. Don't pass paths into git via -C; it hides
+the implied working directory and bypasses the cwd-discipline rule.
+
+Two-call replacement:
+  cd <path>          (one Bash call)
+  git <subcommand>   (subsequent calls reuse the cwd)
+EOF
+  exit 2
+fi
+
+# Branch deletion is a human-only operation. `git branch -d/-D/--delete`
+# removes a ref; the force form (-D, == --delete --force) drops unmerged
+# commits with no recovery prompt and no reflog warning. settings.json
+# `permissions.deny` catches the literal `git branch -d`/`-D`/`--delete`
+# prefixes; this hook is the backstop for flag arrangements the prefix
+# matcher can't catch — the delete flag after the branch name
+# (`git branch feature -D`), combined short clusters (`git branch -rd x`),
+# or a leading `git -c ... branch`.
+#
+# First regex: the command is a `git branch` invocation (optionally
+# `git -c/-C <cfg> branch`). Second: a delete flag appears anywhere — either
+# `--delete`, or a single-dash short cluster containing d/D (-d, -D, -rd, -Dr).
+if printf '%s' "$SCRUBBED" | rg -q '(^|\s)git(\s+-[cC]\s+\S+)*\s+branch\b' \
+   && printf '%s' "$SCRUBBED" | rg -q '(^|\s)(--delete(\s|=|$)|-[a-zA-Z]*[dD][a-zA-Z]*(\s|$))'; then
+  cat >&2 <<'EOF'
+🚫 BLOCKED: `git branch -d/-D/--delete` detected.
+
+Deleting a branch is a human-only operation. 
+
+If the branch genuinely needs deleting, ask the human to run it.
 EOF
   exit 2
 fi
