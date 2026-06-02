@@ -9,7 +9,7 @@
     },
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@0.0.70"]
+      "args": ["-y", "@playwright/mcp@0.0.70", "--output-dir", ".playwright-mcp"]
     },
     "chrome-devtools": {
       "command": "npx",
