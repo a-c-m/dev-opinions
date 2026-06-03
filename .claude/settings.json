@@ -6,6 +6,7 @@
   },
   "permissions": {
     "allow": [
+      "Bash(find:*)",
       "Bash(pnpm install:*)",
       "Bash(pnpm add:*)",
       "Bash(pnpm remove:*)",
@@ -34,6 +35,8 @@
       "Bash(git log:*)",
       "Bash(git branch:*)",
       "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git ls-tree:*)",
       "Bash(git fetch:*)",
       "Bash(git remote -v)",
       "Bash(gh pr:*)",
@@ -60,7 +63,8 @@
       "mcp__playwright__browser_close",
       "mcp__playwright__browser_select_option",
       "mcp__playwright__browser_snapshot",
-      "mcp__atlassian__getJiraIssue"
+      "mcp__atlassian__getJiraIssue",
+      "mcp__atlassian__getAccessibleAtlassianResources"
     ],
     "deny": [
       "Bash(rm -rf:*)",
