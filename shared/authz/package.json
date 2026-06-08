@@ -49,9 +49,9 @@
     }
   },
   "devDependencies": {
-    "@nestjs/common": "11.1.24",
-    "@nestjs/core": "11.1.24",
-    "@vitest/coverage-v8": "4.1.7",
-    "vitest": "4.1.7"
+    "@nestjs/common": "11.1.25",
+    "@nestjs/core": "11.1.25",
+    "@vitest/coverage-v8": "4.1.8",
+    "vitest": "4.1.8"
   }
 }
