@@ -1,4 +1,5 @@
 node_modules/
+.pnpm-store/
 dist/
 build/
 **/coverage/*
@@ -32,6 +33,7 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+.playwright-mcp/
 
 # beads — local task manager, wired via .claude/skills/beads-local-tasks.md
 # State is intentionally local-only (user convention); team tasks live on GitHub Issues.

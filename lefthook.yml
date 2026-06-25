@@ -1,3 +1,10 @@
+# Quiet by default: print only failures and their output. The version boxes
+# (meta), per-step ✔️ lines (success/summary), full execution dumps
+# (execution_out), and skip notices otherwise burn a lot of tokens — especially
+# in agent sessions. Failures still print in full. To temporarily see more:
+# LEFTHOOK_OUTPUT=meta,summary,success,execution_out git commit ...
+output: false
+
 pre-commit:
   parallel: true
   commands:

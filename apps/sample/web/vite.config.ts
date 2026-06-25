@@ -27,7 +27,7 @@ function envInjectionGuard(examplePath: string): Plugin {
     apply: "build",
     generateBundle(_options, bundle) {
       const html = bundle["index.html"];
-      if (!html || html.type !== "asset") {
+      if (html?.type !== "asset") {
         throw new Error("[env-injection-guard] index.html missing from bundle");
       }
       if (!String(html.source).includes("import_meta_env_placeholder")) {

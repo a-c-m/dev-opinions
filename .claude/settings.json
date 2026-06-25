@@ -1,7 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "NPM_CONFIG_GLOBALCONFIG": "/dev/null",
+    "NX_TUI": "false"
+  },
   "permissions": {
     "allow": [
+      "Bash(find:*)",
       "Bash(pnpm install:*)",
       "Bash(pnpm add:*)",
       "Bash(pnpm remove:*)",
@@ -14,30 +19,52 @@
       "Bash(pnpm knip:*)",
       "Bash(pnpm check:*)",
       "Bash(pnpm commit:*)",
-      "Bash(pnpm security *)",
+      "Bash(pnpm security:*)",
       "Bash(pnpm exec:*)",
-      "Bash(pnpm view *)",
-      "Bash(pnpm help *)",
-      "Bash(pnpm scripts:help *)",
+      "Bash(pnpm view:*)",
+      "Bash(pnpm help:*)",
+      "Bash(pnpm scripts:help:*)",
       "Bash(pnpm nx:*)",
       "Bash(pnpm --version)",
+      "Bash(corepack enable:*)",
       "Bash(nx:*)",
-      "Bash(git status)",
+      "Bash(git status:*)",
+      "Bash(git show:*)",
       "Bash(git diff:*)",
+      "Bash(git --no-pager diff:*)",
       "Bash(git log:*)",
+      "Bash(git branch:*)",
       "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git fetch:*)",
+      "Bash(git remote -v)",
       "Bash(gh pr:*)",
       "Bash(gh issue:*)",
-      "Bash(ls:*)",
       "Bash(./.claude/commands/check.sh)",
       "Bash(./.claude/commands/create-issue.sh:*)",
       "Bash(./.claude/commands/create-pr.sh:*)",
+      "Bash(mkdir -p .ai-wip)",
+      "Bash(./scripts/setup-mac.sh:*)",
       "Bash(bd:*)",
+      "Bash(rg:*)",
+      "Bash(ls:*)",
+      "Bash(node .ai-wip/*)",
+      "Bash(cd repos/*)",
+      "Bash(cd ./repos/*)",
       "Bash(echo \"exit=$?\")",
       "Bash(echo \"$?\")",
-      "Bash(rg:*)",
-      "Bash(node .ai-wip/*)",
-      "Bash(./scripts/setup-mac.sh:*)"
+      "Bash(git remote:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_select_option",
+      "mcp__playwright__browser_snapshot",
+      "mcp__atlassian__getJiraIssue",
+      "mcp__atlassian__getAccessibleAtlassianResources"
     ],
     "deny": [
       "Bash(rm -rf:*)",
@@ -60,7 +87,16 @@
       "Bash(git checkout -- .:*)",
       "Bash(git restore .:*)",
       "Bash(git restore -- .:*)",
+      "Bash(git branch -d:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git branch --delete:*)",
+      "Read(.env)",
+      "Read(**/.env)",
+      "Read(**/.env.local)",
       "Grep"
+    ],
+    "additionalDirectories": [
+      "/Users/alexmcfadyen/dev/claude-playground/github/billing/.ai-wip"
     ]
   },
   "hooks": {
@@ -70,11 +106,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/validate-edit-biome.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/validate-edit-biome.sh\""
           },
           {
             "type": "command",
-            "command": "./.claude/hooks/validate-edit-no-wait.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/validate-edit-no-wait.sh\""
           }
         ]
       },
@@ -83,15 +119,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/block-bash-git.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/block-bash-git.sh\""
           },
           {
             "type": "command",
-            "command": "./.claude/hooks/block-bash-biome.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/block-bash-biome.sh\""
           },
           {
             "type": "command",
-            "command": "./.claude/hooks/block-bash-rules.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/block-bash-rules.sh\""
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/allow-bash-capture.sh\""
           }
         ]
       }
@@ -102,7 +142,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/notify-edit-biome.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/notify-edit-biome.sh\""
           }
         ]
       },
@@ -111,7 +151,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/notify-bash-commit.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/notify-bash-commit.sh\""
           }
         ]
       }
@@ -121,10 +161,61 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/hooks/bootstrap-session-beads.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/bootstrap-session-beads.sh\""
           }
         ]
       }
     ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false,
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "codeload.github.com",
+        "objects.githubusercontent.com",
+        "registry.npmjs.org"
+      ]
+    },
+    "filesystem": {
+      "denyRead": [
+        "~/.config",
+        "~/.aws",
+        "~/.azure",
+        "~/.oci",
+        "~/.docker",
+        "~/.kube",
+        "~/.vault-token",
+        "~/.password-store",
+        "~/.netrc",
+        "~/.git-credentials",
+        "~/.authinfo",
+        "~/.gnupg",
+        "~/.npmrc",
+        "~/.yarnrc.yml",
+        "~/.pypirc",
+        "~/.cargo/credentials.toml",
+        "~/.gem/credentials",
+        "~/.m2/settings.xml",
+        "~/.composer/auth.json",
+        "~/.terraform.d",
+        "~/.terraformrc",
+        "~/.pulumi",
+        "~/.zsh_history",
+        "~/.bash_history",
+        "~/.zshrc",
+        "~/.zshenv",
+        "~/.zprofile",
+        "~/.bashrc",
+        "~/.bash_profile",
+        "~/.profile",
+        "~/.envrc",
+        "~/Library/Keychains"
+      ],
+      "allowRead": ["~/.config/git"]
+    },
+    "excludedCommands": ["gh", "gh *"]
   }
 }

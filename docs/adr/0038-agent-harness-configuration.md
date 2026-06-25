@@ -35,7 +35,7 @@ The two ADRs are complementary, not stacked:
 
 Per-directory inventory and conventions live in [`.claude/README.md`](../../.claude/README.md) and [`.claude/hooks/README.md`](../../.claude/hooks/README.md). This ADR explains the *shape* and *why*; the READMEs stay current with the *what*.
 
-### Hook philosophy — four tiers, all fail-don't-skip
+### Hook philosophy — five tiers, all fail-don't-skip
 
 Hooks split by *what they protect*, not by which tool triggers them. Filename prefix encodes the tier, so `ls .claude/hooks/` reads as a topology:
 
@@ -43,12 +43,15 @@ Hooks split by *what they protect*, not by which tool triggers them. Filename pr
 |--------|-----------|-----------|
 | `validate-edit-*` | PreToolUse Edit\|Write | Content validator — blocks if proposed content fails the check. Runs against the *simulated post-edit file* via stdin, so the check acts on content being written, not stale on-disk content. |
 | `block-bash-*` | PreToolUse Bash | Command guard — refuses Bash calls that would silently undo other guardrails (`--no-verify`, `bs update`, `--unsafe`, `gh issue create` bypassing the wrapper, bare `grep`, `coverage-baseline --allow-decrease`, command chaining, absolute repo paths). |
+| `allow-bash-*` | PreToolUse Bash | Command auto-approver — emits an `allow` decision so a narrowly-scoped, known-safe Bash call skips the permission prompt (today: capturing an already-allowlisted command's output to `.ai-wip/`, which the permission engine otherwise prompts on because the redirect is an ungranted file-write). Adds no run-trust the allowlist didn't already grant. |
 | `notify-*-*` | PostToolUse | Advisory only — emits a warning to stderr, exits 0. Catches what PreToolUse couldn't inspect (e.g., a commit subject coming from `$EDITOR`). |
 | `bootstrap-session-*` | SessionStart | Runs once per session to prime context (today: surface ready beads). |
 
 Hooks fail by exiting non-zero with a clear stderr message. None carry an escape hatch (no "skip if missing", no `|| true`). If a hook can't run because a tool is missing, that's a setup problem to fix, not a condition to swallow.
 
 **Carve-out for `bootstrap-session-*`:** session bootstrappers are *context primers*, not guards. When their input isn't present (e.g. `bootstrap-session-beads.sh` and no `.beads/` directory because beads isn't used in this repo), they exit 0 silently — there is nothing to prime, so nothing to surface. This is not an escape hatch on a guard; the guard tiers (`validate-edit-*`, `block-bash-*`) still fail-don't-skip.
+
+**Carve-out for `allow-bash-*`:** auto-approvers fail-don't-skip in the *opposite direction*. A guard's safe failure is to block; an auto-approver's safe failure is to **grant nothing** — so on any missing tool, error, or unmet condition it exits 0 with no decision, deferring to the normal permission prompt. It can only ever *add* an `allow`; a `deny`/exit-2 from any guard tier still wins (deny-first precedence), so an auto-approver can never widen what a guard blocks.
 
 New hook? Pick the tier matching its lifecycle moment; name `<tier>-<surface>-<concern>.sh`. If no existing tier fits, that's an ADR amendment, not a naming exception.
 
