@@ -79,13 +79,13 @@ jobs:
 
       - name: Configure AWS credentials via OIDC
         if: env.AWS_ROLE != ''
-        uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6
+        uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b # v6
         with:
           role-to-assume: ${{ env.AWS_ROLE }}
           aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
 
       - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@847eaa4afeb791b06daa46e8eafa8b1b68d7cfb4 # v2
+        uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2
         with:
           tofu_version: ${{ inputs.tofu-version }}
 
